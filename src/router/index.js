@@ -11,6 +11,7 @@ import componentsRouter from './modules/components'
 import chartsRouter from './modules/charts'
 import tableRouter from './modules/table'
 import nestedRouter from './modules/nested'
+import pageRouter from './modules/page'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -73,14 +74,16 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
+    redirect: '/order-manage',
     children: [
       {
         path: 'dashboard',
         component: () => import('@/views/dashboard/index'),
+        hidden: true,
         name: 'Dashboard',
         meta: { title: 'Dashboard', icon: 'dashboard', affix: true }
-      }
+      },
+      ...pageRouter
     ]
   },
   {
@@ -90,6 +93,7 @@ export const constantRoutes = [
       {
         path: 'index',
         component: () => import('@/views/documentation/index'),
+        hidden: true,
         name: 'Documentation',
         meta: { title: 'Documentation', icon: 'documentation', affix: true }
       }
@@ -103,6 +107,7 @@ export const constantRoutes = [
       {
         path: 'index',
         component: () => import('@/views/guide/index'),
+        hidden: true,
         name: 'Guide',
         meta: { title: 'Guide', icon: 'guide', noCache: true }
       }
