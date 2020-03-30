@@ -21,6 +21,10 @@ service.interceptors.request.use(
       // please modify it according to the actual situation
       config.headers['X-Token'] = getToken()
     }
+    if (config.url.indexOf('/services/wine') > -1) {
+      config.headers['Content-Type'] = 'text/plain'
+      config.data = JSON.stringify(config.data)
+    }
     return config
   },
   error => {
@@ -46,7 +50,7 @@ service.interceptors.response.use(
     const res = response.data
 
     // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== 20000) {
+    if (res.code !== 20000 && res.header.resCode !== '0000') {
       Message({
         message: res.message || 'Error',
         type: 'error',

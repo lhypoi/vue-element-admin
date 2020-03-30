@@ -42,7 +42,6 @@
         @click="handleDownload"
       >导出为Excel</el-button>
     </div>
-
     <el-table
       :key="tableKey"
       v-loading="listLoading"
@@ -53,99 +52,14 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
-      <el-table-column
-        label="ID"
-        prop="id"
-        sortable="custom"
-        align="center"
-        width="80"
-        :class-name="getSortClass('id')"
-      >
-        <template slot-scope="{row}">
-          <span>{{ row.id }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="Date" width="150px" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="Title" min-width="150px">
-        <template slot-scope="{row}">
-          <span class="link-type" @click="handleUpdate(row)">{{ row.title }}</span>
-          <el-tag>{{ row.type | typeFilter }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="Author" width="110px" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.author }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column v-if="showReviewer" label="Reviewer" width="110px" align="center">
-        <template slot-scope="{row}">
-          <span style="color:red;">{{ row.reviewer }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="Imp" width="80px">
-        <template slot-scope="{row}">
-          <svg-icon
-            v-for="n in + row.importance"
-            :key="n"
-            icon-class="star"
-            class="meta-item__icon"
-          />
-        </template>
-      </el-table-column>
-      <el-table-column label="Readings" align="center" width="95">
-        <template slot-scope="{row}">
-          <span
-            v-if="row.pageviews"
-            class="link-type"
-            @click="handleFetchPv(row.pageviews)"
-          >{{ row.pageviews }}</span>
-          <span v-else>0</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="Status" class-name="status-col" width="100">
-        <template slot-scope="{row}">
-          <el-tag :type="row.status | statusFilter">{{ row.status }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column
-        label="Actions"
-        align="center"
-        width="230"
-        class-name="small-padding fixed-width"
-      >
-        <template slot-scope="{row,$index}">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">Edit</el-button>
-          <el-button
-            v-if="row.status!='published'"
-            size="mini"
-            type="success"
-            @click="handleModifyStatus(row,'published')"
-          >Publish</el-button>
-          <el-button
-            v-if="row.status!='draft'"
-            size="mini"
-            @click="handleModifyStatus(row,'draft')"
-          >Draft</el-button>
-          <el-button
-            v-if="row.status!='deleted'"
-            size="mini"
-            type="danger"
-            @click="handleDelete(row,$index)"
-          >Delete</el-button>
-        </template>
-      </el-table-column>
+      <el-table-column v-for="col in columns" :key="col.key" :label="col.label" :prop="col.key" />
     </el-table>
-
     <pagination
       v-show="total>0"
       :total="total"
       :page.sync="listQuery.page"
       :limit.sync="listQuery.limit"
-      @pagination="getList"
+      @pagination="getList(listQuery.page, listQuery.limit)"
     />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
@@ -219,11 +133,13 @@
 
 <script>
 import {
-  fetchList,
   fetchPv,
   createArticle,
   updateArticle
 } from '@/api/article'
+import {
+  orderManage
+} from '@/api/order'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -298,13 +214,9 @@ export default {
       listQuery: {
         page: 1,
         limit: 30,
-        importance: undefined,
-        title: undefined,
-        type: undefined,
-        wxId: undefined,
-        orderId: undefined,
-        time: undefined,
-        sort: '+id'
+        wxId: '',
+        orderId: '',
+        time: []
       },
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
@@ -347,18 +259,31 @@ export default {
           { required: true, message: 'title is required', trigger: 'blur' }
         ]
       },
-      downloadLoading: false
+      downloadLoading: false,
+      columns: []
     }
   },
   created() {
-    this.getList()
+    this.getList(1, 30)
   },
   methods: {
-    getList() {
+    getList(page, limit) {
       this.listLoading = true
-      fetchList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
+      this.listQuery.page = page
+      this.listQuery.limit = limit
+      console.log(this.listQuery)
+      orderManage({
+        'userId': this.listQuery.wxId || undefined,
+        'orderId': this.listQuery.orderId || undefined,
+        'startIndex': this.listQuery.page,
+        'pageSize': this.listQuery.limit,
+        'startTime': this.listQuery.time[0] ? new Date(this.listQuery.time[0]).getTime() : undefined,
+        'endTime': this.listQuery.time[1] ? new Date(this.listQuery.time[1]).getTime() : undefined
+      }).then(response => {
+        const data = response.body
+        this.columns = data.columns.filter(col => data.hideTitle.indexOf(col.key) === -1)
+        this.list = data.orderList
+        this.total = data.totalCount
 
         // Just to simulate the time of the request
         setTimeout(() => {
@@ -367,8 +292,7 @@ export default {
       })
     },
     handleFilter() {
-      this.listQuery.page = 1
-      this.getList()
+      this.getList(1, 30)
     },
     handleModifyStatus(row, status) {
       this.$message({
@@ -474,19 +398,13 @@ export default {
     handleDownload() {
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['timestamp', 'title', 'type', 'importance', 'status']
-        const filterVal = [
-          'timestamp',
-          'title',
-          'type',
-          'importance',
-          'status'
-        ]
+        const tHeader = this.columns.map(({ label }) => label)
+        const filterVal = this.columns.map(({ key }) => key)
         const data = this.formatJson(filterVal)
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: 'table-list'
+          filename: '订单'
         })
         this.downloadLoading = false
       })

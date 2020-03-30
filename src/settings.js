@@ -5,7 +5,7 @@ module.exports = {
    * @type {boolean} true | false
    * @description Whether show the settings right-panel
    */
-  showSettings: true,
+  showSettings: process.env.NODE_ENV === 'development',
 
   /**
    * @type {boolean} true | false
