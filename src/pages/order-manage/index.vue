@@ -50,9 +50,33 @@
       fit
       highlight-current-row
       style="width: 100%;"
+      height="calc(100vh - 50px - 40px - 96px - 56px - 30px)"
       @sort-change="sortChange"
     >
-      <el-table-column v-for="col in columns" :key="col.key" :label="col.label" :prop="col.key" />
+      <el-table-column v-for="col in columns" :key="col.key" :label="col.label" :prop="col.key" :width="col.key === 'wineNameList' ? 200 : col.key === 'addressLabel' ? '' : 100" :fixed="col.fixed">
+        <template slot-scope="scope">
+          <div v-if="col.key === 'wineNameList'">
+            <el-card v-for="wine in scope.row[col.key]" :key="wine.wineId">
+              <span>名称：</span><span>{{ wine.wineName }}</span>
+              <el-divider class="divider" />
+              <span>规格：</span><span>{{ wine.volume }}</span>
+              <el-divider class="divider" />
+              <span>价格：</span><span>{{ wine.price }}</span>
+              <el-divider class="divider" />
+              <span>数量：</span><span>{{ wine.count }}</span>
+              <el-divider class="divider" />
+            </el-card>
+          </div>
+          <div v-else-if="col.key === 'operation'">
+            <el-button type="success" @click="sendGood(scope.row)">发货</el-button>
+            <br>
+            <el-button type="danger" style="margin-top: 5px" @click="sendGood2(scope.row)">收货</el-button>
+          </div>
+          <span v-else>
+            {{ scope.row[col.key] }}
+          </span>
+        </template>
+      </el-table-column>
     </el-table>
     <pagination
       v-show="total>0"
@@ -61,6 +85,41 @@
       :limit.sync="listQuery.limit"
       @pagination="getList(listQuery.page, listQuery.limit)"
     />
+
+    <!-- 发货 -->
+    <el-dialog
+      title="物流信息"
+      :visible.sync="dialogVisible"
+      width="30%"
+    >
+      <el-form
+        :model="sendInfo"
+        label-width="80px"
+      >
+        <el-form-item label="物流公司" prop="company">
+          <el-input v-model="sendInfo.company" />
+        </el-form-item>
+        <el-form-item label="物流单号" prop="sendNumber">
+          <el-input v-model="sendInfo.sendNumber" />
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" :loading="updateSend" @click="confirmSend">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- 收货 -->
+    <el-dialog
+      title="确定收货？"
+      :visible.sync="dialogVisible2"
+      width="30%"
+    >
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible2 = false">取 消</el-button>
+        <el-button type="primary" :loading="updateSend" @click="confirmSend2">确 定</el-button>
+      </span>
+    </el-dialog>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form
@@ -138,7 +197,7 @@ import {
   updateArticle
 } from '@/api/article'
 import {
-  orderManage
+  orderManage, updateSendState
 } from '@/api/order'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
@@ -260,7 +319,16 @@ export default {
         ]
       },
       downloadLoading: false,
-      columns: []
+      columns: [],
+      dialogVisible: false,
+      dialogVisible2: false,
+      sendInfo: {
+        'orderId': '',
+        'state': '',
+        'company': '',
+        'sendNumber': ''
+      },
+      updateSend: false
     }
   },
   created() {
@@ -281,7 +349,13 @@ export default {
         'endTime': this.listQuery.time[1] ? new Date(this.listQuery.time[1]).getTime() : undefined
       }).then(response => {
         const data = response.body
-        this.columns = data.columns.filter(col => data.hideTitle.indexOf(col.key) === -1)
+        const columns = data.columns.filter(col => data.hideTitle.indexOf(col.key) === -1)
+        columns.push({
+          label: '操作',
+          fixed: 'right',
+          key: 'operation'
+        })
+        this.columns = columns
         this.list = data.orderList
         this.total = data.totalCount
 
@@ -423,7 +497,73 @@ export default {
     getSortClass: function(key) {
       const sort = this.listQuery.sort
       return sort === `+${key}` ? 'ascending' : 'descending'
+    },
+    sendGood(row) {
+      this.sendInfo.orderId = row.orderId
+      this.sendInfo.state = '1'
+      this.dialogVisible = true
+    },
+    sendGood2(row) {
+      this.sendInfo.orderId = row.orderId
+      this.sendInfo.state = '2'
+      this.sendInfo.company = ''
+      this.sendInfo.sendNumber = ''
+      this.dialogVisible2 = true
+    },
+    confirmSend() {
+      if (this.sendInfo.company.trim() && this.sendInfo.sendNumber.trim()) {
+        this.updateSend = true
+        updateSendState(this.sendInfo).then(res => {
+          this.updateSend = false
+          this.dialogVisible = false
+          if (res.header.resCode === '0000') {
+            this.$message({
+              message: '发货成功',
+              type: 'success',
+              duration: 1500
+            })
+          } else {
+            this.$message({
+              message: '发货失败：' + res.header.resMessage,
+              type: 'error',
+              duration: 1500
+            })
+          }
+        })
+      } else {
+        this.$message({
+          message: '请填写物流信息',
+          type: 'error',
+          duration: 1500
+        })
+      }
+    },
+    confirmSend2() {
+      this.updateSend = true
+      updateSendState(this.sendInfo).then(res => {
+        this.updateSend = false
+        this.dialogVisible2 = false
+        if (res.header.resCode === '0000') {
+          this.$message({
+            message: '收货成功',
+            type: 'success',
+            duration: 1500
+          })
+        } else {
+          this.$message({
+            message: '收货失败：' + res.header.resMessage,
+            type: 'error',
+            duration: 1500
+          })
+        }
+      })
     }
+
   }
 }
 </script>
+<style lang="scss" scoped>
+  .divider {
+    margin: 5px 0;
+  }
+</style>

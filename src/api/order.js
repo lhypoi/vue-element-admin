@@ -13,3 +13,17 @@ export function orderManage(query) {
     }
   })
 }
+
+export function updateSendState(query) {
+  return request({
+    url: '/services/wine',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'updateSendState',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
