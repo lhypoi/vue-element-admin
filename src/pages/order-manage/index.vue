@@ -2,8 +2,8 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input
-        v-model="listQuery.wxId"
-        placeholder="微信ID"
+        v-model="listQuery.mobile"
+        placeholder="手机号"
         style="width: 200px;"
         class="filter-item"
         @keyup.enter.native="handleFilter"
@@ -53,7 +53,7 @@
       height="calc(100vh - 50px - 40px - 96px - 56px - 30px)"
       @sort-change="sortChange"
     >
-      <el-table-column v-for="col in columns" :key="col.key" :label="col.label" :prop="col.key" :width="col.key === 'wineNameList' ? 200 : col.key === 'addressLabel' ? '' : 100" :fixed="col.fixed">
+      <el-table-column v-for="col in columns" :key="col.key" :label="col.label" :prop="col.key" :width="col.key === 'wineNameList' ? 200 : col.key === 'addressLabel' ? '' : 120" :fixed="col.fixed">
         <template slot-scope="scope">
           <div v-if="col.key === 'wineNameList'">
             <el-card v-for="wine in scope.row[col.key]" :key="wine.wineId">
@@ -68,9 +68,9 @@
             </el-card>
           </div>
           <div v-else-if="col.key === 'operation'">
-            <el-button type="success" @click="sendGood(scope.row)">发货</el-button>
+            <el-button type="success" :disabled="scope.row.sendStatus != '0'" @click="sendGood(scope.row)">发货通知</el-button>
             <br>
-            <el-button type="danger" style="margin-top: 5px" @click="sendGood2(scope.row)">收货</el-button>
+            <el-button type="danger" style="margin-top: 5px" :disabled="scope.row.sendStatus != '1'" @click="sendGood2(scope.row)">到货通知</el-button>
           </div>
           <span v-else>
             {{ scope.row[col.key] }}
@@ -273,7 +273,7 @@ export default {
       listQuery: {
         page: 1,
         limit: 30,
-        wxId: '',
+        mobile: '',
         orderId: '',
         time: []
       },
@@ -328,6 +328,7 @@ export default {
         'company': '',
         'sendNumber': ''
       },
+      handleRow: null,
       updateSend: false
     }
   },
@@ -341,7 +342,7 @@ export default {
       this.listQuery.limit = limit
       console.log(this.listQuery)
       orderManage({
-        'userId': this.listQuery.wxId || undefined,
+        'mobile': this.listQuery.mobile || undefined,
         'orderId': this.listQuery.orderId || undefined,
         'startIndex': this.listQuery.page,
         'pageSize': this.listQuery.limit,
@@ -357,6 +358,7 @@ export default {
         })
         this.columns = columns
         this.list = data.orderList
+        console.log(data.orderList.map(({ is_send, id }) => id + ': ' + is_send).join('-'))
         this.total = data.totalCount
 
         // Just to simulate the time of the request
@@ -472,9 +474,10 @@ export default {
     handleDownload() {
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = this.columns.map(({ label }) => label)
-        const filterVal = this.columns.map(({ key }) => key)
+        const tHeader = this.columns.filter(col => col.key !== 'wineNameList' && col.key !== 'operation').map(({ label }) => label).concat('商品明细')
+        const filterVal = this.columns.filter(col => col.key !== 'wineNameList' && col.key !== 'operation').map(({ key }) => key)
         const data = this.formatJson(filterVal)
+        console.log(tHeader, data)
         excel.export_json_to_excel({
           header: tHeader,
           data,
@@ -491,7 +494,7 @@ export default {
           } else {
             return v[j]
           }
-        })
+        }).concat(v['wineNameList'].map(wine => JSON.stringify(wine)))
       )
     },
     getSortClass: function(key) {
@@ -502,13 +505,16 @@ export default {
       this.sendInfo.orderId = row.orderId
       this.sendInfo.state = '1'
       this.dialogVisible = true
+      this.handleRow = row
     },
     sendGood2(row) {
+      row.disable = true
       this.sendInfo.orderId = row.orderId
       this.sendInfo.state = '2'
       this.sendInfo.company = ''
       this.sendInfo.sendNumber = ''
       this.dialogVisible2 = true
+      this.handleRow = row
     },
     confirmSend() {
       if (this.sendInfo.company.trim() && this.sendInfo.sendNumber.trim()) {
@@ -522,6 +528,7 @@ export default {
               type: 'success',
               duration: 1500
             })
+            this.handleRow.sendStatus = '1'
           } else {
             this.$message({
               message: '发货失败：' + res.header.resMessage,
@@ -549,6 +556,7 @@ export default {
             type: 'success',
             duration: 1500
           })
+          this.handleRow.sendStatus = '2'
         } else {
           this.$message({
             message: '收货失败：' + res.header.resMessage,
