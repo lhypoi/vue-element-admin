@@ -53,7 +53,7 @@
       height="calc(100vh - 50px - 40px - 96px - 56px - 30px)"
       @sort-change="sortChange"
     >
-      <el-table-column v-for="col in columns" :key="col.key" :label="col.label" :prop="col.key" :width="col.key === 'wineNameList' ? 200 : col.key === 'addressLabel' ? '' : 120" :fixed="col.fixed">
+      <el-table-column v-for="col in columns" :key="col.key" :label="col.label" :prop="col.key" :width="col.key === 'wineNameList' ? 200 : col.key === 'addressLabel' ? '' : col.key === 'index' ? 50 : 120" :fixed="col.fixed">
         <template slot-scope="scope">
           <div v-if="col.key === 'wineNameList'">
             <el-card v-for="wine in scope.row[col.key]" :key="wine.wineId">
@@ -71,6 +71,15 @@
             <el-button type="success" :disabled="scope.row.sendStatus != '0'" @click="sendGood(scope.row)">发货通知</el-button>
             <br>
             <el-button type="danger" style="margin-top: 5px" :disabled="scope.row.sendStatus != '1'" @click="sendGood2(scope.row)">到货通知</el-button>
+          </div>
+          <div v-else-if="col.key === 'isPay'">
+            <span>{{ scope.row.isPay === "1" ? "已支付" : ( scope.row.isPay === "2" ? "待支付" : ( scope.row.isPay === "3" ? "已过期" : "") ) }}</span>
+          </div>
+          <div v-else-if="col.key === 'sendStatus'">
+            <span>{{ scope.row.sendStatus === "0" ? "未发货" : ( scope.row.sendStatus === "1" ? "已发货" : ( scope.row.sendStatus === "2" ? "已收货" : "") ) }}</span>
+          </div>
+          <div v-else-if="col.key === 'index'">
+            <span>{{ scope.$index + 1 + ( listQuery.page - 1 ) * listQuery.limit }}</span>
           </div>
           <span v-else>
             {{ scope.row[col.key] }}
@@ -340,7 +349,6 @@ export default {
       this.listLoading = true
       this.listQuery.page = page
       this.listQuery.limit = limit
-      console.log(this.listQuery)
       orderManage({
         'mobile': this.listQuery.mobile || undefined,
         'orderId': this.listQuery.orderId || undefined,
@@ -350,15 +358,20 @@ export default {
         'endTime': this.listQuery.time[1] ? new Date(this.listQuery.time[1]).getTime() : undefined
       }).then(response => {
         const data = response.body
+        data.hideTitle = data.hideTitle.concat('id')
         const columns = data.columns.filter(col => data.hideTitle.indexOf(col.key) === -1)
         columns.push({
           label: '操作',
           fixed: 'right',
           key: 'operation'
         })
+        columns.unshift({
+          label: '序号',
+          fixed: 'left',
+          key: 'index'
+        })
         this.columns = columns
         this.list = data.orderList
-        console.log(data.orderList.map(({ is_send, id }) => id + ': ' + is_send).join('-'))
         this.total = data.totalCount
 
         // Just to simulate the time of the request
@@ -477,7 +490,6 @@ export default {
         const tHeader = this.columns.filter(col => col.key !== 'wineNameList' && col.key !== 'operation').map(({ label }) => label).concat('商品明细')
         const filterVal = this.columns.filter(col => col.key !== 'wineNameList' && col.key !== 'operation').map(({ key }) => key)
         const data = this.formatJson(filterVal)
-        console.log(tHeader, data)
         excel.export_json_to_excel({
           header: tHeader,
           data,
