@@ -27,3 +27,29 @@ export function updateSendState(query) {
     }
   })
 }
+
+export function getAreaList(query) {
+  return request({
+    url: '/services/wine',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'getAreaList',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
+
+export function uploadWine(query) {
+  return request({
+    url: '/services/uploadWine',
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    data: query
+  })
+}
+

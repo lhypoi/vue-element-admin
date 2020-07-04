@@ -82,10 +82,10 @@ export const constantRoutes = [
         hidden: true,
         name: 'Dashboard',
         meta: { title: 'Dashboard', icon: 'dashboard', affix: true }
-      },
-      ...pageRouter
+      }
     ]
   },
+  ...pageRouter,
   {
     path: '/documentation',
     component: Layout,

@@ -39,12 +39,20 @@ module.exports = {
     before: require('./mock/mock-server.js'),
     proxy: {
       [process.env.VUE_APP_BASE_API + '/services/wine']: {
-          target: 'https://api.xxinshi.com/services/wine',
-          changeOrigin: true,
-          ws: true,
-          pathRewrite: {
-            [process.env.VUE_APP_BASE_API + '/services/wine']: ''
-          }
+        target: 'https://api.xxinshi.com/services/wine',
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          [process.env.VUE_APP_BASE_API + '/services/wine']: ''
+        }
+      },
+      [process.env.VUE_APP_BASE_API + '/services/uploadWine']: {
+        target: 'https://api.xxinshi.com/services/uploadWine',
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          [process.env.VUE_APP_BASE_API + '/services/uploadWine']: ''
+        }
       }
     }
   },
