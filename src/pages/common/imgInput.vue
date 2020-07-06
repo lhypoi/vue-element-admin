@@ -51,6 +51,7 @@ export default {
         this.fileList = fileList.slice(-1)
       }
       this.$emit('change', fileList)
+      console.log(fileList)
     }
   }
 }

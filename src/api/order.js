@@ -53,3 +53,44 @@ export function uploadWine(query) {
   })
 }
 
+export function getAllWineListByPage(query) {
+  return request({
+    url: '/services/wine',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'getAllWineListByPage',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
+
+export function getWineDetail(query) {
+  return request({
+    url: '/services/wine',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'getWineDetail',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
+
+export function updateWine(query) {
+  return request({
+    url: '/services/wine',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'updateWine',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}

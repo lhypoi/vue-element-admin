@@ -12,6 +12,7 @@
         v-model="listQuery.area"
         style="width: 200px;"
         class="filter-item"
+        placeholder="选择模块"
       >
         <el-option v-for="item in areaList" :key="item.id" :value="item.id" :label="item.areaName" />
       </el-select>
@@ -61,8 +62,8 @@
             </el-card>
           </div>
           <div v-else-if="col.key === 'operation'">
-            <el-button type="success" @click="handleUp">上架</el-button>
-            <el-button type="danger" style="margin-left: 5px" @click="handleDown">下架</el-button>
+            <el-button type="success" :disabled="scope.row.isShow === '1'" @click="handleUp(scope.row)">上架</el-button>
+            <el-button type="danger" :disabled="scope.row.isShow === '0'" style="margin-left: 5px" @click="handleDown(row)">下架</el-button>
             <el-button type="success" style="margin-left: 5px" @click="handleShowInfo(scope.row)">详情</el-button>
           </div>
           <div v-else-if="col.key === 'isPay'">
@@ -87,7 +88,7 @@
     />
     <!-- 酒信息 -->
     <el-dialog :visible.sync="dialogVisible" width="60%" title="物品信息">
-      <el-form :model="wineInfo" label-width="150px">
+      <el-form v-loading="updateSend" :model="wineInfo" label-width="150px">
         <el-form-item label="选择上架板块" prop="areaType">
           <el-select v-model="wineInfo.areaType">
             <el-option v-for="item in areaList" :key="item.id" :value="item.id" :label="item.areaName" />
@@ -104,8 +105,8 @@
         </el-form-item>
         <el-row v-for="(type, index) in wineInfo.wineTypeList" :key="index">
           <el-col :span="8">
-            <el-form-item :label="`输入${index === 0 ? '默认' : ''}规格名称`" prop="volumn">
-              <el-input v-model="type.volumn" />
+            <el-form-item :label="`输入${index === 0 ? '默认' : ''}规格名称`" prop="volume">
+              <el-input v-model="type.volume" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -150,7 +151,7 @@
             class="el-icon-circle-plus"
             style="font-size: 20px; cursor: pointer;"
             @click="() => {
-              wineInfo.wineTypeList.push({ volumn: null, price: null, stock: null, time: null, salePrice: null })
+              wineInfo.wineTypeList.push({ volume: null, price: null, stock: null, time: null, salePrice: null })
             }"
           >&nbsp;添加规格</i>
         </el-form-item>
@@ -171,8 +172,8 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="danger" @click="handleDele">删 除</el-button>
-        <el-button type="primary" :loading="updateSend" @click="confirmSend">{{ curRow ? '修 改' : '上 架' }}</el-button>
+        <!-- <el-button v-if="curRowId" type="danger" @click="handleDele">删 除</el-button> -->
+        <el-button type="primary" :loading="updateSend" @click="confirmSend">{{ curRowId ? '修 改' : '上 架' }}</el-button>
       </span>
     </el-dialog>
   </div>
@@ -180,7 +181,7 @@
 
 <script>
 import {
-  orderManage, getAreaList, uploadWine
+  getAllWineListByPage, getAreaList, uploadWine, getWineDetail, updateWine
 } from '@/api/order'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -203,32 +204,14 @@ export default {
       list: null,
       total: 0,
       columns: [],
-      dialogVisible: true,
-      // formData:
-      // ******text类型*****
-      // wineName: 123,
-      // wineTypeList: [
-      // {"volumn":"标准",price:"100",stock:"999",vipPrice:"96",salePrice:"90",saleTime:"1353568745569"},
-      // {"volumn":"120ml",price:"120",stock:"999",vipPrice:"96"}
-      // ],
-      // boldText: "形容与"
-      // prodPlace: "法国"
-      // description:"描述"
-      // display: 1瀑布流，3轮播
-      // areaType: 传对应板块的ID
-      // words: "word1#word2#word3"
-      // isSale: 1表示促销，2表示不促销
-      // ********文件类型********
-      // wineImage一张图片，酒大图
-      // detailTopImage 酒的轮播图
-      // detailImage 酒的详情图
+      dialogVisible: false,
       wineInfo: {
         areaType: '',
         wineName: '',
         words: [],
         description: '',
         wineTypeList: [
-          { volumn: null, price: null, stock: null, time: null, salePrice: null }
+          { volume: null, price: null, stock: null, time: null, salePrice: null }
         ],
         tags: [],
         wineImage: [],
@@ -264,12 +247,11 @@ export default {
         '阿根廷',
         '新西兰'
       ],
-      curRow: null,
+      curRowId: null,
       areaList: []
     }
   },
   created() {
-    this.getList(1, 30)
     getAreaList({}).then(res => {
       // areaName: "特价"
       // createTime: "1592914685993"
@@ -279,15 +261,16 @@ export default {
       const data = res.body
       this.areaList = data
     })
+    this.getList(1, 30)
   },
   methods: {
     getList(page, limit) {
       this.listLoading = true
       this.listQuery.page = page
       this.listQuery.limit = limit
-      orderManage({
-        'mobile': this.listQuery.mobile || undefined,
-        'orderId': this.listQuery.orderId || undefined,
+      getAllWineListByPage({
+        'wineName': this.listQuery.name || undefined,
+        'areaType': this.listQuery.area || undefined,
         'startIndex': this.listQuery.page,
         'pageSize': this.listQuery.limit
       }).then(response => {
@@ -305,7 +288,7 @@ export default {
           key: 'index'
         })
         this.columns = columns
-        this.list = data.orderList
+        this.list = data.list
         this.total = data.totalCount
 
         // Just to simulate the time of the request
@@ -331,42 +314,79 @@ export default {
       }
       this.handleFilter()
     },
-    handleShowInfo(row) {
-      this.curRow = row
+    async handleShowInfo(row) {
+      this.curRowId = row ? row.wineId : ''
+      this.wineInfo = {
+        areaType: '',
+        wineName: '',
+        words: [],
+        description: '',
+        wineTypeList: [
+          { volume: null, price: null, stock: null, time: null, salePrice: null }
+        ],
+        tags: [],
+        wineImage: [],
+        detailTopImage: [],
+        detailImage: []
+      }
+      this.updateSend = false
       this.dialogVisible = true
+      if (this.curRowId) {
+        this.updateSend = true
+        const res = await getWineDetail({
+          wineId: this.curRowId
+        })
+        const wine = res.body
+        this.wineInfo = {
+          isShow: wine.isShow ? '1' : '0',
+          areaType: wine.areaType,
+          wineName: wine.wineName,
+          words: wine.words,
+          description: wine.description,
+          wineTypeList: wine.typeList.map(type => {
+            const tempType = {}
+            tempType.volume = type.volume
+            tempType.price = type.price
+            tempType.stock = type.stock
+            tempType.salePrice = type.salePrice
+            if (type.saleStartTime || type.saleEndTime) {
+              tempType.time = []
+              tempType.time[0] = type.saleStartTime ? new Date(parseInt(type.saleStartTime)) : null
+              tempType.time[1] = type.saleEndTime ? new Date(parseInt(type.saleEndTime)) : null
+            }
+            return tempType
+          }),
+          tags: wine.tags,
+          wineImage: [{
+            url: `https://api.xxinshi.com/wineImg/${wine.wineId}.png`,
+            raw: await this.getFileFromSrc(`https://api.xxinshi.com/wineImg/${wine.wineId}.png`)
+          }],
+          detailTopImage: await Promise.all(wine.detailTopImage.map(async name => {
+            return {
+              url: `https://api.xxinshi.com/detailTopImg/${wine.wineId}/${name}`,
+              raw: await this.getFileFromSrc(`https://api.xxinshi.com/detailTopImg/${wine.wineId}/${name}`)
+            }
+          })),
+          detailImage: await Promise.all(wine.detail.map(async name => {
+            return {
+              url: `https://api.xxinshi.com/detailImg/${wine.wineId}/${name.src}.png`,
+              raw: await this.getFileFromSrc(`https://api.xxinshi.com/detailImg/${wine.wineId}/${name.src}.png`)
+            }
+          }))
+        }
+        this.updateSend = false
+      }
     },
     async confirmSend() {
       console.log(this.wineInfo)
-      // ******text类型*****
-      // wineName: 123,
-      // wineTypeList: [
-      // {"volumn":"标准",price:"100",stock:"999",vipPrice:"96",salePrice:"90",saleTime:"1353568745569"},
-      // {"volumn":"120ml",price:"120",stock:"999",vipPrice:"96"}
-      // ],
-      // boldText: "形容与"
-      // prodPlace: "法国"
-      // description:"描述"
-      // display: 1瀑布流，3轮播
-      // areaType: 传对应板块的ID
-      // words: "word1#word2#word3"
-      // isSale: 1表示促销，2表示不促销
-      // ********文件类型********
-      // wineImage一张图片，酒大图
-      // detailTopImage 酒的轮播图
-      // detailImage 酒的详情图
-
-      // areaType: '',
-      // wineName: '',
-      // words: [],
-      // description: '',
-      // wineTypeList: [
-      //   { volumn: null, price: null, stock: null, time: null, salePrice: null },
-      //   { volumn: null, price: null, stock: null, time: null, salePrice: null }
-      // ],
-      // tags: [],
-      // wineImage: [],
-      // detailTopImage: [],
-      // detailImage: []
+      if (this.wineInfo.isShow === '1') {
+        this.$message({
+          type: 'warning',
+          message: `请先下架`
+        })
+        return false
+      }
+      this.updateSend = true
       const formData = new FormData()
       formData.append('areaType', this.wineInfo.areaType)
       formData.append('wineName', this.wineInfo.wineName)
@@ -374,7 +394,7 @@ export default {
       formData.append('description', this.wineInfo.description)
       formData.append('wineTypeList', JSON.stringify(this.wineInfo.wineTypeList.map((item, index) => {
         const wine = {
-          volumn: item.volumn,
+          volume: item.volume,
           price: item.price,
           stock: item.stock
         }
@@ -387,15 +407,21 @@ export default {
       })))
       formData.append('tags', this.wineInfo.tags.join(','))
       formData.append('wineImage', this.wineInfo.wineImage.map(item => item.raw)[0])
-      formData.append('detailTopImage', this.wineInfo.detailTopImage.map(item => item.raw))
-      formData.append('detailImage', this.wineInfo.detailImage.map(item => item.raw))
+      this.wineInfo.detailTopImage.map(item => item.raw).forEach(element => {
+        formData.append('detailTopImage', element)
+      })
+      this.wineInfo.detailImage.map(item => item.raw).forEach(element => {
+        formData.append('detailImage', element)
+      })
       const res = await uploadWine(formData)
       console.log(res)
+      this.updateSend = false
       this.$message({
         type: 'success',
-        message: `${this.curRow ? '修改' : '上架'}成功!`
+        message: `${this.curRowId ? '修改' : '上架'}成功!`
       })
-      // this.dialogVisible = false
+      this.dialogVisible = false
+      this.getList(1, 10)
     },
 
     getFileFromSrc(img) {
@@ -436,33 +462,41 @@ export default {
         }
       })
     },
-    handleUp() {
+    async handleUp(row) {
       this.$confirm('确定上架?')
         .then(async() => {
-          await new Promise((resolve) => {
-            setTimeout(() => {
-              resolve()
-            }, 300)
+          const res = await updateWine({
+            data: {
+              wineId: row.wineId,
+              isShow: '1'
+            }
           })
-          this.$message({
-            type: 'success',
-            message: '上架成功!'
-          })
+          if (res === 1) {
+            this.$message({
+              type: 'success',
+              message: '上架成功!'
+            })
+            row.isShow = '1'
+          }
         })
         .catch(err => { console.log(err) })
     },
-    handleDown() {
+    handleDown(row) {
       this.$confirm('确定下架?')
         .then(async() => {
-          await new Promise((resolve) => {
-            setTimeout(() => {
-              resolve()
-            }, 300)
+          const res = await updateWine({
+            data: {
+              wineId: row.wineId,
+              isShow: '0'
+            }
           })
-          this.$message({
-            type: 'success',
-            message: '下架成功!'
-          })
+          if (res === 1) {
+            this.$message({
+              type: 'success',
+              message: '下架成功!'
+            })
+            row.isShow = '0'
+          }
         })
         .catch(err => { console.log(err) })
     },
