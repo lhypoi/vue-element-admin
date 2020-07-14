@@ -94,3 +94,59 @@ export function updateWine(query) {
     }
   })
 }
+
+export function getCouponByPage(query) {
+  return request({
+    url: '/services/wine',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'getCouponByPage',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
+
+export function insertCoupon(query) {
+  return request({
+    url: '/services/wine',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'insertCoupon',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
+
+export function getCouponDetail(query) {
+  return request({
+    url: '/services/wine',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'getCouponDetail',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
+
+export function updateCoupon(query) {
+  return request({
+    url: '/services/wine',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'updateCoupon',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}

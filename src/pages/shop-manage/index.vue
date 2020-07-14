@@ -41,29 +41,26 @@
         :key="col.key"
         :label="col.label"
         :prop="col.key"
-        :width="col.key === 'wineNameList' ? 200 : col.key === 'addressLabel' ? '' : col.key === 'index' ? 50 : col.key === 'operation' ? 250 : 120"
+        :width="col.key === 'stockAndSaleNum' ? 200 : col.key === 'addressLabel' ? '' : col.key === 'index' ? 50 : col.key === 'operation' ? 250 : 120"
         :fixed="col.fixed"
       >
         <template slot-scope="scope">
-          <div v-if="col.key === 'wineNameList'">
+          <div v-if="col.key === 'stockAndSaleNum'">
             <el-card v-for="wine in scope.row[col.key]" :key="wine.wineId">
-              <span>名称：</span>
-              <span>{{ wine.wineName }}</span>
-              <el-divider class="divider" />
               <span>规格：</span>
               <span>{{ wine.volume }}</span>
               <el-divider class="divider" />
-              <span>价格：</span>
-              <span>{{ wine.price }}</span>
+              <span>库存：</span>
+              <span>{{ wine.stock }}</span>
               <el-divider class="divider" />
-              <span>数量：</span>
-              <span>{{ wine.count }}</span>
+              <span>销量：</span>
+              <span>{{ wine.saleNum }}</span>
               <el-divider class="divider" />
             </el-card>
           </div>
           <div v-else-if="col.key === 'operation'">
             <el-button type="success" :disabled="scope.row.isShow === '1'" @click="handleUp(scope.row)">上架</el-button>
-            <el-button type="danger" :disabled="scope.row.isShow === '0'" style="margin-left: 5px" @click="handleDown(row)">下架</el-button>
+            <el-button type="danger" :disabled="scope.row.isShow === '0'" style="margin-left: 5px" @click="handleDown(scope.row)">下架</el-button>
             <el-button type="success" style="margin-left: 5px" @click="handleShowInfo(scope.row)">详情</el-button>
           </div>
           <div v-else-if="col.key === 'isPay'">
@@ -338,7 +335,7 @@ export default {
         })
         const wine = res.body
         this.wineInfo = {
-          isShow: wine.isShow ? '1' : '0',
+          isShow: wine.isShow,
           areaType: wine.areaType,
           wineName: wine.wineName,
           words: wine.words,
@@ -471,7 +468,7 @@ export default {
               isShow: '1'
             }
           })
-          if (res === 1) {
+          if (res.body === 1) {
             this.$message({
               type: 'success',
               message: '上架成功!'
@@ -490,7 +487,7 @@ export default {
               isShow: '0'
             }
           })
-          if (res === 1) {
+          if (res.body === 1) {
             this.$message({
               type: 'success',
               message: '下架成功!'
