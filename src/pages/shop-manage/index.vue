@@ -84,7 +84,7 @@
       @pagination="getList(listQuery.page, listQuery.limit)"
     />
     <!-- 酒信息 -->
-    <el-dialog :visible.sync="dialogVisible" width="60%" title="物品信息">
+    <el-dialog :visible.sync="dialogVisible" width="60%" title="物品信息" :close-on-click-modal="false" :close-on-press-escape="false">
       <el-form v-loading="updateSend" :model="wineInfo" label-width="150px">
         <el-form-item label="选择上架板块" prop="areaType">
           <el-select v-model="wineInfo.areaType">
@@ -99,6 +99,9 @@
         </el-form-item>
         <el-form-item label="输入商品文字描述" prop="description">
           <el-input v-model="wineInfo.description" type="textarea" />
+        </el-form-item>
+        <el-form-item label="是否特价" prop="isSale">
+          <el-switch v-model="wineInfo.isSale" active-value="1" inactive-value="0" />
         </el-form-item>
         <el-row v-for="(type, index) in wineInfo.wineTypeList" :key="index">
           <el-col :span="8">
@@ -125,12 +128,12 @@
               }"
             />
           </el-col>
-          <el-col v-if="wineInfo.areaType === '1' && index === 0" :span="8">
+          <el-col v-if="wineInfo.isSale === '1' && index === 0" :span="8">
             <el-form-item label="输入特价" prop="salePrice">
               <el-input v-model="type.salePrice" type="number" />
             </el-form-item>
           </el-col>
-          <el-col v-if="wineInfo.areaType === '1' && index === 0" :span="16">
+          <el-col v-if="wineInfo.isSale === '1' && index === 0" :span="16">
             <el-form-item label="选择开展活动时间" prop="time">
               <el-date-picker
                 v-model="type.time"
@@ -158,6 +161,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="上传封面图" prop="wineImage">
+          <!-- <img-input :img-list="wineInfo.wineImage" :multi="false" @change="list => wineInfo.wineImage = list" /> -->
           <img-input :img-list="wineInfo.wineImage" :multi="false" @change="list => wineInfo.wineImage = list" />
         </el-form-item>
         <el-form-item label="上传详情页轮播图" prop="detailTopImage">
@@ -206,6 +210,7 @@ export default {
         areaType: '',
         wineName: '',
         words: [],
+        isSale: '0',
         description: '',
         wineTypeList: [
           { volume: null, price: null, stock: null, time: null, salePrice: null }
@@ -317,6 +322,7 @@ export default {
         areaType: '',
         wineName: '',
         words: [],
+        isSale: '0',
         description: '',
         wineTypeList: [
           { volume: null, price: null, stock: null, time: null, salePrice: null }
@@ -339,6 +345,7 @@ export default {
           areaType: wine.areaType,
           wineName: wine.wineName,
           words: wine.words,
+          isSale: wine.isSale,
           description: wine.description,
           wineTypeList: wine.typeList.map(type => {
             const tempType = {}
@@ -356,18 +363,21 @@ export default {
           tags: wine.tags,
           wineImage: [{
             url: `https://api.xxinshi.com/wineImg/${wine.wineId}.png`,
-            raw: await this.getFileFromSrc(`https://api.xxinshi.com/wineImg/${wine.wineId}.png`)
+            response: [`${wine.wineId}.png`]
+            // raw: await this.getFileFromSrc(`https://api.xxinshi.com/wineImg/${wine.wineId}.png`)
           }],
           detailTopImage: await Promise.all(wine.detailTopImage.map(async name => {
             return {
               url: `https://api.xxinshi.com/detailTopImg/${wine.wineId}/${name}`,
-              raw: await this.getFileFromSrc(`https://api.xxinshi.com/detailTopImg/${wine.wineId}/${name}`)
+              response: [`${name}`]
+              // raw: await this.getFileFromSrc(`https://api.xxinshi.com/detailTopImg/${wine.wineId}/${name}`)
             }
           })),
           detailImage: await Promise.all(wine.detail.map(async name => {
             return {
               url: `https://api.xxinshi.com/detailImg/${wine.wineId}/${name.src}.png`,
-              raw: await this.getFileFromSrc(`https://api.xxinshi.com/detailImg/${wine.wineId}/${name.src}.png`)
+              response: [`${name.src}.png`]
+              // raw: await this.getFileFromSrc(`https://api.xxinshi.com/detailImg/${wine.wineId}/${name.src}.png`)
             }
           }))
         }
@@ -385,9 +395,11 @@ export default {
       }
       this.updateSend = true
       const formData = new FormData()
+      if (this.curRowId) formData.append('wineId', this.curRowId)
       formData.append('areaType', this.wineInfo.areaType)
       formData.append('wineName', this.wineInfo.wineName)
-      formData.append('words', this.wineInfo.words.join(','))
+      if (this.wineInfo.words.length) formData.append('words', this.wineInfo.words.join(','))
+      formData.append('isSale', this.wineInfo.isSale)
       formData.append('description', this.wineInfo.description)
       formData.append('wineTypeList', JSON.stringify(this.wineInfo.wineTypeList.map((item, index) => {
         const wine = {
@@ -395,7 +407,7 @@ export default {
           price: item.price,
           stock: item.stock
         }
-        if (this.wineInfo.areaType === '1' && index === 0) {
+        if (this.wineInfo.isSale === '1' && index === 0) {
           wine.salePrice = item.salePrice
           wine.saleStartTime = item.time[0].getTime()
           wine.saleEndTime = item.time[1].getTime()
@@ -403,13 +415,9 @@ export default {
         return wine
       })))
       formData.append('tags', this.wineInfo.tags.join(','))
-      formData.append('wineImage', this.wineInfo.wineImage.map(item => item.raw)[0])
-      this.wineInfo.detailTopImage.map(item => item.raw).forEach(element => {
-        formData.append('detailTopImage', element)
-      })
-      this.wineInfo.detailImage.map(item => item.raw).forEach(element => {
-        formData.append('detailImage', element)
-      })
+      formData.append('wineImage', this.wineInfo.wineImage.map(item => item.response[0])[0])
+      formData.append('detailTopImage', this.wineInfo.detailTopImage.map(item => item.response[0]).join(','))
+      formData.append('detailImage', this.wineInfo.detailImage.map(item => item.response[0]).join(','))
       const res = await uploadWine(formData)
       console.log(res)
       this.updateSend = false

@@ -336,7 +336,7 @@ export default {
               type: 'success',
               message: '下架成功!'
             })
-            row.isShow = '1'
+            this.$set(row, 'isShow', '1')
           }
         })
         .catch(err => { console.log(err) })
