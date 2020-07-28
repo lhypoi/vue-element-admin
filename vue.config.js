@@ -54,12 +54,12 @@ module.exports = {
           [process.env.VUE_APP_BASE_API + '/services/uploadWine']: ''
         }
       },
-      '/services/uploadImg': {
+      [process.env.VUE_APP_BASE_API + '/services/uploadImg']: {
         target: 'https://api.xxinshi.com/services/uploadImg',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
-          '/services/uploadImg': ''
+          [process.env.VUE_APP_BASE_API + '/services/uploadImg']: ''
         }
       }
     }

@@ -1,6 +1,6 @@
 <template>
   <el-upload
-    action="/services/uploadImg"
+    :action="action"
     class="upload-demo"
     name="imageList"
     :on-preview="handlePreview"
@@ -29,7 +29,8 @@ export default {
   },
   data() {
     return {
-      fileList: this.imgList
+      fileList: this.imgList,
+      action: process.env.VUE_APP_BASE_API + '/services/uploadImg'
     }
   },
   watch: {
