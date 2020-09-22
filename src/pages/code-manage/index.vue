@@ -1,13 +1,13 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input
+      <!-- <el-input
         v-model="listQuery.name"
         placeholder="商品名称搜索"
         style="width: 200px;"
         class="filter-item"
         @keyup.enter.native="handleFilter"
-      />
+      /> -->
       <el-button
         v-waves
         class="filter-item"
@@ -15,7 +15,7 @@
         icon="el-icon-search"
         @click="handleFilter"
       >查询</el-button>
-      <el-button v-waves class="filter-item" type="primary" @click="handleShowInfo">新增优惠券</el-button>
+      <el-button v-waves class="filter-item" type="primary" @click="handleShowInfo">新增推荐码</el-button>
     </div>
     <el-table
       :key="tableKey"
@@ -78,30 +78,36 @@
       @pagination="getList(listQuery.page, listQuery.limit)"
     />
     <!-- 酒信息 -->
-    <el-dialog :visible.sync="dialogVisible" width="60%" title="优惠券信息">
-      <el-form v-loading="updateSend" :model="wineInfo" label-width="150px" :disabled="curRowId">
-        <el-form-item label="优惠券类型" prop="couponType">
-          <el-select v-model="wineInfo.couponType">
+    <el-dialog :visible.sync="dialogVisible" width="60%" title="推荐码信息">
+      <el-form v-loading="updateSend" :model="wineInfo" label-width="150px">
+        <el-form-item label="推荐码" prop="codeId" :disabled="curRowId">
+          <el-input v-model="wineInfo.codeId" @blur="handleCheckCodeExist" />
+        </el-form-item>
+        <el-form-item label="推荐码名称" prop="name">
+          <el-input v-model="wineInfo.name" />
+        </el-form-item>
+        <el-form-item label="推荐码类型" prop="codeType">
+          <el-select v-model="wineInfo.codeType">
             <el-option v-for="item in couponTypeList" :key="item.id" :value="item.id" :label="item.label" />
           </el-select>
         </el-form-item>
-        <el-form-item v-if="wineInfo.couponType === '1'" :label="`优惠内容`" prop="couponNum">
+        <el-form-item v-if="wineInfo.codeType === '1'" :label="`优惠内容`" prop="codeNum">
           <el-row>
             <el-col :span="12">
-              <el-input v-model="wineInfo.couponNum" />
+              <el-input v-model="wineInfo.codeNum" />
             </el-col>
             &nbsp;&nbsp;&nbsp;&nbsp;折
           </el-row>
         </el-form-item>
-        <el-form-item v-if="wineInfo.couponType === '2'" :label="`优惠内容`" prop="couponNum">
+        <el-form-item v-if="wineInfo.codeType === '2'" :label="`优惠内容`" prop="codeNum">
           <el-row>
             <span style="float: left">满&nbsp;&nbsp;&nbsp;&nbsp;</span>
             <el-col :span="4">
-              <el-input v-model="wineInfo.couponUpon" />
+              <el-input v-model="wineInfo.codeUpon" />
             </el-col>
             <span style="float: left">&nbsp;&nbsp;&nbsp;&nbsp;减&nbsp;&nbsp;&nbsp;&nbsp;</span>
             <el-col :span="4">
-              <el-input v-model="wineInfo.couponNum" />
+              <el-input v-model="wineInfo.codeNum" />
             </el-col>
           </el-row>
         </el-form-item>
@@ -115,21 +121,21 @@
             end-placeholder="结束日期"
           />
         </el-form-item>
-        <el-form-item label="数量" prop="couponCount">
+        <!-- <el-form-item label="数量" prop="couponCount">
           <el-input v-model="wineInfo.couponCount" type="number" />
-        </el-form-item>
-        <el-form-item label="过期时间" prop="validateTime">
+        </el-form-item> -->
+        <!-- <el-form-item label="过期时间" prop="validateTime">
           <el-date-picker
             v-model="wineInfo.validateTime"
             style="width: 100%"
             type="datetime"
           />
-        </el-form-item>
+        </el-form-item> -->
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <!-- <el-button v-if="curRowId" type="danger" @click="handleDele">删 除</el-button> -->
-        <el-button v-if="!curRowId" type="primary" :loading="updateSend" @click="confirmSend">{{ curRowId ? '修 改' : '上 架' }}</el-button>
+        <el-button v-if="curRowId" type="danger" @click="handleDele">删 除</el-button>
+        <el-button type="primary" :loading="updateSend" @click="confirmSend">{{ curRowId ? '修 改' : '上 架' }}</el-button>
       </span>
     </el-dialog>
   </div>
@@ -137,7 +143,7 @@
 
 <script>
 import {
-  getCouponByPage, insertCoupon, getCouponDetail, updateCoupon
+  getCodeList, checkCodeExist, insertCode, getCodeDetail, updateCode, deleteCode
 } from '@/api/order'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -158,12 +164,15 @@ export default {
       columns: [],
       dialogVisible: false,
       wineInfo: {
-        couponType: '1',
-        couponNum: null,
-        couponUpon: null,
+        codeId: '',
+        name: '',
+        codeType: '1',
+        codeNum: null,
+        codeUpon: null,
         time: null,
-        couponCount: null,
-        validateTime: null
+        isShow: '1'
+        // couponCount: null,
+        // validateTime: null
       },
       updateSend: false,
       curRowId: null,
@@ -187,7 +196,7 @@ export default {
       this.listLoading = true
       this.listQuery.page = page
       this.listQuery.limit = limit
-      getCouponByPage({
+      getCodeList({
         'startIndex': this.listQuery.page,
         'pageSize': this.listQuery.limit
       }).then(response => {
@@ -204,7 +213,7 @@ export default {
           key: 'index'
         })
         this.columns = columns
-        this.list = data.couponList
+        this.list = data.codeList
         this.total = data.totalCount
 
         // Just to simulate the time of the request
@@ -231,30 +240,36 @@ export default {
       this.handleFilter()
     },
     async handleShowInfo(row) {
-      this.curRowId = row ? row.couponId : ''
+      this.curRowId = row ? row.codeId : ''
       this.wineInfo = {
-        couponType: '1',
-        couponNum: null,
-        couponUpon: null,
+        codeId: '',
+        name: '',
+        codeType: '1',
+        codeNum: null,
+        codeUpon: null,
         time: null,
-        couponCount: null,
-        validateTime: null
+        isShow: '1'
+        // couponCount: null,
+        // validateTime: null
       }
       this.updateSend = false
       this.dialogVisible = true
       if (this.curRowId) {
         this.updateSend = true
-        const res = await getCouponDetail({
-          couponId: this.curRowId
+        const res = await getCodeDetail({
+          codeId: this.curRowId
         })
         const wine = res.body
         this.wineInfo = {
-          couponType: wine.couponType,
-          couponNum: wine.couponNum,
-          couponUpon: wine.couponUpon,
-          time: [new Date(parseInt(wine.couponStartTime)), new Date(parseInt(wine.couponEndTime))],
-          couponCount: wine.couponCount,
-          validateTime: new Date(parseInt(wine.validateTime))
+          codeId: wine.codeId,
+          name: wine.name,
+          codeType: wine.codeType,
+          codeNum: wine.codeNum,
+          codeUpon: wine.codeUpon,
+          time: [new Date(parseInt(wine.startTime)), new Date(parseInt(wine.endTime))],
+          isShow: wine.isShow
+          // couponCount: wine.couponCount,
+          // validateTime: new Date(parseInt(wine.validateTime))
         }
         this.updateSend = false
       }
@@ -263,15 +278,18 @@ export default {
       console.log(this.wineInfo)
       this.updateSend = true
       const params = {
-        couponType: this.wineInfo.couponType,
-        couponNum: this.wineInfo.couponNum,
-        couponUpon: this.wineInfo.couponUpon,
-        couponStartTime: this.wineInfo.time[0].getTime(),
-        couponEndTime: this.wineInfo.time[1].getTime(),
-        couponCount: this.wineInfo.couponCount,
-        validateTime: this.wineInfo.validateTime.getTime()
+        codeId: this.wineInfo.codeId,
+        name: this.wineInfo.name,
+        codeType: this.wineInfo.codeType,
+        codeNum: this.wineInfo.codeNum,
+        codeUpon: this.wineInfo.codeUpon,
+        startTime: this.wineInfo.time[0].getTime(),
+        endTime: this.wineInfo.time[1].getTime(),
+        isShow: this.wineInfo.isShow
+        // couponCount: this.wineInfo.couponCount,
+        // validateTime: this.wineInfo.validateTime.getTime()
       }
-      const res = await insertCoupon({
+      const res = await insertCode({
         data: params
       })
       console.log(res)
@@ -325,9 +343,9 @@ export default {
     handleDown(row) {
       this.$confirm('确定下架? （下架后不可再上架）')
         .then(async() => {
-          const res = await updateCoupon({
+          const res = await updateCode({
             data: {
-              couponId: row.couponId,
+              codeId: row.codeId,
               isShow: '0'
             }
           })
@@ -341,20 +359,42 @@ export default {
         })
         .catch(err => { console.log(err) })
     },
-    handleDele() {
+    handleDele(row) {
       this.$confirm('确定删除?')
         .then(async() => {
-          await new Promise((resolve) => {
-            setTimeout(() => {
-              resolve()
-            }, 300)
+          this.updateSend = true
+          const res = await deleteCode({
+            codeId: this.curRowId
           })
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
-          })
+          this.updateSend = false
+          if (res.body === 1) {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
+            this.dialogVisible = false
+            this.getList(1, 10)
+          } else {
+            this.$message({
+              type: 'warning',
+              message: '删除失败!'
+            })
+          }
         })
         .catch(err => { console.log(err) })
+    },
+    async handleCheckCodeExist() {
+      if (this.wineInfo.codeId) {
+        const res = await checkCodeExist({
+          codeId: this.wineInfo.codeId
+        })
+        if (res.body !== 0) {
+          this.$message({
+            type: 'warning',
+            message: '推荐码已存在'
+          })
+        }
+      }
     }
   }
 }

@@ -150,3 +150,84 @@ export function updateCoupon(query) {
     }
   })
 }
+
+export function getCodeList(query) {
+  return request({
+    url: '/services/code',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'getCodeList',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
+
+export function insertCode(query) {
+  return request({
+    url: '/services/code',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'insertCode',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
+
+export function checkCodeExist(query) {
+  return request({
+    url: '/services/code',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'checkCodeExist',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
+export function getCodeDetail(query) {
+  return request({
+    url: '/services/code',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'getCodeDetail',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
+export function updateCode(query) {
+  return request({
+    url: '/services/code',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'updateCode',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
+export function deleteCode(query) {
+  return request({
+    url: '/services/code',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'deleteCode',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}

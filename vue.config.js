@@ -46,6 +46,14 @@ module.exports = {
           [process.env.VUE_APP_BASE_API + '/services/wine']: ''
         }
       },
+      [process.env.VUE_APP_BASE_API + '/services/code']: {
+        target: 'https://api.xxinshi.com/services/code',
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          [process.env.VUE_APP_BASE_API + '/services/code']: ''
+        }
+      },
       [process.env.VUE_APP_BASE_API + '/services/uploadWine']: {
         target: 'https://api.xxinshi.com/services/uploadWine',
         changeOrigin: true,

@@ -31,6 +31,16 @@ const pageRouter = [
       name: '优惠券管理',
       meta: { title: '优惠券管理', icon: 'table', affix: true }
     }]
+  },
+  {
+    path: '/code-manage',
+    component: Layout,
+    children: [{
+      path: '/code-manage',
+      component: () => import('@/pages/code-manage/index'),
+      name: '推荐码管理',
+      meta: { title: '推荐码管理', icon: 'table', affix: true }
+    }]
   }
 ]
 export default pageRouter
