@@ -41,7 +41,7 @@
         :key="col.key"
         :label="col.label"
         :prop="col.key"
-        :width="col.key === 'stockAndSaleNum' ? 200 : col.key === 'addressLabel' ? '' : col.key === 'index' ? 50 : col.key === 'operation' ? 250 : 120"
+        :width="col.key === 'stockAndSaleNum' ? 200 : col.key === 'description' ? '' : col.key === 'index' ? 50 : col.key === 'operation' ? 250 : 120"
         :fixed="col.fixed"
       >
         <template slot-scope="scope">

@@ -33,7 +33,7 @@
         :key="col.key"
         :label="col.label"
         :prop="col.key"
-        :width="col.key === 'wineNameList' ? 200 : col.key === 'addressLabel' ? '' : col.key === 'index' ? 50 : col.key === 'operation' ? 180 : 120"
+        :width="col.key === 'wineNameList' ? 200 : col.key === 'couponId' ? '' : col.key === 'index' ? 50 : col.key === 'operation' ? 180 : 140"
         :fixed="col.fixed"
       >
         <template slot-scope="scope">
@@ -79,7 +79,12 @@
     />
     <!-- 酒信息 -->
     <el-dialog :visible.sync="dialogVisible" width="60%" title="优惠券信息">
-      <el-form v-loading="updateSend" :model="wineInfo" label-width="150px" :disabled="curRowId">
+      <el-form v-loading="updateSend" :model="wineInfo" label-width="150px" :disabled="!!curRowId">
+        <el-form-item label="优惠券范围" prop="wineId">
+          <el-select v-model="wineInfo.wineId">
+            <el-option v-for="item in wineList" :key="item.wineId" :value="item.wineId" :label="item.wineName" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="优惠券类型" prop="couponType">
           <el-select v-model="wineInfo.couponType">
             <el-option v-for="item in couponTypeList" :key="item.id" :value="item.id" :label="item.label" />
@@ -137,7 +142,7 @@
 
 <script>
 import {
-  getCouponByPage, insertCoupon, getCouponDetail, updateCoupon
+  getCouponByPage, insertCoupon, getCouponDetail, updateCoupon, getAllWineListByPage
 } from '@/api/order'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -158,6 +163,7 @@ export default {
       columns: [],
       dialogVisible: false,
       wineInfo: {
+        wineId: null,
         couponType: '1',
         couponNum: null,
         couponUpon: null,
@@ -176,10 +182,19 @@ export default {
           label: '满减券',
           id: '2'
         }
-      ]
+      ],
+      wineList: []
     }
   },
   created() {
+    getAllWineListByPage({
+      'startIndex': 1,
+      'pageSize': 999
+    }).then(response => {
+      const list = response.body.list
+      this.wineList = list
+      console.log(list)
+    })
     this.getList(1, 30)
   },
   methods: {
@@ -233,6 +248,7 @@ export default {
     async handleShowInfo(row) {
       this.curRowId = row ? row.couponId : ''
       this.wineInfo = {
+        wineId: null,
         couponType: '1',
         couponNum: null,
         couponUpon: null,
@@ -249,6 +265,7 @@ export default {
         })
         const wine = res.body
         this.wineInfo = {
+          wineId: wine.wineId || null,
           couponType: wine.couponType,
           couponNum: wine.couponNum,
           couponUpon: wine.couponUpon,
@@ -263,6 +280,7 @@ export default {
       console.log(this.wineInfo)
       this.updateSend = true
       const params = {
+        wineId: this.wineInfo.wineId,
         couponType: this.wineInfo.couponType,
         couponNum: this.wineInfo.couponNum,
         couponUpon: this.wineInfo.couponUpon,
