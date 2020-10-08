@@ -33,7 +33,7 @@
         :key="col.key"
         :label="col.label"
         :prop="col.key"
-        :width="col.key === 'wineNameList' ? 200 : col.key === 'addressLabel' ? '' : col.key === 'index' ? 50 : col.key === 'operation' ? 180 : 120"
+        :width="col.key === 'codeNum' ? 200 : col.key === 'name' ? '' : col.key === 'index' ? 50 : col.key === 'operation' ? 180 : 120"
         :fixed="col.fixed"
       >
         <template slot-scope="scope">

@@ -87,7 +87,7 @@
     <el-dialog :visible.sync="dialogVisible" width="60%" title="物品信息" :close-on-click-modal="false" :close-on-press-escape="false">
       <el-form v-loading="updateSend" :model="wineInfo" label-width="150px">
         <el-form-item label="选择上架板块" prop="areaType">
-          <el-select v-model="wineInfo.areaType">
+          <el-select v-model="wineInfo.areaType" :disabled="!!curRowId">
             <el-option v-for="item in areaList" :key="item.id" :value="item.id" :label="item.areaName" />
           </el-select>
         </el-form-item>
@@ -100,18 +100,18 @@
         <el-form-item label="输入商品文字描述" prop="description">
           <el-input v-model="wineInfo.description" type="textarea" />
         </el-form-item>
-        <el-form-item label="是否特价" prop="isSale">
-          <el-switch v-model="wineInfo.isSale" active-value="1" inactive-value="0" />
+        <el-form-item v-if="wineInfo.areaType !== '99'" label="是否置顶" prop="topOrder">
+          <el-switch v-model="wineInfo.topOrder" active-value="1" inactive-value="0" />
         </el-form-item>
         <el-row v-for="(type, index) in wineInfo.wineTypeList" :key="index">
           <el-col :span="8">
             <el-form-item :label="`输入${index === 0 ? '默认' : ''}规格名称`" prop="volume">
-              <el-input v-model="type.volume" />
+              <el-input v-model="type.volume" :disabled="!!curRowId" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="输入商品价格" prop="price">
-              <el-input v-model="type.price" type="number" />
+              <el-input v-model="type.price" type="number" :disabled="!!curRowId" />
             </el-form-item>
           </el-col>
           <el-col :span="7">
@@ -119,7 +119,7 @@
               <el-input v-model="type.stock" type="number" />
             </el-form-item>
           </el-col>
-          <el-col v-if="index != 0" :span="1" style="text-align: center;">
+          <el-col v-if="index != 0 && !curRowId" :span="1" style="text-align: center;">
             <i
               class="el-icon-remove"
               style="font-size: 25px; cursor: pointer; padding-top: 6px"
@@ -128,12 +128,12 @@
               }"
             />
           </el-col>
-          <el-col v-if="wineInfo.isSale === '1' && index === 0" :span="8">
+          <el-col v-if="wineInfo.areaType === '99' && index === 0" :span="8">
             <el-form-item label="输入特价" prop="salePrice">
-              <el-input v-model="type.salePrice" type="number" />
+              <el-input v-model="type.salePrice" type="number" :disabled="!!curRowId" />
             </el-form-item>
           </el-col>
-          <el-col v-if="wineInfo.isSale === '1' && index === 0" :span="16">
+          <el-col v-if="wineInfo.areaType === '99' && index === 0" :span="16">
             <el-form-item label="选择开展活动时间" prop="time">
               <el-date-picker
                 v-model="type.time"
@@ -142,11 +142,12 @@
                 range-separator="至"
                 start-placeholder="开始日期"
                 end-placeholder="结束日期"
+                :disabled="!!curRowId"
               />
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="" prop="">
+        <el-form-item v-if="wineInfo.areaType !== '99' && !curRowId" label="" prop="">
           <i
             class="el-icon-circle-plus"
             style="font-size: 20px; cursor: pointer;"
@@ -210,8 +211,8 @@ export default {
         areaType: '',
         wineName: '',
         words: [],
-        isSale: '0',
         description: '',
+        topOrder: '0',
         wineTypeList: [
           { volume: null, price: null, stock: null, time: null, salePrice: null }
         ],
@@ -322,8 +323,8 @@ export default {
         areaType: '',
         wineName: '',
         words: [],
-        isSale: '0',
         description: '',
+        topOrder: '0',
         wineTypeList: [
           { volume: null, price: null, stock: null, time: null, salePrice: null }
         ],
@@ -345,8 +346,8 @@ export default {
           areaType: wine.areaType,
           wineName: wine.wineName,
           words: wine.words,
-          isSale: wine.isSale,
           description: wine.description,
+          topOrder: wine.topOrder,
           wineTypeList: wine.typeList.map(type => {
             const tempType = {}
             tempType.volume = type.volume
@@ -399,15 +400,15 @@ export default {
       formData.append('areaType', this.wineInfo.areaType)
       formData.append('wineName', this.wineInfo.wineName)
       if (this.wineInfo.words.length) formData.append('words', this.wineInfo.words.join(','))
-      formData.append('isSale', this.wineInfo.isSale)
       formData.append('description', this.wineInfo.description)
-      formData.append('wineTypeList', JSON.stringify(this.wineInfo.wineTypeList.map((item, index) => {
+      formData.append('topOrder', this.wineInfo.topOrder)
+      formData.append('wineTypeList', JSON.stringify(this.wineInfo.wineTypeList.filter((item, index) => this.wineInfo.areaType !== '99' || index === 0).map((item, index) => {
         const wine = {
           volume: item.volume,
           price: item.price,
           stock: item.stock
         }
-        if (this.wineInfo.isSale === '1' && index === 0) {
+        if (this.wineInfo.areaType === '99' && index === 0) {
           wine.salePrice = item.salePrice
           wine.saleStartTime = item.time[0].getTime()
           wine.saleEndTime = item.time[1].getTime()
