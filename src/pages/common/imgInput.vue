@@ -30,7 +30,7 @@ export default {
   data() {
     return {
       fileList: this.imgList,
-      action: process.env.VUE_APP_BASE_API + '/services/uploadImg'
+      action: process.env.VUE_APP_BASE_API + '/uploadImg'
     }
   },
   watch: {

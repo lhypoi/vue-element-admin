@@ -38,36 +38,36 @@ module.exports = {
     },
     before: require('./mock/mock-server.js'),
     proxy: {
-      [process.env.VUE_APP_BASE_API + '/services/wine']: {
-        target: 'https://api.xxinshi.com/services/wine',
+      [process.env.VUE_APP_BASE_API + '/wine']: {
+        target: 'https://api.xxinshi.com/services1/wine',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
-          [process.env.VUE_APP_BASE_API + '/services/wine']: ''
+          [process.env.VUE_APP_BASE_API + '/wine']: ''
         }
       },
-      [process.env.VUE_APP_BASE_API + '/services/code']: {
-        target: 'https://api.xxinshi.com/services/code',
+      [process.env.VUE_APP_BASE_API + '/code']: {
+        target: 'https://api.xxinshi.com/services1/code',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
-          [process.env.VUE_APP_BASE_API + '/services/code']: ''
+          [process.env.VUE_APP_BASE_API + '/code']: ''
         }
       },
-      [process.env.VUE_APP_BASE_API + '/services/uploadWine']: {
-        target: 'https://api.xxinshi.com/services/uploadWine',
+      [process.env.VUE_APP_BASE_API + '/uploadWine']: {
+        target: 'https://api.xxinshi.com/services1/uploadWine',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
-          [process.env.VUE_APP_BASE_API + '/services/uploadWine']: ''
+          [process.env.VUE_APP_BASE_API + '/uploadWine']: ''
         }
       },
-      [process.env.VUE_APP_BASE_API + '/services/uploadImg']: {
-        target: 'https://api.xxinshi.com/services/uploadImg',
+      [process.env.VUE_APP_BASE_API + '/uploadImg']: {
+        target: 'https://api.xxinshi.com/services1/uploadImg',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
-          [process.env.VUE_APP_BASE_API + '/services/uploadImg']: ''
+          [process.env.VUE_APP_BASE_API + '/uploadImg']: ''
         }
       }
     }

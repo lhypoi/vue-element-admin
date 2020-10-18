@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function orderManage(query) {
   return request({
-    url: '/services/wine',
+    url: '/wine',
     method: 'post',
     data: {
       body: query,
@@ -16,7 +16,7 @@ export function orderManage(query) {
 
 export function updateSendState(query) {
   return request({
-    url: '/services/wine',
+    url: '/wine',
     method: 'post',
     data: {
       body: query,
@@ -30,7 +30,7 @@ export function updateSendState(query) {
 
 export function getAreaList(query) {
   return request({
-    url: '/services/wine',
+    url: '/wine',
     method: 'post',
     data: {
       body: query,
@@ -44,7 +44,7 @@ export function getAreaList(query) {
 
 export function uploadWine(query) {
   return request({
-    url: '/services/uploadWine',
+    url: '/uploadWine',
     method: 'post',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'
@@ -55,7 +55,7 @@ export function uploadWine(query) {
 
 export function getAllWineListByPage(query) {
   return request({
-    url: '/services/wine',
+    url: '/wine',
     method: 'post',
     data: {
       body: query,
@@ -69,7 +69,7 @@ export function getAllWineListByPage(query) {
 
 export function getWineDetail(query) {
   return request({
-    url: '/services/wine',
+    url: '/wine',
     method: 'post',
     data: {
       body: query,
@@ -83,7 +83,7 @@ export function getWineDetail(query) {
 
 export function updateWine(query) {
   return request({
-    url: '/services/wine',
+    url: '/wine',
     method: 'post',
     data: {
       body: query,
@@ -97,7 +97,7 @@ export function updateWine(query) {
 
 export function getCouponByPage(query) {
   return request({
-    url: '/services/wine',
+    url: '/wine',
     method: 'post',
     data: {
       body: query,
@@ -111,7 +111,7 @@ export function getCouponByPage(query) {
 
 export function insertCoupon(query) {
   return request({
-    url: '/services/wine',
+    url: '/wine',
     method: 'post',
     data: {
       body: query,
@@ -125,7 +125,7 @@ export function insertCoupon(query) {
 
 export function getCouponDetail(query) {
   return request({
-    url: '/services/wine',
+    url: '/wine',
     method: 'post',
     data: {
       body: query,
@@ -139,7 +139,7 @@ export function getCouponDetail(query) {
 
 export function updateCoupon(query) {
   return request({
-    url: '/services/wine',
+    url: '/wine',
     method: 'post',
     data: {
       body: query,
@@ -153,7 +153,7 @@ export function updateCoupon(query) {
 
 export function getCodeList(query) {
   return request({
-    url: '/services/code',
+    url: '/code',
     method: 'post',
     data: {
       body: query,
@@ -167,7 +167,7 @@ export function getCodeList(query) {
 
 export function insertCode(query) {
   return request({
-    url: '/services/code',
+    url: '/code',
     method: 'post',
     data: {
       body: query,
@@ -181,7 +181,7 @@ export function insertCode(query) {
 
 export function checkCodeExist(query) {
   return request({
-    url: '/services/code',
+    url: '/code',
     method: 'post',
     data: {
       body: query,
@@ -194,7 +194,7 @@ export function checkCodeExist(query) {
 }
 export function getCodeDetail(query) {
   return request({
-    url: '/services/code',
+    url: '/code',
     method: 'post',
     data: {
       body: query,
@@ -207,7 +207,7 @@ export function getCodeDetail(query) {
 }
 export function updateCode(query) {
   return request({
-    url: '/services/code',
+    url: '/code',
     method: 'post',
     data: {
       body: query,
@@ -220,7 +220,7 @@ export function updateCode(query) {
 }
 export function deleteCode(query) {
   return request({
-    url: '/services/code',
+    url: '/code',
     method: 'post',
     data: {
       body: query,
