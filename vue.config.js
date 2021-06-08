@@ -36,7 +36,41 @@ module.exports = {
       warnings: false,
       errors: true
     },
-    before: require('./mock/mock-server.js')
+    before: require('./mock/mock-server.js'),
+    proxy: {
+      [process.env.VUE_APP_BASE_API + '/wine']: {
+        target: 'https://api.xxinshi.com/services1/wine',
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          [process.env.VUE_APP_BASE_API + '/wine']: ''
+        }
+      },
+      [process.env.VUE_APP_BASE_API + '/code']: {
+        target: 'https://api.xxinshi.com/services1/code',
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          [process.env.VUE_APP_BASE_API + '/code']: ''
+        }
+      },
+      [process.env.VUE_APP_BASE_API + '/uploadWine']: {
+        target: 'https://api.xxinshi.com/services1/uploadWine',
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          [process.env.VUE_APP_BASE_API + '/uploadWine']: ''
+        }
+      },
+      [process.env.VUE_APP_BASE_API + '/uploadImg']: {
+        target: 'https://api.xxinshi.com/services1/uploadImg',
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          [process.env.VUE_APP_BASE_API + '/uploadImg']: ''
+        }
+      }
+    }
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that

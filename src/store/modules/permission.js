@@ -55,6 +55,9 @@ const actions = {
       } else {
         accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
       }
+      if (process.env.NODE_ENV === 'production') {
+        accessedRoutes = []
+      }
       commit('SET_ROUTES', accessedRoutes)
       resolve(accessedRoutes)
     })
