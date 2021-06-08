@@ -14,6 +14,10 @@
 </template>
 
 <script>
+import defaultSettings from '@/settings'
+
+const { isTestApi } = defaultSettings
+
 export default {
   name: 'SidebarLogo',
   props: {
@@ -24,7 +28,7 @@ export default {
   },
   data() {
     return {
-      title: '浅醺社',
+      title: '浅醺社' + (isTestApi ? '-测试' : ''),
       logo: 'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
     }
   }
