@@ -24,8 +24,8 @@ module.exports = {
    * In most cases please use '/' !!!
    * Detail: https://cli.vuejs.org/config/#publicpath
    */
-  publicPath: '/',
-  outputDir: 'dist',
+  publicPath: '/llj',
+  outputDir: 'llj',
   assetsDir: 'static',
   lintOnSave: process.env.NODE_ENV === 'development',
   productionSourceMap: false,
@@ -39,7 +39,7 @@ module.exports = {
     before: require('./mock/mock-server.js'),
     proxy: {
       [process.env.VUE_APP_BASE_API + '/wine']: {
-        target: 'https://api.xxinshi.com/services1/wine',
+        target: 'https://api.xxinshi.com/services/wine',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
@@ -47,7 +47,7 @@ module.exports = {
         }
       },
       [process.env.VUE_APP_BASE_API + '/code']: {
-        target: 'https://api.xxinshi.com/services1/code',
+        target: 'https://api.xxinshi.com/services/code',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
@@ -55,7 +55,7 @@ module.exports = {
         }
       },
       [process.env.VUE_APP_BASE_API + '/uploadWine']: {
-        target: 'https://api.xxinshi.com/services1/uploadWine',
+        target: 'https://api.xxinshi.com/services/uploadWine',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
@@ -63,7 +63,7 @@ module.exports = {
         }
       },
       [process.env.VUE_APP_BASE_API + '/uploadImg']: {
-        target: 'https://api.xxinshi.com/services1/uploadImg',
+        target: 'https://api.xxinshi.com/services/uploadImg',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
