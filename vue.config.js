@@ -39,7 +39,7 @@ module.exports = {
     before: require('./mock/mock-server.js'),
     proxy: {
       [process.env.VUE_APP_BASE_API + '/wine']: {
-        target: 'https://api.xxinshi.com/services/wine',
+        target: 'http://120.25.231.168:18089/services/wine',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
@@ -47,7 +47,7 @@ module.exports = {
         }
       },
       [process.env.VUE_APP_BASE_API + '/code']: {
-        target: 'https://api.xxinshi.com/services/code',
+        target: 'http://120.25.231.168:18089/services/code',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
@@ -55,7 +55,7 @@ module.exports = {
         }
       },
       [process.env.VUE_APP_BASE_API + '/uploadWine']: {
-        target: 'https://api.xxinshi.com/services/uploadWine',
+        target: 'http://120.25.231.168:18089/services/uploadWine',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
@@ -63,7 +63,7 @@ module.exports = {
         }
       },
       [process.env.VUE_APP_BASE_API + '/uploadImg']: {
-        target: 'https://api.xxinshi.com/services/uploadImg',
+        target: 'http://120.25.231.168:18089/services/uploadImg',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
