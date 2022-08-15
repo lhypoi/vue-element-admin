@@ -23,6 +23,16 @@ const pageRouter = [
     }]
   },
   {
+    path: '/category-manage',
+    component: Layout,
+    children: [{
+      path: '/category-manage',
+      component: () => import('@/pages/category-manage/index'),
+      name: '分类管理',
+      meta: { title: '分类管理', icon: 'table', affix: true }
+    }]
+  },
+  {
     path: '/coupon-manage',
     component: Layout,
     children: [{
