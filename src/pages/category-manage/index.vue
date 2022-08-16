@@ -1,14 +1,14 @@
 <template>
   <div class="app-container">
     <div class="filter-container" style="text-align: right;">
-      <el-button v-waves class="filter-item" type="primary">新增分类</el-button>
-      <el-button v-waves class="filter-item" type="danger">删除</el-button>
+      <el-button v-waves class="filter-item" type="primary" @click="dialogVisible = true">新增分类</el-button>
+      <el-button v-waves class="filter-item" type="danger" @click="confirmDelete">删除</el-button>
     </div>
     <div style="text-align: center;">
-      <draggable v-model="wineList" style="width: 50%;margin: 0 auto;" @start="onStart" @end="onEnd">
+      <draggable v-model="categoryList" style="width: 50%;margin: 0 auto;" @start="onStart" @end="onEnd">
         <transition-group animation="200">
-          <el-checkbox v-for="item in wineList" :key="item.id" :label="item.name" class="item" @change="categorySelect($event, item.id)" border />
-          <!-- <div v-for="item in wineList" :key="item.id" class="item">{{ item.name }}</div> -->
+          <el-checkbox v-for="item in categoryList" :key="item.id" :label="item.name" class="item" @change="categorySelect($event, item.id)" border />
+          <!-- <div v-for="item in categoryList" :key="item.id" class="item">{{ item.name }}</div> -->
         </transition-group>
       </draggable>
     </div>
@@ -21,19 +21,15 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <!-- <el-button v-if="curRowId" type="danger" @click="handleDele">删 除</el-button> -->
-        <el-button v-if="!curRowId" type="primary" :loading="updateSend" @click="confirmSend">{{ curRowId ? '修 改' : '上 架' }}</el-button>
+        <el-button v-if="!curRowId" type="primary" :loading="updateSend" @click="confirmSend">{{ curRowId ? '修 改' : '提 交' }}</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import {
-  insertCoupon, getCouponDetail, updateCoupon
-} from '@/api/order'
 import draggable from 'vuedraggable'
-import { getCategoryList, insertCategory } from '@/api/category'
+import { getCategoryList, insertCategory, deleteCategory } from '@/api/category'
 import waves from '@/directive/waves' // waves directive
 export default {
   name: 'ShopManage',
@@ -41,14 +37,6 @@ export default {
   directives: { waves },
   data() {
     return {
-      tableKey: 0,
-      listLoading: false,
-      listQuery: {
-        page: 1,
-        limit: 30
-      },
-      list: null,
-      total: 0,
       columns: [{
         label: '分类名称',
         key: 'name'
@@ -57,28 +45,9 @@ export default {
       categoryForm: {
         name: ''
       },
-      wineInfo: {
-        wineId: null,
-        couponType: '1',
-        couponNum: null,
-        couponUpon: null,
-        time: null,
-        couponCount: null,
-        validateTime: null
-      },
       updateSend: false,
       curRowId: null,
-      couponTypeList: [
-        {
-          label: '折扣券',
-          id: '1'
-        },
-        {
-          label: '满减券',
-          id: '2'
-        }
-      ],
-      wineList: [],
+      categoryList: [],
       categorySelected: []
     }
   },
@@ -89,7 +58,7 @@ export default {
     getDataList() {
       getCategoryList({}).then(response => {
         const list = response.body
-        this.wineList = list
+        this.categoryList = list
         console.log(list)
       })
     },
@@ -107,29 +76,30 @@ export default {
 
     },
     onEnd() {
-      console.log(this.wineList)
+      console.log(this.categoryList)
     },
-    getList(page, limit) {
-    },
-    handleFilter() {
-      this.getList(1, 30)
-    },
-    sortChange(data) {
-      const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
+    confirmDelete() {
+      if (this.categorySelected.length === 0) {
+        this.$message.warning('请选择要删除的分类')
+        return false
       }
-    },
-    sortByID(order) {
-      if (order === 'ascending') {
-        this.listQuery.sort = '+id'
-      } else {
-        this.listQuery.sort = '-id'
-      }
-      this.handleFilter()
+      this.$confirm('确定删除选择的分类吗', '警告')
+        .then(() => {
+          const data = {
+            ids: this.categorySelected
+          }
+          deleteCategory(data)
+            .then(res => {
+              console.log(res)
+              this.$message.success('操作成功')
+              this.getDataList()
+            })
+            .catch(() => {
+              this.$message.error('操作失败，请重试')
+            })
+        }).catch()
     },
     async confirmSend() {
-      console.log(this.wineInfo)
       this.updateSend = true
       const params = {
         parentId: 0,
@@ -148,79 +118,6 @@ export default {
       this.dialogVisible = false
       this.getDataList()
     },
-
-    getFileFromSrc(img) {
-      function convertBase64UrlToBlob(base64) {
-        var urlData = base64.dataURL
-        var type = base64.type
-        var bytes = window.atob(urlData.split(',')[1]) // 去掉url的头，并转换为byte
-        // 处理异常,将ascii码小于0的转换为大于0
-        var ab = new ArrayBuffer(bytes.length)
-        var ia = new Uint8Array(ab)
-        for (var i = 0; i < bytes.length; i++) {
-          ia[i] = bytes.charCodeAt(i)
-        }
-        return new Blob([ab], { type: type })
-      }
-      function getBase64Image(img) {
-        var canvas = document.createElement('canvas')
-        canvas.width = img.width
-        canvas.height = img.height
-        var ctx = canvas.getContext('2d')
-        ctx.drawImage(img, 0, 0, img.width, img.height)
-        var ext = img.src.substring(img.src.lastIndexOf('.') + 1).toLowerCase()
-        var dataURL = canvas.toDataURL('image/' + ext)
-        return {
-          dataURL: dataURL,
-          type: 'image/' + ext
-        }
-      }
-      return new Promise((resolve, reject) => {
-        var image = new Image()
-        image.crossOrigin = ''
-        image.src = img
-        image.onload = function() {
-          var base64 = getBase64Image(image)
-          var img2 = convertBase64UrlToBlob(base64)
-          var file = new File([img2], 'filename', { type: base64.type })
-          resolve(file)
-        }
-      })
-    },
-    handleDown(row) {
-      this.$confirm('确定下架? （下架后不可再上架）')
-        .then(async() => {
-          const res = await updateCoupon({
-            data: {
-              couponId: row.couponId,
-              isShow: '0'
-            }
-          })
-          if (res.body === 1) {
-            this.$message({
-              type: 'success',
-              message: '下架成功!'
-            })
-            this.$set(row, 'isShow', '0')
-          }
-        })
-        .catch(err => { console.log(err) })
-    },
-    handleDele() {
-      this.$confirm('确定删除?')
-        .then(async() => {
-          await new Promise((resolve) => {
-            setTimeout(() => {
-              resolve()
-            }, 300)
-          })
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
-          })
-        })
-        .catch(err => { console.log(err) })
-    }
   }
 }
 </script>

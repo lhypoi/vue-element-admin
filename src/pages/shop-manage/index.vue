@@ -84,16 +84,43 @@
       @pagination="getList(listQuery.page, listQuery.limit)"
     />
     <!-- 酒信息 -->
-    <el-dialog :visible.sync="dialogVisible" width="60%" title="物品信息" :close-on-click-modal="false" :close-on-press-escape="false">
+    <el-dialog :visible.sync="dialogVisible" width="80%" title="物品信息" :close-on-click-modal="false" :close-on-press-escape="false">
       <el-form v-loading="updateSend" :model="wineInfo" label-width="150px">
-        <el-form-item label="选择上架板块" prop="areaType">
+        <!-- <el-form-item label="选择上架板块" prop="areaType">
           <el-select v-model="wineInfo.areaType" :disabled="!!curRowId">
             <el-option v-for="item in areaList" :key="item.id" :value="item.id" :label="item.areaName" />
           </el-select>
         </el-form-item>
+        <el-form-item label="选择商品分类" prop="catId">
+          <el-select v-model="wineInfo.catId" filterable >
+            <el-option v-for="item in categoryList" :key="item.id" :value="item.id" :label="item.name" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="输入商品名称" prop="wineName">
           <el-input v-model="wineInfo.wineName" />
-        </el-form-item>
+        </el-form-item> -->
+        
+        <el-row v-for="(type, index) in wineInfo.wineTypeList" :key="index">
+          <el-col :span="8">
+            <el-form-item label="选择上架板块：" prop="areaType">
+              <el-select size="small" v-model="wineInfo.areaType" :disabled="!!curRowId">
+                <el-option v-for="item in areaList" :key="item.id" :value="item.id" :label="item.areaName" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="选择商品分类：" prop="catId">
+              <el-select size="small" v-model="wineInfo.catId" filterable >
+                <el-option v-for="item in categoryList" :key="item.id" :value="item.id" :label="item.name" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="输入商品名称：" prop="wineName">
+              <el-input size="small" v-model="wineInfo.wineName" />
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-form-item label="输入商品形容词描述" prop="words">
           <tag-input :tags="wineInfo.words" @change="(words) => wineInfo.words = words" />
         </el-form-item>
@@ -156,11 +183,17 @@
             }"
           >&nbsp;添加规格</i>
         </el-form-item>
-        <el-form-item label="添加筛选标签" prop="tags">
+        <el-form-item label="商品佣金比例" prop="commissionRate">
+          <el-input v-model="wineInfo.commissionRate" type="number" :disabled="!!curRowId" />
+        </el-form-item>
+        <el-form-item label="推销佣金比例" prop="promoterRate">
+          <el-input v-model="wineInfo.promoterRate" type="number" :disabled="!!curRowId" />
+        </el-form-item>
+        <!-- <el-form-item label="添加筛选标签" prop="tags">
           <el-select v-model="wineInfo.tags" multiple placeholder="请选择" style="width: 100%">
             <el-option v-for="item in tagOptions" :key="item" :label="item" :value="item" />
           </el-select>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="上传封面图" prop="wineImage">
           <!-- <img-input :img-list="wineInfo.wineImage" :multi="false" @change="list => wineInfo.wineImage = list" /> -->
           <img-input :img-list="wineInfo.wineImage" :multi="false" @change="list => wineInfo.wineImage = list" />
@@ -189,6 +222,7 @@ import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import tagInput from '@/pages/common/tagInput'
 import imgInput from '@/pages/common/imgInput'
+import { getCategoryList } from '@/api/category'
 export default {
   name: 'ShopManage',
   components: { Pagination, tagInput, imgInput },
@@ -209,6 +243,7 @@ export default {
       dialogVisible: false,
       wineInfo: {
         areaType: '',
+        catId: '',
         wineName: '',
         words: [],
         description: '',
@@ -216,12 +251,15 @@ export default {
         wineTypeList: [
           { volume: null, price: null, stock: null, time: null, salePrice: null }
         ],
+        commissionRate: 80,
+        promoterRate: 80,
         tags: [],
         wineImage: [],
         detailTopImage: [],
         detailImage: []
       },
       updateSend: false,
+      categoryList: [],
       tagOptions: [
         '水果花香型',
         '木质香料型',
@@ -266,7 +304,17 @@ export default {
     })
     this.getList(1, 30)
   },
+  mounted() {
+    getCategoryList({})
+      .then(res => {
+        const list = res.body
+        this.categoryList = list
+      })
+  },
   methods: {
+    test(list) {
+      console.log(list)
+    },
     getList(page, limit) {
       this.listLoading = true
       this.listQuery.page = page
@@ -416,7 +464,8 @@ export default {
         return wine
       })))
       formData.append('tags', this.wineInfo.tags.join(','))
-      formData.append('wineImage', this.wineInfo.wineImage.map(item => item.response[0])[0])
+      formData.append('wineImage', this.wineInfo.wineImage.map(item => item.response[0]).join(','))
+      // formData.append('wineImage', this.wineInfo.wineImage.map(item => item.response[0])[0])
       formData.append('detailTopImage', this.wineInfo.detailTopImage.map(item => item.response[0]).join(','))
       formData.append('detailImage', this.wineInfo.detailImage.map(item => item.response[0]).join(','))
       const res = await uploadWine(formData)
