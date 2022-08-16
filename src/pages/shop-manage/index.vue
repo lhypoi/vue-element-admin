@@ -99,25 +99,25 @@
         <el-form-item label="输入商品名称" prop="wineName">
           <el-input v-model="wineInfo.wineName" />
         </el-form-item> -->
-        
+
         <el-row v-for="(type, index) in wineInfo.wineTypeList" :key="index">
           <el-col :span="8">
             <el-form-item label="选择上架板块：" prop="areaType">
-              <el-select size="small" v-model="wineInfo.areaType" :disabled="!!curRowId">
+              <el-select v-model="wineInfo.areaType" size="small" :disabled="!!curRowId">
                 <el-option v-for="item in areaList" :key="item.id" :value="item.id" :label="item.areaName" />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="选择商品分类：" prop="catId">
-              <el-select size="small" v-model="wineInfo.catId" filterable >
+              <el-select v-model="wineInfo.catId" size="small" filterable>
                 <el-option v-for="item in categoryList" :key="item.id" :value="item.id" :label="item.name" />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="输入商品名称：" prop="wineName">
-              <el-input size="small" v-model="wineInfo.wineName" />
+              <el-input v-model="wineInfo.wineName" size="small" />
             </el-form-item>
           </el-col>
         </el-row>

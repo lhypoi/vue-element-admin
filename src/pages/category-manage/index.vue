@@ -7,7 +7,7 @@
     <div style="text-align: center;">
       <draggable v-model="categoryList" style="width: 50%;margin: 0 auto;" @start="onStart" @end="onEnd">
         <transition-group animation="200">
-          <el-checkbox v-for="item in categoryList" :key="item.id" :label="item.name" class="item" @change="categorySelect($event, item.id)" border />
+          <el-checkbox v-for="item in categoryList" :key="item.id" :label="item.name" class="item" border @change="categorySelect($event, item.id)" />
           <!-- <div v-for="item in categoryList" :key="item.id" class="item">{{ item.name }}</div> -->
         </transition-group>
       </draggable>
@@ -117,7 +117,7 @@ export default {
       })
       this.dialogVisible = false
       this.getDataList()
-    },
+    }
   }
 }
 </script>
