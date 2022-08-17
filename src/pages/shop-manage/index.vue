@@ -4,13 +4,13 @@
       <el-input
         v-model="listQuery.name"
         placeholder="商品名称搜索"
-        style="width: 200px;"
+        style="width: 200px;margin-right: 20px;"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
       <el-select
         v-model="listQuery.area"
-        style="width: 200px;"
+        style="width: 200px;margin-right: 20px;"
         class="filter-item"
         placeholder="选择模块"
       >
@@ -19,11 +19,11 @@
       <el-button
         v-waves
         class="filter-item"
-        type="primary"
+        type="warning"
         icon="el-icon-search"
         @click="handleFilter"
       >查询</el-button>
-      <el-button v-waves class="filter-item" type="primary" @click="handleShowInfo">上架新品</el-button>
+      <el-button v-waves class="filter-item" style="float: right;" type="primary" @click="handleShowInfo">上架新品</el-button>
     </div>
     <el-table
       :key="tableKey"
@@ -33,7 +33,6 @@
       fit
       highlight-current-row
       style="width: 100%;"
-      height="calc(100vh - 50px - 40px - 96px - 56px - 30px)"
       @sort-change="sortChange"
     >
       <el-table-column
@@ -85,123 +84,100 @@
     />
     <!-- 酒信息 -->
     <el-dialog :visible.sync="dialogVisible" width="80%" title="物品信息" :close-on-click-modal="false" :close-on-press-escape="false">
-      <el-form v-loading="updateSend" :model="wineInfo" label-width="150px">
-        <!-- <el-form-item label="选择上架板块" prop="areaType">
-          <el-select v-model="wineInfo.areaType" :disabled="!!curRowId">
-            <el-option v-for="item in areaList" :key="item.id" :value="item.id" :label="item.areaName" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="选择商品分类" prop="catId">
-          <el-select v-model="wineInfo.catId" filterable >
-            <el-option v-for="item in categoryList" :key="item.id" :value="item.id" :label="item.name" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="输入商品名称" prop="wineName">
-          <el-input v-model="wineInfo.wineName" />
-        </el-form-item> -->
-
-        <el-row v-for="(type, index) in wineInfo.wineTypeList" :key="index">
+      <el-form v-loading="updateSend" :model="wineInfo" label-width="110px" label-position="left">
+        <el-row :gutter="20">
           <el-col :span="8">
             <el-form-item label="选择上架板块：" prop="areaType">
-              <el-select v-model="wineInfo.areaType" size="small" :disabled="!!curRowId">
+              <el-select v-model="wineInfo.areaType" size="small" style="width: 100%;" placeholder="选择上架板块">
                 <el-option v-for="item in areaList" :key="item.id" :value="item.id" :label="item.areaName" />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
+            <el-form-item label="输入商品名称：" prop="wineName">
+              <el-input v-model="wineInfo.wineName" size="small" placeholder="输入商品名称" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
             <el-form-item label="选择商品分类：" prop="catId">
-              <el-select v-model="wineInfo.catId" size="small" filterable>
+              <el-select v-model="wineInfo.catId" size="small" style="width: 100%;" filterable placeholder="选择商品分类">
                 <el-option v-for="item in categoryList" :key="item.id" :value="item.id" :label="item.name" />
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="8">
-            <el-form-item label="输入商品名称：" prop="wineName">
-              <el-input v-model="wineInfo.wineName" size="small" />
-            </el-form-item>
-          </el-col>
         </el-row>
-        <el-form-item label="输入商品形容词描述" prop="words">
-          <tag-input :tags="wineInfo.words" @change="(words) => wineInfo.words = words" />
-        </el-form-item>
-        <el-form-item label="输入商品文字描述" prop="description">
-          <el-input v-model="wineInfo.description" type="textarea" />
-        </el-form-item>
-        <el-form-item v-if="wineInfo.areaType !== '99'" label="是否置顶" prop="topOrder">
+        <el-form-item v-if="wineInfo.areaType !== '99'" label="是否置顶：" prop="topOrder">
           <el-switch v-model="wineInfo.topOrder" active-value="1" inactive-value="0" />
         </el-form-item>
-        <el-row v-for="(type, index) in wineInfo.wineTypeList" :key="index">
-          <el-col :span="8">
-            <el-form-item :label="`输入${index === 0 ? '默认' : ''}规格名称`" prop="volume">
-              <el-input v-model="type.volume" :disabled="!!curRowId" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="输入商品价格" prop="price">
-              <el-input v-model="type.price" type="number" :disabled="!!curRowId" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="7">
-            <el-form-item label="输入商品库存" prop="stock">
-              <el-input v-model="type.stock" type="number" />
-            </el-form-item>
-          </el-col>
-          <el-col v-if="index != 0 && !curRowId" :span="1" style="text-align: center;">
-            <i
-              class="el-icon-remove"
-              style="font-size: 25px; cursor: pointer; padding-top: 6px"
-              @click="() => {
-                wineInfo.wineTypeList.splice(index, 1)
-              }"
+        <div style="background: #F7F6F4;padding: 20px 10px;border-radius: 4px;margin-bottom: 10px;">
+          <el-form-item v-if="wineInfo.areaType === '99'" label="特价活动时间：" prop="time">
+            <el-date-picker
+              v-model="wineInfo.saleTime"
+              style="width: 40%"
+              type="datetimerange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
             />
-          </el-col>
-          <el-col v-if="wineInfo.areaType === '99' && index === 0" :span="8">
-            <el-form-item label="输入特价" prop="salePrice">
-              <el-input v-model="type.salePrice" type="number" :disabled="!!curRowId" />
-            </el-form-item>
-          </el-col>
-          <el-col v-if="wineInfo.areaType === '99' && index === 0" :span="16">
-            <el-form-item label="选择开展活动时间" prop="time">
-              <el-date-picker
-                v-model="type.time"
-                style="width: 100%"
-                type="datetimerange"
-                range-separator="至"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                :disabled="!!curRowId"
+          </el-form-item>
+          <el-row v-for="(type, index) in wineInfo.wineTypeList" :key="index" :gutter="20">
+            <el-col :span="wineInfo.areaType === '99' ? 6 : 8">
+              <el-form-item label="输入规格名称：" prop="volume">
+                <el-input v-model="type.volume" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="wineInfo.areaType === '99' ? 6 : 8">
+              <el-form-item label="输入价格：" prop="price">
+                <el-input v-model="type.price" type="number" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="wineInfo.areaType === '99' ? 6 : 7">
+              <el-form-item label="输入库存：" prop="stock">
+                <el-input v-model="type.stock" type="number" />
+              </el-form-item>
+            </el-col>
+            <el-col v-if="wineInfo.areaType === '99'" :span="5">
+              <el-form-item label="输入特价：" prop="stock">
+                <el-input v-model="type.salePrice" type="number" />
+              </el-form-item>
+            </el-col>
+            <el-col v-if="index != 0 && !curRowId" :span="1" style="text-align: center;">
+              <!-- <el-button size="small" @click="() => { wineInfo.wineTypeList.splice(index, 1) }">删除</el-button> -->
+              <i
+                class="el-icon-delete"
+                style="font-size: 16px; cursor: pointer; padding-top: 10px"
+                @click="() => {
+                  wineInfo.wineTypeList.splice(index, 1)
+                }"
               />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-form-item v-if="wineInfo.areaType !== '99' && !curRowId" label="" prop="">
-          <i
-            class="el-icon-circle-plus"
-            style="font-size: 20px; cursor: pointer;"
+            </el-col>
+          </el-row>
+          <el-button
+            type="primary"
+            size="small"
             @click="() => {
               wineInfo.wineTypeList.push({ volume: null, price: null, stock: null, time: null, salePrice: null })
             }"
-          >&nbsp;添加规格</i>
+          >添加规格</el-button>
+        </div>
+        <el-form-item label="商品佣金比例：" prop="commissionRate">
+          <el-input v-model="wineInfo.commissionRate" style="width: 40%;" type="number">
+            <span slot="append">%</span>
+          </el-input>
         </el-form-item>
-        <el-form-item label="商品佣金比例" prop="commissionRate">
-          <el-input v-model="wineInfo.commissionRate" type="number" :disabled="!!curRowId" />
+        <el-form-item label="推销佣金比例：" prop="promoterRate">
+          <el-input v-model="wineInfo.promoterRate" style="width: 40%;" type="number">
+            <span slot="append">%</span>
+          </el-input>
         </el-form-item>
-        <el-form-item label="推销佣金比例" prop="promoterRate">
-          <el-input v-model="wineInfo.promoterRate" type="number" :disabled="!!curRowId" />
-        </el-form-item>
-        <!-- <el-form-item label="添加筛选标签" prop="tags">
-          <el-select v-model="wineInfo.tags" multiple placeholder="请选择" style="width: 100%">
-            <el-option v-for="item in tagOptions" :key="item" :label="item" :value="item" />
-          </el-select>
-        </el-form-item> -->
-        <el-form-item label="上传封面图" prop="wineImage">
+        <el-form-item label="上传封面图：" prop="wineImage">
           <!-- <img-input :img-list="wineInfo.wineImage" :multi="false" @change="list => wineInfo.wineImage = list" /> -->
           <img-input :img-list="wineInfo.wineImage" :multi="false" @change="list => wineInfo.wineImage = list" />
         </el-form-item>
-        <el-form-item label="上传详情页轮播图" prop="detailTopImage">
+        <el-form-item label="详情页轮播图：" prop="detailTopImage">
           <img-input :img-list="wineInfo.detailTopImage" @change="list => wineInfo.detailTopImage = list" />
         </el-form-item>
-        <el-form-item label="上传详情页详情图" prop="detailImage">
+        <el-form-item label="商品详情图：" prop="detailImage">
           <img-input :img-list="wineInfo.detailImage" @change="list => wineInfo.detailImage = list" />
         </el-form-item>
       </el-form>
@@ -220,12 +196,11 @@ import {
 } from '@/api/order'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-import tagInput from '@/pages/common/tagInput'
 import imgInput from '@/pages/common/imgInput'
 import { getCategoryList } from '@/api/category'
 export default {
   name: 'ShopManage',
-  components: { Pagination, tagInput, imgInput },
+  components: { Pagination, imgInput },
   directives: { waves },
   data() {
     return {
@@ -256,38 +231,11 @@ export default {
         tags: [],
         wineImage: [],
         detailTopImage: [],
-        detailImage: []
+        detailImage: [],
+        saleTime: ''
       },
       updateSend: false,
       categoryList: [],
-      tagOptions: [
-        '水果花香型',
-        '木质香料型',
-        '动物森林型',
-        '红葡萄酒',
-        '白葡萄酒',
-        '粉红酒',
-        '气泡酒',
-        '香槟',
-        '加烈酒',
-        '甜酒',
-        '威士忌',
-        '清酒',
-        '果酒',
-        '白葡萄品种',
-        '红葡萄品种',
-        '法国',
-        '意大利',
-        '西班牙',
-        '葡萄牙',
-        '希腊',
-        '德国',
-        '美国',
-        '澳洲',
-        '智利',
-        '阿根廷',
-        '新西兰'
-      ],
       curRowId: null,
       areaList: []
     }
@@ -369,6 +317,7 @@ export default {
       this.curRowId = row ? row.wineId : ''
       this.wineInfo = {
         areaType: '',
+        catId: '',
         wineName: '',
         words: [],
         description: '',
@@ -376,10 +325,13 @@ export default {
         wineTypeList: [
           { volume: null, price: null, stock: null, time: null, salePrice: null }
         ],
+        commissionRate: 80,
+        promoterRate: 80,
         tags: [],
         wineImage: [],
         detailTopImage: [],
-        detailImage: []
+        detailImage: [],
+        saleTime: ''
       }
       this.updateSend = false
       this.dialogVisible = true
@@ -392,10 +344,13 @@ export default {
         this.wineInfo = {
           isShow: wine.isShow,
           areaType: wine.areaType,
+          catId: wine.catId,
           wineName: wine.wineName,
           words: wine.words,
           description: wine.description,
           topOrder: wine.topOrder,
+          commissionRate: wine.commissionRate,
+          promoterRate: wine.promoterRate,
           wineTypeList: wine.typeList.map(type => {
             const tempType = {}
             tempType.volume = type.volume
@@ -411,22 +366,22 @@ export default {
           }),
           tags: wine.tags,
           wineImage: [{
-            url: `https://api.xxinshi.com/wineImg/${wine.wineId}.png`,
+            url: `https://api.ukshuxi.com/goodsImg/${wine.wineId}.png`,
             response: [`${wine.wineId}.png`]
-            // raw: await this.getFileFromSrc(`https://api.xxinshi.com/wineImg/${wine.wineId}.png`)
+            // raw: await this.getFileFromSrc(`https://api.ukshuxi.com/goodsImg/${wine.wineId}.png`)
           }],
           detailTopImage: await Promise.all(wine.detailTopImage.map(async name => {
             return {
-              url: `https://api.xxinshi.com/detailTopImg/${wine.wineId}/${name}`,
+              url: `https://api.ukshuxi.com/goodsDetailTopImg/${wine.wineId}/${name}`,
               response: [`${name}`]
-              // raw: await this.getFileFromSrc(`https://api.xxinshi.com/detailTopImg/${wine.wineId}/${name}`)
+              // raw: await this.getFileFromSrc(`https://api.ukshuxi.com/goodDetailTopImg/${wine.wineId}/${name}`)
             }
           })),
           detailImage: await Promise.all(wine.detail.map(async name => {
             return {
-              url: `https://api.xxinshi.com/detailImg/${wine.wineId}/${name.src}.png`,
+              url: `https://api.ukshuxi.com/goodsDetailImg/${wine.wineId}/${name.src}.png`,
               response: [`${name.src}.png`]
-              // raw: await this.getFileFromSrc(`https://api.xxinshi.com/detailImg/${wine.wineId}/${name.src}.png`)
+              // raw: await this.getFileFromSrc(`https://api.ukshuxi.com/goodDetailImg/${wine.wineId}/${name.src}.png`)
             }
           }))
         }
@@ -434,7 +389,8 @@ export default {
       }
     },
     async confirmSend() {
-      console.log(this.wineInfo)
+      const cloneData = Object.assign({}, this.wineInfo)
+      delete cloneData.saleTime
       if (this.wineInfo.isShow === '1') {
         this.$message({
           type: 'warning',
@@ -447,19 +403,29 @@ export default {
       if (this.curRowId) formData.append('wineId', this.curRowId)
       formData.append('areaType', this.wineInfo.areaType)
       formData.append('wineName', this.wineInfo.wineName)
+      formData.append('catId', this.wineInfo.catId)
+      formData.append('promoterRate', this.wineInfo.promoterRate)
+      formData.append('commissionRate', this.wineInfo.commissionRate)
       if (this.wineInfo.words.length) formData.append('words', this.wineInfo.words.join(','))
       formData.append('description', this.wineInfo.description)
       formData.append('topOrder', this.wineInfo.topOrder)
+      if (this.wineInfo.areaType === '99') {
+        formData.append('saleStartTime', this.wineInfo.saleTime[0].getTime())
+        formData.append('saleEndTime', this.wineInfo.saleTime[1].getTime())
+      }
       formData.append('wineTypeList', JSON.stringify(this.wineInfo.wineTypeList.filter((item, index) => this.wineInfo.areaType !== '99' || index === 0).map((item, index) => {
         const wine = {
           volume: item.volume,
           price: item.price,
           stock: item.stock
         }
-        if (this.wineInfo.areaType === '99' && index === 0) {
+        // if (this.wineInfo.areaType === '99' && index === 0) {
+        if (this.wineInfo.areaType === '99') {
           wine.salePrice = item.salePrice
-          wine.saleStartTime = item.time[0].getTime()
-          wine.saleEndTime = item.time[1].getTime()
+          // wine.saleStartTime = item.time[0].getTime()
+          // wine.saleEndTime = item.time[1].getTime()
+          wine.saleStartTime = this.wineInfo.saleTime[0].getTime()
+          wine.saleEndTime = this.wineInfo.saleTime[1].getTime()
         }
         return wine
       })))
@@ -468,15 +434,19 @@ export default {
       // formData.append('wineImage', this.wineInfo.wineImage.map(item => item.response[0])[0])
       formData.append('detailTopImage', this.wineInfo.detailTopImage.map(item => item.response[0]).join(','))
       formData.append('detailImage', this.wineInfo.detailImage.map(item => item.response[0]).join(','))
+      console.log(formData)
       const res = await uploadWine(formData)
       console.log(res)
-      this.updateSend = false
-      this.$message({
-        type: 'success',
-        message: `${this.curRowId ? '修改' : '上架'}成功!`
-      })
-      this.dialogVisible = false
-      this.getList(1, 10)
+      const body = res.body || 0
+      if (body !== 0) {
+        this.updateSend = false
+        this.$message({
+          type: 'success',
+          message: `${this.curRowId ? '修改' : '上架'}成功!`
+        })
+        this.dialogVisible = false
+        this.getList(1, 10)
+      }
     },
 
     getFileFromSrc(img) {
