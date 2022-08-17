@@ -43,14 +43,24 @@ const pageRouter = [
     }]
   },
   {
-    path: '/code-manage',
+    path: '/promoter-manage',
     component: Layout,
     children: [{
-      path: '/code-manage',
-      component: () => import('@/pages/code-manage/index'),
-      name: '推荐码管理',
-      meta: { title: '推荐码管理', icon: 'table', affix: true }
+      path: '/promoter-manage',
+      component: () => import('@/pages/promoter-manage/index'),
+      name: '推销商管理',
+      meta: { title: '推销商管理', icon: 'table', affix: true }
     }]
-  }
+  },
+  // {
+  //   path: '/code-manage',
+  //   component: Layout,
+  //   children: [{
+  //     path: '/code-manage',
+  //     component: () => import('@/pages/code-manage/index'),
+  //     name: '推荐码管理',
+  //     meta: { title: '推荐码管理', icon: 'table', affix: true }
+  //   }]
+  // }
 ]
 export default pageRouter

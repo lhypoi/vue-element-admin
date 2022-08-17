@@ -2,6 +2,7 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input
+        clearable
         v-model="listQuery.name"
         placeholder="商品名称搜索"
         style="width: 200px;margin-right: 20px;"
@@ -9,6 +10,7 @@
         @keyup.enter.native="handleFilter"
       />
       <el-select
+        clearable
         v-model="listQuery.area"
         style="width: 200px;margin-right: 20px;"
         class="filter-item"
@@ -36,11 +38,11 @@
       @sort-change="sortChange"
     >
       <el-table-column
-        v-for="col in columns"
+        v-for="col in tableColumns"
         :key="col.key"
         :label="col.label"
         :prop="col.key"
-        :width="col.key === 'stockAndSaleNum' ? 200 : col.key === 'description' ? '' : col.key === 'index' ? 50 : col.key === 'operation' ? 250 : 120"
+        :width="col.key === 'createTime' ? 160 : col.key === 'saleTime' ? '300' : col.key === 'index' ? 50 : col.key === 'operation' ? 250 : 120"
         :fixed="col.fixed"
       >
         <template slot-scope="scope">
@@ -62,8 +64,15 @@
             <el-button type="danger" :disabled="scope.row.isShow === '0'" style="margin-left: 5px" @click="handleDown(scope.row)">下架</el-button>
             <el-button type="success" style="margin-left: 5px" @click="handleShowInfo(scope.row)">详情</el-button>
           </div>
-          <div v-else-if="col.key === 'isPay'">
-            <span>{{ scope.row.isPay === "1" ? "已支付" : ( scope.row.isPay === "2" ? "待支付" : ( scope.row.isPay === "3" ? "已过期" : "") ) }}</span>
+          <div v-else-if="col.key === 'isShow'">
+            <el-tag type="success" v-if="scope.row.isShow === '1'">已上架</el-tag>
+            <el-tag type="warning" v-else>已下架</el-tag>
+          </div>
+          <div v-else-if="col.key === 'createTime'">
+            {{ parseTime(scope.row.createTime) }}
+          </div>
+          <div v-else-if="col.key === 'saleTime'">
+            {{ scope.row.saleStartTime ? (parseTime(scope.row.saleStartTime) + '-' + parseTime(scope.row.saleEndTime)) : '未开启特价' }}
           </div>
           <div v-else-if="col.key === 'sendStatus'">
             <span>{{ scope.row.sendStatus === "0" ? "未发货" : ( scope.row.sendStatus === "1" ? "已发货" : ( scope.row.sendStatus === "2" ? "已收货" : "") ) }}</span>
@@ -71,7 +80,8 @@
           <div v-else-if="col.key === 'index'">
             <span>{{ scope.$index + 1 + ( listQuery.page - 1 ) * listQuery.limit }}</span>
           </div>
-          <span v-else>{{ scope.row[col.key] }}</span>
+          <span v-else>{{ scope.row[col.key]}}</span>
+          <span v-if="/Rate/.test(col.key)">%</span>
         </template>
       </el-table-column>
     </el-table>
@@ -198,6 +208,7 @@ import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import imgInput from '@/pages/common/imgInput'
 import { getCategoryList } from '@/api/category'
+import { parseTime } from '@/utils/index'
 export default {
   name: 'ShopManage',
   components: { Pagination, imgInput },
@@ -232,12 +243,26 @@ export default {
         wineImage: [],
         detailTopImage: [],
         detailImage: [],
-        saleTime: ''
+        saleTime: []
       },
       updateSend: false,
       categoryList: [],
       curRowId: null,
-      areaList: []
+      areaList: [],
+      tableColumns: [
+        {label: '商品名称', key: 'wineName', fixed: 'left'},
+        {label: '所属板块', key: 'areaName'},
+        {label: '商品分类', key: 'catName'},
+        {label: '商品价格', key: 'price'},
+        {label: '特价价格', key: 'salePrice'},
+        {label: '特价活动时间', key: 'saleTime'},
+        {label: '商品佣金', key: 'commission'},
+        {label: '推销佣金', key: 'promoterCommission'},
+        {label: '商品状态', key: 'isShow'},
+        {label: '添加时间', key: 'createTime'},
+        {label: '操作', key: 'operation', fixed: 'right'},
+
+      ]
     }
   },
   created() {
@@ -260,9 +285,7 @@ export default {
       })
   },
   methods: {
-    test(list) {
-      console.log(list)
-    },
+    parseTime,
     getList(page, limit) {
       this.listLoading = true
       this.listQuery.page = page
@@ -286,7 +309,7 @@ export default {
           fixed: 'left',
           key: 'index'
         })
-        this.columns = columns
+        // this.columns = columns
         this.list = data.list
         this.total = data.totalCount
 
@@ -331,7 +354,7 @@ export default {
         wineImage: [],
         detailTopImage: [],
         detailImage: [],
-        saleTime: ''
+        saleTime: []
       }
       this.updateSend = false
       this.dialogVisible = true
@@ -343,6 +366,7 @@ export default {
         const wine = res.body
         this.wineInfo = {
           isShow: wine.isShow,
+          saleTime: wine.saleStartTime ? [new Date(Number(wine.saleStartTime)), new Date(Number(wine.saleEndTime))] : [],
           areaType: wine.areaType,
           catId: wine.catId,
           wineName: wine.wineName,
@@ -413,7 +437,8 @@ export default {
         formData.append('saleStartTime', this.wineInfo.saleTime[0].getTime())
         formData.append('saleEndTime', this.wineInfo.saleTime[1].getTime())
       }
-      formData.append('wineTypeList', JSON.stringify(this.wineInfo.wineTypeList.filter((item, index) => this.wineInfo.areaType !== '99' || index === 0).map((item, index) => {
+      // formData.append('wineTypeList', JSON.stringify(this.wineInfo.wineTypeList.filter((item, index) => this.wineInfo.areaType !== '99' || index === 0).map((item, index) => {
+      formData.append('wineTypeList', JSON.stringify(this.wineInfo.wineTypeList.map((item, index) => {
         const wine = {
           volume: item.volume,
           price: item.price,

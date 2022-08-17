@@ -1,9 +1,9 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <!-- <el-input
+      <el-input
         v-model="listQuery.name"
-        placeholder="商品名称搜索"
+        placeholder="手机号"
         style="width: 200px;"
         class="filter-item"
         @keyup.enter.native="handleFilter"
@@ -14,8 +14,8 @@
         type="primary"
         icon="el-icon-search"
         @click="handleFilter"
-      >查询</el-button> -->
-      <el-button v-waves class="filter-item" type="primary" @click="handleShowInfo">新增优惠券</el-button>
+      >查询</el-button>
+      <el-button v-waves class="filter-item" type="primary" @click="handleShowInfo">添加一级分销员</el-button>
     </div>
     <el-table
       :key="tableKey"
