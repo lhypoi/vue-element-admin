@@ -46,6 +46,14 @@ module.exports = {
           [process.env.VUE_APP_BASE_API + '/wine']: ''
         }
       },
+      [process.env.VUE_APP_BASE_API + '/promoter']: {
+        target: 'http://120.25.231.168:18089/services/promoter',
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          [process.env.VUE_APP_BASE_API + '/promoter']: ''
+        }
+      },
       [process.env.VUE_APP_BASE_API + '/code']: {
         target: 'http://120.25.231.168:18089/services/code',
         changeOrigin: true,

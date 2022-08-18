@@ -21,7 +21,7 @@ service.interceptors.request.use(
       // please modify it according to the actual situation
       // config.headers['X-Token'] = getToken()
     }
-    if (config.url.indexOf('/wine') > -1 || config.url.indexOf('/code') > -1) {
+    if (config.url.indexOf('/wine') > -1 || config.url.indexOf('/code') > -1 || config.url.indexOf('/promoter') > -1) {
       config.headers['Content-Type'] = 'text/plain'
       config.data = JSON.stringify(config.data)
     }

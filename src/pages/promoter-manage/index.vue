@@ -2,20 +2,22 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input
-        v-model="listQuery.name"
+        v-model="listQuery.phoneNumber"
         placeholder="手机号"
-        style="width: 200px;"
+        style="width: 200px;margin-right: 15px;"
         class="filter-item"
+        size="small"
         @keyup.enter.native="handleFilter"
       />
       <el-button
         v-waves
         class="filter-item"
-        type="primary"
+        type="warning"
         icon="el-icon-search"
+        size="small"
         @click="handleFilter"
       >查询</el-button>
-      <el-button v-waves class="filter-item" type="primary" @click="handleShowInfo">添加一级分销员</el-button>
+      <el-button v-waves class="filter-item" size="small" style="float: right;" type="primary" @click="handleShowInfo">添加一级分销员</el-button>
     </div>
     <el-table
       :key="tableKey"
@@ -28,7 +30,7 @@
       @sort-change="sortChange"
     >
       <el-table-column
-        v-for="col in tableColumns"
+        v-for="col in columns"
         :key="col.key"
         :label="col.label"
         :prop="col.key"
@@ -36,38 +38,11 @@
         :fixed="col.fixed"
       >
         <template slot-scope="scope">
-          <div v-if="col.key === 'wineNameList'">
-            <el-card v-for="wine in scope.row[col.key]" :key="wine.wineId">
-              <span>名称：</span>
-              <span>{{ wine.wineName }}</span>
-              <el-divider class="divider" />
-              <span>规格：</span>
-              <span>{{ wine.volume }}</span>
-              <el-divider class="divider" />
-              <span>价格：</span>
-              <span>{{ wine.price }}</span>
-              <el-divider class="divider" />
-              <span>数量：</span>
-              <span>{{ wine.count }}</span>
-              <el-divider class="divider" />
-            </el-card>
-          </div>
-          <div v-else-if="col.key === 'operation'">
-            <el-button type="danger" :disabled="scope.row.isShow === '0'" style="margin-left: 5px" @click="handleDown(scope.row)">下架</el-button>
-            <el-button type="success" style="margin-left: 5px" @click="handleShowInfo(scope.row)">详情</el-button>
+          <div v-if="col.key === 'operation'">
+            <el-link type="primary" @click="handleDown(scope.row)">查看订单</el-link>
           </div>
           <div v-else-if="/Time/.test(col.key)">
             <span>{{ parseTime(scope.row[col.key]) }}</span>
-          </div>
-          <div v-else-if="col.key === 'couponNumber'">
-            <span v-if="scope.row.couponType === '满减券'">{{ `满${scope.row.couponUpon}减${scope.row.couponNum}` }}</span>
-            <span v-else>{{ `${scope.row.couponNum}折` }}</span>
-          </div>
-          <div v-else-if="col.key === 'isPay'">
-            <span>{{ scope.row.isPay === "1" ? "已支付" : ( scope.row.isPay === "2" ? "待支付" : ( scope.row.isPay === "3" ? "已过期" : "") ) }}</span>
-          </div>
-          <div v-else-if="col.key === 'sendStatus'">
-            <span>{{ scope.row.sendStatus === "0" ? "未发货" : ( scope.row.sendStatus === "1" ? "已发货" : ( scope.row.sendStatus === "2" ? "已收货" : "") ) }}</span>
           </div>
           <div v-else-if="col.key === 'index'">
             <span>{{ scope.$index + 1 + ( listQuery.page - 1 ) * listQuery.limit }}</span>
@@ -84,79 +59,36 @@
       @pagination="getList(listQuery.page, listQuery.limit)"
     />
     <!-- 酒信息 -->
-    <el-dialog :visible.sync="dialogVisible" width="60%" title="优惠券信息">
-      <el-form v-loading="updateSend" :model="wineInfo" label-width="150px" :disabled="!!curRowId">
-        <!-- <el-form-item label="优惠券范围" prop="wineId">
-          <el-select v-model="wineInfo.wineId">
-            <el-option v-for="item in wineList" :key="item.wineId" :value="item.wineId" :label="item.wineName" />
-          </el-select>
-        </el-form-item> -->
-        <el-form-item label="优惠券类型" prop="couponType">
-          <el-select v-model="wineInfo.couponType">
-            <el-option v-for="item in couponTypeList" :key="item.id" :value="item.id" :label="item.label" />
-          </el-select>
-        </el-form-item>
-        <el-form-item v-if="wineInfo.couponType === '1'" :label="`优惠内容`" prop="couponNum">
-          <el-row>
-            <el-col :span="12">
-              <el-input v-model="wineInfo.couponNum" />
-            </el-col>
-            &nbsp;&nbsp;&nbsp;&nbsp;折
-          </el-row>
-        </el-form-item>
-        <el-form-item v-if="wineInfo.couponType === '2'" :label="`优惠内容`" prop="couponNum">
-          <el-row>
-            <span style="float: left">满&nbsp;&nbsp;&nbsp;&nbsp;</span>
-            <el-col :span="4">
-              <el-input v-model="wineInfo.couponUpon" />
-            </el-col>
-            <span style="float: left">&nbsp;&nbsp;&nbsp;&nbsp;减&nbsp;&nbsp;&nbsp;&nbsp;</span>
-            <el-col :span="4">
-              <el-input v-model="wineInfo.couponNum" />
-            </el-col>
-          </el-row>
-        </el-form-item>
-        <el-form-item label="有效期" prop="time">
-          <el-date-picker
-            v-model="wineInfo.time"
-            style="width: 100%"
-            type="datetimerange"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-          />
-        </el-form-item>
-        <el-form-item label="数量" prop="couponCount">
-          <el-input v-model="wineInfo.couponCount" type="number" />
-        </el-form-item>
-        <el-form-item label="过期时间" prop="validateTime">
-          <el-date-picker
-            v-model="wineInfo.validateTime"
-            style="width: 100%"
-            type="datetime"
-          />
+    <el-dialog :visible.sync="dialogVisible" width="40%" title="添加一级营销员">
+      <el-form v-loading="updateSend" :model="promoterInfo" :disabled="!!curRowId">
+        <el-form-item label="手机号：" prop="phoneNumber">
+          <el-input v-model="promoterInfo.phoneNumber" type="number" />
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button size="small" @click="dialogVisible = false">取 消</el-button>
         <!-- <el-button v-if="curRowId" type="danger" @click="handleDele">删 除</el-button> -->
-        <el-button v-if="!curRowId" type="primary" :loading="updateSend" @click="confirmSend">{{ curRowId ? '修 改' : '上 架' }}</el-button>
+        <el-button v-if="!curRowId" size="small" type="primary" :loading="updateSend" @click="confirmSend">{{ curRowId ? '修 改' : '提 交' }}</el-button>
       </span>
     </el-dialog>
+    <promoterOrder ref="promoterOrder" />
   </div>
 </template>
 
 <script>
 import {
-  getCouponByPage, insertCoupon, getCouponDetail, updateCoupon, getAllWineListByPage
+  updateCoupon
 } from '@/api/order'
+import { getPromoterList, insertPromoter, getPromoterOrder } from '@/api/promoter'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import { parseTime } from '@/utils/index'
+import promoterOrder from './promoterOrder'
 export default {
   name: 'ShopManage',
-  components: { Pagination },
+  components: { Pagination, promoterOrder },
   directives: { waves },
+  props: ["userId"],
   data() {
     return {
       tableKey: 0,
@@ -169,48 +101,16 @@ export default {
       total: 0,
       columns: [],
       dialogVisible: false,
-      wineInfo: {
-        wineId: null,
-        couponType: '1',
-        couponNum: null,
-        couponUpon: null,
-        time: null,
-        couponCount: null,
-        validateTime: null
+      promoterInfo: {
+        phoneNumber: '',
+        level: 1
       },
       updateSend: false,
       curRowId: null,
-      couponTypeList: [
-        {
-          label: '折扣券',
-          id: '1'
-        },
-        {
-          label: '满减券',
-          id: '2'
-        }
-      ],
-      tableColumns: [
-        {label: '优惠券类型', key: 'couponType'},
-        {label: '优惠力度', key: 'couponNumber'},
-        {label: '领取开始时间', key: 'couponStartTime', width: '160'},
-        {label: '领取结束时间', key: 'couponEndTime', width: '160'},
-        {label: '过期时间', key: 'validateTime', width: '160'},
-        {label: '创建时间', key: 'createTime', width: '160'},
-        {label: '操作', key: 'operation'},
-      ],
       wineList: []
     }
   },
   created() {
-    getAllWineListByPage({
-      'startIndex': 1,
-      'pageSize': 999
-    }).then(response => {
-      const list = response.body.list
-      this.wineList = list
-      console.log(list)
-    })
     this.getList(1, 30)
   },
   methods: {
@@ -219,9 +119,10 @@ export default {
       this.listLoading = true
       this.listQuery.page = page
       this.listQuery.limit = limit
-      getCouponByPage({
+      getPromoterList({
         'startIndex': this.listQuery.page,
-        'pageSize': this.listQuery.limit
+        'pageSize': this.listQuery.limit,
+        'phoneNumber': this.listQuery.phoneNumber
       }).then(response => {
         const data = response.body
         const columns = data.columns.filter(col => data.hideTitle.indexOf(col.key) === -1)
@@ -230,13 +131,8 @@ export default {
           fixed: 'right',
           key: 'operation'
         })
-        columns.unshift({
-          label: '序号',
-          fixed: 'left',
-          key: 'index'
-        })
         this.columns = columns
-        this.list = data.couponList
+        this.list = data.promoterList
         this.total = data.totalCount
 
         // Just to simulate the time of the request
@@ -264,117 +160,55 @@ export default {
     },
     async handleShowInfo(row) {
       this.curRowId = row ? row.couponId : ''
-      this.wineInfo = {
-        wineId: null,
-        couponType: '1',
-        couponNum: null,
-        couponUpon: null,
-        time: null,
-        couponCount: null,
-        validateTime: null
-      }
       this.updateSend = false
       this.dialogVisible = true
       if (this.curRowId) {
         this.updateSend = true
-        const res = await getCouponDetail({
+        const res = await getPromoterOrder({
           couponId: this.curRowId
         })
         const wine = res.body
-        this.wineInfo = {
-          wineId: wine.wineId || null,
-          couponType: wine.couponType,
-          couponNum: wine.couponNum,
-          couponUpon: wine.couponUpon,
-          time: [new Date(parseInt(wine.couponStartTime)), new Date(parseInt(wine.couponEndTime))],
-          couponCount: wine.couponCount,
-          validateTime: new Date(parseInt(wine.validateTime))
-        }
+        console.log(wine)
         this.updateSend = false
       }
     },
-    async confirmSend() {
-      console.log(this.wineInfo)
+    confirmSend() {
       this.updateSend = true
-      const params = {
-        wineId: this.wineInfo.wineId,
-        couponType: this.wineInfo.couponType,
-        couponNum: this.wineInfo.couponNum,
-        couponUpon: this.wineInfo.couponUpon,
-        couponStartTime: this.wineInfo.time[0].getTime(),
-        couponEndTime: this.wineInfo.time[1].getTime(),
-        couponCount: this.wineInfo.couponCount,
-        validateTime: this.wineInfo.validateTime.getTime()
-      }
-      const res = await insertCoupon({
-        data: params
-      })
-      console.log(res)
-      this.updateSend = false
-      this.$message({
-        type: 'success',
-        message: `${this.curRowId ? '修改' : '上架'}成功!`
-      })
-      this.dialogVisible = false
-      this.getList(1, 10)
-    },
-
-    getFileFromSrc(img) {
-      function convertBase64UrlToBlob(base64) {
-        var urlData = base64.dataURL
-        var type = base64.type
-        var bytes = window.atob(urlData.split(',')[1]) // 去掉url的头，并转换为byte
-        // 处理异常,将ascii码小于0的转换为大于0
-        var ab = new ArrayBuffer(bytes.length)
-        var ia = new Uint8Array(ab)
-        for (var i = 0; i < bytes.length; i++) {
-          ia[i] = bytes.charCodeAt(i)
+      const params = this.promoterInfo
+      params.userName = this.promoterInfo.phoneNumber // 用户名默认是手机号码
+      // const res = insertPromoter(params)
+      insertPromoter({data: params}).then(res => {
+        const body = res.body || 0
+        if (body === 1) {
+          this.$message({
+            type: 'success',
+            message: `${this.curRowId ? '修改' : '上架'}成功!`
+          })
+          this.dialogVisible = false
+          this.updateSend = false
+          this.getList(1, 30)
         }
-        return new Blob([ab], { type: type })
-      }
-      function getBase64Image(img) {
-        var canvas = document.createElement('canvas')
-        canvas.width = img.width
-        canvas.height = img.height
-        var ctx = canvas.getContext('2d')
-        ctx.drawImage(img, 0, 0, img.width, img.height)
-        var ext = img.src.substring(img.src.lastIndexOf('.') + 1).toLowerCase()
-        var dataURL = canvas.toDataURL('image/' + ext)
-        return {
-          dataURL: dataURL,
-          type: 'image/' + ext
-        }
-      }
-      return new Promise((resolve, reject) => {
-        var image = new Image()
-        image.crossOrigin = ''
-        image.src = img
-        image.onload = function() {
-          var base64 = getBase64Image(image)
-          var img2 = convertBase64UrlToBlob(base64)
-          var file = new File([img2], 'filename', { type: base64.type })
-          resolve(file)
-        }
-      })
+      }).catch(() => { this.updateSend = false })
     },
     handleDown(row) {
-      this.$confirm('确定下架? （下架后不可再上架）')
-        .then(async() => {
-          const res = await updateCoupon({
-            data: {
-              couponId: row.couponId,
-              isShow: '0'
-            }
-          })
-          if (res.body === 1) {
-            this.$message({
-              type: 'success',
-              message: '下架成功!'
-            })
-            this.$set(row, 'isShow', '0')
-          }
-        })
-        .catch(err => { console.log(err) })
+      this.$refs.promoterOrder.showDialog()
+      // this.$confirm('确定下架? （下架后不可再上架）')
+      //   .then(async() => {
+      //     const res = await updateCoupon({
+      //       data: {
+      //         couponId: row.couponId,
+      //         isShow: '0'
+      //       }
+      //     })
+      //     if (res.body === 1) {
+      //       this.$message({
+      //         type: 'success',
+      //         message: '下架成功!'
+      //       })
+      //       this.$set(row, 'isShow', '0')
+      //     }
+      //   })
+      //   .catch(err => { console.log(err) })
     },
     handleDele() {
       this.$confirm('确定删除?')

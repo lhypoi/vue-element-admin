@@ -13,9 +13,9 @@
       </draggable>
     </div>
     <!-- 酒信息 -->
-    <el-dialog :visible.sync="dialogVisible" width="60%" title="优惠券信息">
-      <el-form v-loading="updateSend" :model="categoryForm" label-width="150px" :disabled="!!curRowId">
-        <el-form-item label="分类名称" prop="couponType">
+    <el-dialog :visible.sync="dialogVisible" width="40%" title="添加分类">
+      <el-form v-loading="updateSend" :model="categoryForm" :disabled="!!curRowId">
+        <el-form-item label="分类名称：" prop="couponType">
           <el-input v-model="categoryForm.name " />
         </el-form-item>
       </el-form>
