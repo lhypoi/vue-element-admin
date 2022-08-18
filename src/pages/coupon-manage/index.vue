@@ -53,8 +53,10 @@
             </el-card>
           </div>
           <div v-else-if="col.key === 'operation'">
-            <el-button type="danger" :disabled="scope.row.isShow === '0'" style="margin-left: 5px" @click="handleDown(scope.row)">下架</el-button>
-            <el-button type="success" style="margin-left: 5px" @click="handleShowInfo(scope.row)">详情</el-button>
+            <el-link :type="scope.row.isShow === '1' ? 'warning' : ''" :disabled="scope.row.isShow === '0'" @click="handleDown(scope.row)">下架</el-link>
+            <el-link type="primary" style="margin-left: 15px;" @click="handleShowInfo(scope.row)">详情</el-link>
+            <!-- <el-button type="danger" :disabled="scope.row.isShow === '0'" style="margin-left: 5px" @click="handleDown(scope.row)">下架</el-button> -->
+            <!-- <el-button type="success" style="margin-left: 5px" @click="handleShowInfo(scope.row)">详情</el-button> -->
           </div>
           <div v-else-if="/Time/.test(col.key)">
             <span>{{ parseTime(scope.row[col.key]) }}</span>

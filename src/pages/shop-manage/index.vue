@@ -42,7 +42,7 @@
         :key="col.key"
         :label="col.label"
         :prop="col.key"
-        :width="col.key === 'createTime' ? 160 : col.key === 'saleTime' ? '300' : col.key === 'index' ? 50 : col.key === 'operation' ? 250 : 120"
+        :width="col.key === 'createTime' ? 160 : col.key === 'saleTime' ? '300' : col.key === 'index' ? 50 : col.key === 'operation' ? 150 : 120"
         :fixed="col.fixed"
       >
         <template slot-scope="scope">
@@ -60,13 +60,13 @@
             </el-card>
           </div>
           <div v-else-if="col.key === 'operation'">
-            <el-button type="success" :disabled="scope.row.isShow === '1'" @click="handleUp(scope.row)">上架</el-button>
-            <el-button type="danger" :disabled="scope.row.isShow === '0'" style="margin-left: 5px" @click="handleDown(scope.row)">下架</el-button>
-            <el-button type="success" style="margin-left: 5px" @click="handleShowInfo(scope.row)">详情</el-button>
+            <el-link :type="scope.row.isShow === '0' ? 'warning' : ''" :disabled="scope.row.isShow === '1'" @click="handleUp(scope.row)">上架</el-link>
+            <el-link :type="scope.row.isShow === '1' ? 'warning' : ''" :disabled="scope.row.isShow === '0'" style="margin-left: 15px" @click="handleDown(scope.row)">下架</el-link>
+            <el-link type="primary" style="margin-left: 15px" @click="handleShowInfo(scope.row)">详情</el-link>
           </div>
           <div v-else-if="col.key === 'isShow'">
-            <el-tag type="success" v-if="scope.row.isShow === '1'">已上架</el-tag>
-            <el-tag type="warning" v-else>已下架</el-tag>
+            <el-tag v-if="scope.row.isShow === '1'" type="success">已上架</el-tag>
+            <el-tag v-else type="warning">已下架</el-tag>
           </div>
           <div v-else-if="col.key === 'createTime'">
             {{ parseTime(scope.row.createTime) }}

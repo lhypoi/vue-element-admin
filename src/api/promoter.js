@@ -55,3 +55,17 @@ export function insertPromoter(query) {
     }
   })
 }
+
+export function getPromoterTotal(query) {
+  return request({
+    url: '/promoter',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'getPromoterTotal',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
