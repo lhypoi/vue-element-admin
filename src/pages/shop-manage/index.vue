@@ -2,16 +2,16 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input
-        clearable
         v-model="listQuery.name"
+        clearable
         placeholder="商品名称搜索"
         style="width: 200px;margin-right: 20px;"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
       <el-select
-        clearable
         v-model="listQuery.area"
+        clearable
         style="width: 200px;margin-right: 20px;"
         class="filter-item"
         placeholder="选择模块"
@@ -80,7 +80,7 @@
           <div v-else-if="col.key === 'index'">
             <span>{{ scope.$index + 1 + ( listQuery.page - 1 ) * listQuery.limit }}</span>
           </div>
-          <span v-else>{{ scope.row[col.key]}}</span>
+          <span v-else>{{ scope.row[col.key] }}</span>
           <span v-if="/Rate/.test(col.key)">%</span>
         </template>
       </el-table-column>
@@ -250,17 +250,17 @@ export default {
       curRowId: null,
       areaList: [],
       tableColumns: [
-        {label: '商品名称', key: 'wineName', fixed: 'left'},
-        {label: '所属板块', key: 'areaName'},
-        {label: '商品分类', key: 'catName'},
-        {label: '商品价格', key: 'price'},
-        {label: '特价价格', key: 'salePrice'},
-        {label: '特价活动时间', key: 'saleTime'},
-        {label: '商品佣金', key: 'commission'},
-        {label: '推销佣金', key: 'promoterCommission'},
-        {label: '商品状态', key: 'isShow'},
-        {label: '添加时间', key: 'createTime'},
-        {label: '操作', key: 'operation', fixed: 'right'},
+        { label: '商品名称', key: 'wineName', fixed: 'left' },
+        { label: '所属板块', key: 'areaName' },
+        { label: '商品分类', key: 'catName' },
+        { label: '商品价格', key: 'price' },
+        { label: '特价价格', key: 'salePrice' },
+        { label: '特价活动时间', key: 'saleTime' },
+        { label: '商品佣金', key: 'commission' },
+        { label: '推销佣金', key: 'promoterCommission' },
+        { label: '商品状态', key: 'isShow' },
+        { label: '添加时间', key: 'createTime' },
+        { label: '操作', key: 'operation', fixed: 'right' }
 
       ]
     }

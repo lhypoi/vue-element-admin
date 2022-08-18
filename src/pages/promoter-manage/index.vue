@@ -2,8 +2,8 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input
-        clearable
         v-model="listQuery.phoneNumber"
+        clearable
         placeholder="手机号"
         style="width: 200px;margin-right: 15px;"
         class="filter-item"
@@ -61,7 +61,7 @@
       style="margin-top: 15px;;"
       :current-page="listQuery.page"
       :page-size="listQuery.limit"
-      layout='total, sizes, prev, pager, next, jumper'
+      layout="total, sizes, prev, pager, next, jumper"
       :page-sizes="[10, 20, 30, 50]"
       :total="total"
       @size-change="handleSizeChange"
@@ -103,7 +103,7 @@ export default {
   name: 'ShopManage',
   components: { Pagination, promoterOrder, statistics },
   directives: { waves },
-  props: ["userId"],
+  props: ['userId'],
   data() {
     return {
       tableKey: 0,
@@ -147,7 +147,7 @@ export default {
       this.listQuery.page = val
       this.getList(data)
     },
-    getList(obj=undefined) {
+    getList(obj = undefined) {
       this.listLoading = true
       const param = obj || {
         startIndex: this.listQuery.page,
@@ -177,7 +177,7 @@ export default {
       const param = {
         startIndex: 1,
         pageSize: this.listQuery.limit,
-        phoneNumber: this.listQuery.phoneNumber,
+        phoneNumber: this.listQuery.phoneNumber
       }
       this.getList(param)
     },
@@ -200,7 +200,7 @@ export default {
       const params = this.promoterInfo
       params.userName = this.promoterInfo.phoneNumber // 用户名默认是手机号码
       // const res = insertPromoter(params)
-      insertPromoter({data: params}).then(res => {
+      insertPromoter({ data: params }).then(res => {
         const body = res.body || 0
         if (body === 1) {
           this.$message({

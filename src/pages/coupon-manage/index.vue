@@ -193,13 +193,13 @@ export default {
         }
       ],
       tableColumns: [
-        {label: '优惠券类型', key: 'couponType'},
-        {label: '优惠力度', key: 'couponNumber'},
-        {label: '领取开始时间', key: 'couponStartTime', width: '160'},
-        {label: '领取结束时间', key: 'couponEndTime', width: '160'},
-        {label: '过期时间', key: 'validateTime', width: '160'},
-        {label: '创建时间', key: 'createTime', width: '160'},
-        {label: '操作', key: 'operation'},
+        { label: '优惠券类型', key: 'couponType' },
+        { label: '优惠力度', key: 'couponNumber' },
+        { label: '领取开始时间', key: 'couponStartTime', width: '160' },
+        { label: '领取结束时间', key: 'couponEndTime', width: '160' },
+        { label: '过期时间', key: 'validateTime', width: '160' },
+        { label: '创建时间', key: 'createTime', width: '160' },
+        { label: '操作', key: 'operation' }
       ],
       wineList: []
     }

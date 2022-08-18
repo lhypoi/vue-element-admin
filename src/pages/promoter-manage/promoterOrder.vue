@@ -3,24 +3,24 @@
     <div class="app-container">
       <div class="filter-container">
         <el-input
-          clearable
           v-model="listQuery.phoneNumber"
+          clearable
           placeholder="手机号"
           style="width: 200px;margin-right: 15px;"
           class="filter-item"
           @keyup.enter.native="handleFilter"
         />
         <el-input
-          clearable
           v-model="listQuery.orderId"
+          clearable
           placeholder="订单号"
           style="width: 200px;margin-right: 15px;"
           class="filter-item"
           @keyup.enter.native="handleFilter"
         />
         <el-select
-          clearable
           v-model="listQuery.source"
+          clearable
           style="width: 200px;margin-right: 20px;"
           class="filter-item"
           placeholder="选择来源"
@@ -59,7 +59,7 @@
         style="margin-top: 15px;;"
         :current-page="listQuery.page"
         :page-size="listQuery.limit"
-        layout='total, sizes, prev, pager, next, jumper'
+        layout="total, sizes, prev, pager, next, jumper"
         :page-sizes="[10, 20, 30, 50]"
         :total="total"
         @size-change="handleSizeChange"

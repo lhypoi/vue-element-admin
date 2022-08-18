@@ -1,24 +1,24 @@
 <template>
   <el-dialog :visible.sync="dialogVisible" destroy-on-close width="50%" title="营销员订单">
     <el-form label-position="left" inline class="demo-table-expand">
-        <el-form-item label="当月订单数">
-            <span>{{ statisticsData.monthOrderNum || '暂无数据' }}</span>
-        </el-form-item>
-        <el-form-item label="当月社群新增人数">
-            <span>{{ statisticsData.monthTeamNum || '暂无数据' }}</span>
-        </el-form-item>
-        <el-form-item label="当月营业额">
-            <span>{{ statisticsData.monthTurnover || '暂无数据' }}</span>
-        </el-form-item>
-        <el-form-item label="推广员上级名称">
-            <span>{{ statisticsData.parentName || '暂无数据' }}</span>
-        </el-form-item>
-        <el-form-item label="收益余额">
-            <span>{{ statisticsData.profitBalance || '暂无数据' }}</span>
-        </el-form-item>
-        <el-form-item label="总收益">
-            <span>{{ statisticsData.totalProfit || '暂无数据' }}</span>
-        </el-form-item>
+      <el-form-item label="当月订单数">
+        <span>{{ statisticsData.monthOrderNum || '暂无数据' }}</span>
+      </el-form-item>
+      <el-form-item label="当月社群新增人数">
+        <span>{{ statisticsData.monthTeamNum || '暂无数据' }}</span>
+      </el-form-item>
+      <el-form-item label="当月营业额">
+        <span>{{ statisticsData.monthTurnover || '暂无数据' }}</span>
+      </el-form-item>
+      <el-form-item label="推广员上级名称">
+        <span>{{ statisticsData.parentName || '暂无数据' }}</span>
+      </el-form-item>
+      <el-form-item label="收益余额">
+        <span>{{ statisticsData.profitBalance || '暂无数据' }}</span>
+      </el-form-item>
+      <el-form-item label="总收益">
+        <span>{{ statisticsData.totalProfit || '暂无数据' }}</span>
+      </el-form-item>
     </el-form>
   </el-dialog>
 </template>
