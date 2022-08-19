@@ -52,6 +52,16 @@ const pageRouter = [
       meta: { title: '推销商管理', icon: 'table', affix: true }
     }]
   },
+  {
+    path: '/withdraw-manage',
+    component: Layout,
+    children: [{
+      path: '/withdraw-manage',
+      component: () => import('@/pages/withdraw-manage/index'),
+      name: '提现管理',
+      meta: { title: '提现管理', icon: 'table', affix: true }
+    }]
+  },
   // {
   //   path: '/code-manage',
   //   component: Layout,

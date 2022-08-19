@@ -85,13 +85,23 @@
         </template>
       </el-table-column>
     </el-table>
-    <pagination
+    <el-pagination
+      style="margin-top: 15px;;"
+      :current-page="listQuery.page"
+      :page-size="listQuery.limit"
+      layout="total, sizes, prev, pager, next, jumper"
+      :page-sizes="[10, 20, 30, 50]"
+      :total="total"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+    />
+    <!-- <pagination
       v-show="total>0"
       :total="total"
       :page.sync="listQuery.page"
       :limit.sync="listQuery.limit"
       @pagination="getList(listQuery.page, listQuery.limit)"
-    />
+    /> -->
     <!-- 酒信息 -->
     <el-dialog :visible.sync="dialogVisible" width="80%" title="物品信息" :close-on-click-modal="false" :close-on-press-escape="false">
       <el-form v-loading="updateSend" :model="wineInfo" label-width="110px" label-position="left">
@@ -205,13 +215,12 @@ import {
   getAllWineListByPage, getAreaList, uploadWine, getWineDetail, updateWine
 } from '@/api/order'
 import waves from '@/directive/waves' // waves directive
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import imgInput from '@/pages/common/imgInput'
 import { getCategoryList } from '@/api/category'
 import { parseTime } from '@/utils/index'
 export default {
   name: 'ShopManage',
-  components: { Pagination, imgInput },
+  components: { imgInput },
   directives: { waves },
   data() {
     return {
@@ -223,6 +232,7 @@ export default {
         name: '',
         area: ''
       },
+      recordPageParam: {},
       list: null,
       total: 0,
       columns: [],
@@ -261,21 +271,15 @@ export default {
         { label: '商品状态', key: 'isShow' },
         { label: '添加时间', key: 'createTime' },
         { label: '操作', key: 'operation', fixed: 'right' }
-
       ]
     }
   },
   created() {
     getAreaList({}).then(res => {
-      // areaName: "特价"
-      // createTime: "1592914685993"
-      // id: "1"
-      // isSwiper: "0"
-      // isTop: "0"
       const data = res.body
       this.areaList = data
     })
-    this.getList(1, 30)
+    this.getList()
   },
   mounted() {
     getCategoryList({})
@@ -286,16 +290,26 @@ export default {
   },
   methods: {
     parseTime,
-    getList(page, limit) {
+    handleSizeChange(val) {
+      const data = Object.assign({}, this.recordPageParam)
+      data.pageSize = val
+      this.listQuery.limit = val
+      this.getList(data)
+    },
+    handleCurrentChange(val) {
+      const data = Object.assign({}, this.recordPageParam)
+      data.startIndex = val
+      this.listQuery.page = val
+      this.getList(data)
+    },
+    getList(obj = undefined) {
       this.listLoading = true
-      this.listQuery.page = page
-      this.listQuery.limit = limit
-      getAllWineListByPage({
-        'wineName': this.listQuery.name || undefined,
-        'areaType': this.listQuery.area || undefined,
-        'startIndex': this.listQuery.page,
-        'pageSize': this.listQuery.limit
-      }).then(response => {
+      const param = obj || {
+        startIndex: this.listQuery.page,
+        pageSize: this.listQuery.limit
+      }
+      getAllWineListByPage(param).then(response => {
+        this.recordPageParam = param
         const data = response.body
         data.hideTitle = data.hideTitle.concat('id')
         const columns = data.columns.filter(col => data.hideTitle.indexOf(col.key) === -1)
@@ -312,15 +326,20 @@ export default {
         // this.columns = columns
         this.list = data.list
         this.total = data.totalCount
-
-        // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
         }, 1.5 * 1000)
       })
     },
     handleFilter() {
-      this.getList(1, 30)
+      this.listQuery.page = 1
+      const param = {
+        'wineName': this.listQuery.name || undefined,
+        'areaType': this.listQuery.area || undefined,
+        'startIndex': this.listQuery.page,
+        'pageSize': this.listQuery.limit
+      }
+      this.getList(param)
     },
     sortChange(data) {
       const { prop, order } = data
@@ -459,9 +478,7 @@ export default {
       // formData.append('wineImage', this.wineInfo.wineImage.map(item => item.response[0])[0])
       formData.append('detailTopImage', this.wineInfo.detailTopImage.map(item => item.response[0]).join(','))
       formData.append('detailImage', this.wineInfo.detailImage.map(item => item.response[0]).join(','))
-      console.log(formData)
       const res = await uploadWine(formData)
-      console.log(res)
       const body = res.body || 0
       if (body !== 0) {
         this.updateSend = false
@@ -470,7 +487,8 @@ export default {
           message: `${this.curRowId ? '修改' : '上架'}成功!`
         })
         this.dialogVisible = false
-        this.getList(1, 10)
+        this.listQuery.page = 1
+        this.getList()
       }
     },
 

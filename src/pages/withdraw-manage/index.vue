@@ -4,21 +4,49 @@
       <el-input
         v-model="listQuery.phoneNumber"
         clearable
-        placeholder="手机号"
+        placeholder="提现手机号"
         style="width: 200px;margin-right: 15px;"
         class="filter-item"
         size="small"
         @keyup.enter.native="handleFilter"
       />
+      <el-input
+        v-model="listQuery.userName"
+        clearable
+        placeholder="提现用户名"
+        style="width: 200px;margin-right: 15px;"
+        class="filter-item"
+        size="small"
+        @keyup.enter.native="handleFilter"
+      />
+      <el-select
+        v-model="listQuery.auditStatus"
+        clearable
+        style="width: 200px;margin-right: 20px;"
+        class="filter-item"
+        placeholder="审核状态"
+      >
+        <el-option value="0" label="待审核" />
+        <el-option value="1" label="已支付" />
+        <el-option value="2" label="已驳回" />
+      </el-select>
       <el-button
         v-waves
         class="filter-item"
-        type="warning"
+        type="primary"
         icon="el-icon-search"
         size="small"
         @click="handleFilter"
       >查询</el-button>
-      <el-button v-waves class="filter-item" size="small" style="float: right;" type="primary" @click="handleShowInfo">添加一级分销员</el-button>
+      <el-button
+        v-waves
+        class="filter-item"
+        style="float: right;"
+        type="warning"
+        icon="el-icon-search"
+        size="small"
+        @click="showPromoterDialog"
+      >查询营销员提现订单</el-button>
     </div>
     <el-table
       :key="tableKey"
@@ -39,9 +67,8 @@
       >
         <template slot-scope="scope">
           <div v-if="col.key === 'operation'">
-            <el-link style="margin-right: 10px;" type="primary" @click="handleDown(scope.row)">查看订单</el-link>
-            <el-link type="warning" @click="showStatistics(scope.row)">查看汇总</el-link>
-            <!-- <el-link type="primary" @click="handleDown(scope.row)"></el-link> -->
+            <el-link style="margin-right: 10px;" type="primary" @click="setPay(scope.row)">已支付</el-link>
+            <el-link type="danger" @click="setBack(scope.row)">驳回</el-link>
           </div>
           <div v-else-if="/Time/.test(col.key)">
             <span>{{ parseTime(scope.row[col.key]) }}</span>
@@ -66,33 +93,18 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
-    <!-- 酒信息 -->
-    <el-dialog :visible.sync="dialogVisible" width="40%" title="添加一级营销员">
-      <el-form v-loading="updateSend" :model="promoterInfo" :disabled="!!curRowId">
-        <el-form-item label="手机号：" prop="phoneNumber">
-          <el-input v-model="promoterInfo.phoneNumber" type="number" />
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button size="small" @click="dialogVisible = false">取 消</el-button>
-        <!-- <el-button v-if="curRowId" type="danger" @click="handleDele">删 除</el-button> -->
-        <el-button v-if="!curRowId" size="small" type="primary" :loading="updateSend" @click="confirmSend">{{ curRowId ? '修 改' : '提 交' }}</el-button>
-      </span>
-    </el-dialog>
-    <promoterOrder ref="promoterOrder" />
-    <statistics ref="statistics" />
+    <promoterWithdrawOrder ref="promoterWithdrawOrder" />
   </div>
 </template>
 
 <script>
-import { getPromoterList, insertPromoter } from '@/api/promoter'
+import { getWithdrawalOrderByPage, updateWithdrawalOrder } from '@/api/promoter'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils/index'
-import promoterOrder from './promoterOrder'
-import statistics from './statistics'
+import promoterWithdrawOrder from './promoterWithdrawOrder'
 export default {
   name: 'ShopManage',
-  components: { promoterOrder, statistics },
+  components: { promoterWithdrawOrder },
   directives: { waves },
   data() {
     return {
@@ -101,7 +113,9 @@ export default {
       listQuery: {
         page: 1,
         limit: 30,
-        phoneNumber: ''
+        phoneNumber: '',
+        userName: '',
+        auditStatus: ''
       },
       recordPageParam: {},
       list: null,
@@ -140,7 +154,7 @@ export default {
         startIndex: this.listQuery.page,
         pageSize: this.listQuery.limit
       }
-      getPromoterList(param).then(response => {
+      getWithdrawalOrderByPage(param).then(response => {
         this.recordPageParam = param
         const data = response.body
         const columns = data.columns
@@ -150,7 +164,7 @@ export default {
           key: 'operation'
         })
         this.columns = columns
-        this.list = data.promoterList
+        this.list = data.orderList
         this.total = data.totalCount
 
         // Just to simulate the time of the request
@@ -159,53 +173,53 @@ export default {
         }, 1.5 * 1000)
       })
     },
+    showPromoterDialog() {
+      this.$refs.promoterWithdrawOrder.showDialog()
+    },
     handleFilter() {
       this.listQuery.page = 1
       const param = {
         startIndex: 1,
         pageSize: this.listQuery.limit,
-        phoneNumber: this.listQuery.phoneNumber
+        phoneNumber: this.listQuery.phoneNumber,
+        userName: this.listQuery.userName,
+        auditStatus: this.listQuery.auditStatus
       }
       this.getList(param)
     },
-    async handleShowInfo() {
-      this.updateSend = false
-      this.dialogVisible = true
+    setPay(row) {
+      this.$confirm('确定将该提现订单设置为已支付吗?')
+        .then(() => {
+          const param = {
+            orderId: row.orderId,
+            auditStatus: 1
+          }
+          updateWithdrawalOrder({data: param})
+            .then(res => {
+              if (res.body === 1) {
+                this.$message.success('操作成功')
+                this.getList()
+              }
+            }).catch(() => { this.$message.error('发生错误，请重试') })
+        })
+        .catch(err => { console.log(err) })
     },
-    confirmSend() {
-      this.updateSend = true
-      const params = this.promoterInfo
-      params.userName = this.promoterInfo.phoneNumber // 用户名默认是手机号码
-      // const res = insertPromoter(params)
-      insertPromoter({ data: params }).then(res => {
-        const body = res.body || 0
-        if (body === 1) {
-          this.$message({
-            type: 'success',
-            message: `${this.curRowId ? '修改' : '上架'}成功!`
-          })
-          this.dialogVisible = false
-          this.updateSend = false
-          this.listQuery.page = 1
-          this.getList()
-        }
-      }).catch(() => { this.updateSend = false })
-    },
-    handleDown(row) {
-      console.log(row)
-      if (!row.userId) {
-        this.$message.warning('该用户未登录小程序激活')
-        // return false
-      }
-      this.$refs.promoterOrder.showDialog(row)
-    },
-    showStatistics(row) {
-      console.log(row)
-      if (!row.userId) {
-        this.$message.warning('该用户未登录小程序激活')
-        // return false
-      }
-      this.$refs.statistics.showDialog(row)
+    setBack(row) {
+      this.$confirm('确定驳回该提现订单吗?')
+        .then(() => {
+          const param = {
+            orderId: row.orderId,
+            auditStatus: 2
+          }
+          updateWithdrawalOrder({data: param})
+            .then(res => {
+              if (res.body === 1) {
+                this.$message.success('操作成功')
+                this.getList()
+              }
+            }).catch(() => { this.$message.error('发生错误，请重试') })
+        })
+        .catch(err => { console.log(err) })
     },
     handleDele() {
       this.$confirm('确定删除?')

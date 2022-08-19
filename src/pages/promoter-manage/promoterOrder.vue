@@ -45,7 +45,6 @@
         fit
         highlight-current-row
         style="width: 100%;"
-        height="calc(100vh - 50px - 40px - 96px - 56px - 30px)"
       >
         <el-table-column v-for="col in columns" :key="col.key" :label="col.label" :prop="col.key" :fixed="col.fixed">
           <template slot-scope="scope">
@@ -72,8 +71,6 @@
 <script>
 import { getPromoterOrder } from '@/api/promoter'
 import waves from '@/directive/waves' // waves directive
-import { parseTime } from '@/utils'
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
 const calendarTypeOptions = [
   { key: 'CN', display_name: 'China' },
@@ -90,7 +87,6 @@ const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
 
 export default {
   name: 'OrderManage',
-  components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {

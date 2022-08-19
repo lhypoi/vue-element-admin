@@ -3,21 +3,36 @@
     <div class="filter-container">
       <el-input
         v-model="listQuery.mobile"
+        clearable
         placeholder="手机号"
-        style="width: 200px;"
+        style="width: 200px;margin-right: 20px;"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
       <el-input
         v-model="listQuery.orderId"
+        clearable
         placeholder=" 订单号"
-        style="width: 200px;"
+        style="width: 200px;margin-right: 20px;"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
+      <el-select
+        v-model="listQuery.isPay"
+        clearable
+        style="width: 200px;margin-right: 20px;"
+        class="filter-item"
+        placeholder="支付状态"
+      >
+        <el-option value="1" label="已支付" />
+        <el-option value="2" label="已退款" />
+        <el-option value="3" label="超时未支付" />
+      </el-select>
       <el-date-picker
         v-model="listQuery.time"
+        clearable
         class="filter-item"
+        style="margin-right: 20px;"
         type="daterange"
         align="right"
         unlink-panels
@@ -33,14 +48,14 @@
         icon="el-icon-search"
         @click="handleFilter"
       >查询</el-button>
-      <el-button
+      <!-- <el-button
         v-waves
         :loading="downloadLoading"
         class="filter-item"
         type="primary"
         icon="el-icon-download"
         @click="handleDownload"
-      >导出为Excel</el-button>
+      >导出为Excel</el-button> -->
     </div>
     <el-table
       :key="tableKey"
@@ -50,7 +65,6 @@
       fit
       highlight-current-row
       style="width: 100%;"
-      height="calc(100vh - 50px - 40px - 96px - 56px - 30px)"
       @sort-change="sortChange"
     >
       <el-table-column v-for="col in columns" :key="col.key" :label="col.label" :prop="col.key" :width="col.key === 'wineNameList' ? 200 : col.key === 'addressLabel' ? '' : col.key === 'index' ? 50 : 120" :fixed="col.fixed">
@@ -87,14 +101,23 @@
         </template>
       </el-table-column>
     </el-table>
-    <pagination
+    <el-pagination
+      style="margin-top: 15px;;"
+      :current-page="listQuery.page"
+      :page-size="listQuery.limit"
+      layout="total, sizes, prev, pager, next, jumper"
+      :page-sizes="[10, 20, 30, 50]"
+      :total="total"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+    />
+    <!-- <pagination
       v-show="total>0"
       :total="total"
       :page.sync="listQuery.page"
       :limit.sync="listQuery.limit"
       @pagination="getList(listQuery.page, listQuery.limit)"
-    />
-
+    /> -->
     <!-- 发货 -->
     <el-dialog
       title="物流信息"
@@ -210,7 +233,6 @@ import {
 } from '@/api/order'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
 const calendarTypeOptions = [
   { key: 'CN', display_name: 'China' },
@@ -227,7 +249,6 @@ const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
 
 export default {
   name: 'OrderManage',
-  components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -284,8 +305,10 @@ export default {
         limit: 30,
         mobile: '',
         orderId: '',
+        isPay: '',
         time: []
       },
+      recordPageParam: {},
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
       sortOptions: [
@@ -342,21 +365,29 @@ export default {
     }
   },
   created() {
-    this.getList(1, 30)
+    this.getList()
   },
   methods: {
-    getList(page, limit) {
+    handleSizeChange(val) {
+      const data = Object.assign({}, this.recordPageParam)
+      data.pageSize = val
+      this.listQuery.limit = val
+      this.getList(data)
+    },
+    handleCurrentChange(val) {
+      const data = Object.assign({}, this.recordPageParam)
+      data.startIndex = val
+      this.listQuery.page = val
+      this.getList(data)
+    },
+    getList(obj = undefined) {
       this.listLoading = true
-      this.listQuery.page = page
-      this.listQuery.limit = limit
-      orderManage({
-        'mobile': this.listQuery.mobile || undefined,
-        'orderId': this.listQuery.orderId || undefined,
-        'startIndex': this.listQuery.page,
-        'pageSize': this.listQuery.limit,
-        'startTime': this.listQuery.time[0] ? new Date(this.listQuery.time[0]).getTime() : undefined,
-        'endTime': this.listQuery.time[1] ? new Date(this.listQuery.time[1]).getTime() : undefined
-      }).then(response => {
+      const param = obj || {
+        startIndex: this.listQuery.page,
+        pageSize: this.listQuery.limit
+      }
+      orderManage(param).then(response => {
+        this.recordPageParam = param
         const data = response.body
         data.hideTitle = data.hideTitle.concat('id')
         const columns = data.columns.filter(col => data.hideTitle.indexOf(col.key) === -1)
@@ -381,7 +412,16 @@ export default {
       })
     },
     handleFilter() {
-      this.getList(1, 30)
+      const param = {
+        'mobile': this.listQuery.mobile || undefined,
+        'orderId': this.listQuery.orderId || undefined,
+        'isPay': this.listQuery.isPay || undefined,
+        'startIndex': this.listQuery.page,
+        'pageSize': this.listQuery.limit,
+        'startTime': this.listQuery.time[0] ? new Date(this.listQuery.time[0]).getTime() : undefined,
+        'endTime': this.listQuery.time[1] ? new Date(this.listQuery.time[1]).getTime() : undefined
+      }
+      this.getList(param)
     },
     handleModifyStatus(row, status) {
       this.$message({

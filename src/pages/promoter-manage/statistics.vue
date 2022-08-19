@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :visible.sync="dialogVisible" destroy-on-close width="50%" title="营销员订单">
+  <el-dialog :visible.sync="dialogVisible" destroy-on-close width="50%" title="营销员订单汇总">
     <el-form label-position="left" inline class="demo-table-expand">
       <el-form-item label="当月订单数">
         <span>{{ statisticsData.monthOrderNum || '暂无数据' }}</span>
@@ -25,40 +25,9 @@
 
 <script>
 import { getPromoterTotal } from '@/api/promoter'
-import waves from '@/directive/waves' // waves directive
-import { parseTime } from '@/utils'
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-
-const calendarTypeOptions = [
-  { key: 'CN', display_name: 'China' },
-  { key: 'US', display_name: 'USA' },
-  { key: 'JP', display_name: 'Japan' },
-  { key: 'EU', display_name: 'Eurozone' }
-]
-
-// arr to obj, such as { CN : "China", US : "USA" }
-const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
-  return acc
-}, {})
 
 export default {
   name: 'OrderManage',
-  components: { Pagination },
-  directives: { waves },
-  filters: {
-    statusFilter(status) {
-      const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
-      }
-      return statusMap[status]
-    },
-    typeFilter(type) {
-      return calendarTypeKeyValue[type]
-    }
-  },
   data() {
     return {
       tableKey: 0,
@@ -66,13 +35,6 @@ export default {
       total: 0,
       listLoading: true,
       recordPageParam: {},
-      importanceOptions: [1, 2, 3],
-      calendarTypeOptions,
-      sortOptions: [
-        { label: 'ID Ascending', key: '+id' },
-        { label: 'ID Descending', key: '-id' }
-      ],
-      statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       dialogFormVisible: false,
       dialogStatus: '',
@@ -122,9 +84,9 @@ div >>> .el-form-item {
   margin-bottom: 0;
   width: 50%;
 }
-  .demo-table-expand .el-form-item {
-    margin-right: 0;
-    margin-bottom: 0;
-    width: 50%;
-  }
+.demo-table-expand .el-form-item {
+  margin-right: 0;
+  margin-bottom: 0;
+  width: 50%;
+}
 </style>

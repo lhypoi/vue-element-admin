@@ -69,3 +69,59 @@ export function getPromoterTotal(query) {
     }
   })
 }
+
+export function insertWithdrawalOrder(query) {
+  return request({
+    url: '/promoter',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'insertWithdrawalOrder',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
+
+export function getWithdrawalOrderByPage(query) {
+  return request({
+    url: '/promoter',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'getWithdrawalOrderByPage',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
+
+export function updateWithdrawalOrder(query) {
+  return request({
+    url: '/promoter',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'updateWithdrawalOrder',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
+
+export function getPromoterWithdrawal(query) {
+  return request({
+    url: '/promoter',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'getPromoterWithdrawal',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
