@@ -129,7 +129,15 @@
         label-width="80px"
       >
         <el-form-item label="物流公司" prop="company">
-          <el-input v-model="sendInfo.company" />
+          <el-select
+            v-model="sendInfo.company"
+            clearable
+            class="filter-item"
+            placeholder="选择物流公司"
+            filterable
+          >
+            <el-option v-for="item in expressCompany" :key="item.id" :value="item.name" :label="item.name + ' —— ' + item.type" />
+          </el-select>
         </el-form-item>
         <el-form-item label="物流单号" prop="sendNumber">
           <el-input v-model="sendInfo.sendNumber" />
@@ -229,7 +237,7 @@ import {
   updateArticle
 } from '@/api/article'
 import {
-  orderManage, updateSendState
+  orderManage, updateSendState, getExpressCompanyList
 } from '@/api/order'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
@@ -361,13 +369,22 @@ export default {
         'sendNumber': ''
       },
       handleRow: null,
-      updateSend: false
+      updateSend: false,
+      expressCompany: []
     }
   },
   created() {
     this.getList()
+    this.getExpressCompanyData()
   },
   methods: {
+    getExpressCompanyData() {
+      getExpressCompanyList({})
+        .then(res => {
+          const data = res.body || []
+          this.expressCompany = data
+        })
+    },
     handleSizeChange(val) {
       const data = Object.assign({}, this.recordPageParam)
       data.pageSize = val
@@ -570,6 +587,9 @@ export default {
     },
     confirmSend() {
       if (this.sendInfo.company.trim() && this.sendInfo.sendNumber.trim()) {
+        const companyData = this.expressCompany.find(item => item.name.trim() === this.sendInfo.company.trim()) || []
+        this.sendInfo.companyCode = companyData.code
+        console.log(111, this.sendInfo)
         this.updateSend = true
         updateSendState(this.sendInfo).then(res => {
           this.updateSend = false

@@ -231,3 +231,17 @@ export function deleteCode(query) {
     }
   })
 }
+
+export function getExpressCompanyList(query) {
+  return request({
+    url: '/wine',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'getExpressCompanyList',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
