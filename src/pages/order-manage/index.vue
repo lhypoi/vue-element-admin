@@ -390,9 +390,10 @@ export default {
       uploadDialogVisible: false,
       fileList: [],
       successList: [],
-      action: 'https://api.ukshuxi.com/services/importSendOrder',
-      // action: process.env.VUE_APP_BASE_API + '/services/importSendOrder',
-      downloadUrl: 'https://api.ukshuxi.com/services/exportSendTemplate'
+      // action: 'https://api.ukshuxi.com/services/importSendOrder',
+      action: process.env.VUE_APP_BASE_API + '/services/importSendOrder',
+      // downloadUrl: 'https://api.ukshuxi.com/services/exportSendTemplate'
+      downloadUrl: process.env.VUE_APP_BASE_API + '/services/exportSendTemplate'
     }
   },
   created() {
