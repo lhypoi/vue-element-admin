@@ -41,14 +41,13 @@
           <div v-if="col.key === 'operation'">
             <el-link style="margin-right: 10px;" type="primary" @click="handleDown(scope.row)">查看订单</el-link>
             <el-link type="warning" @click="showStatistics(scope.row)">查看汇总</el-link>
-            <!-- <el-link type="primary" @click="handleDown(scope.row)"></el-link> -->
           </div>
           <div v-else-if="/Time/.test(col.key)">
             <span>{{ parseTime(scope.row[col.key]) }}</span>
           </div>
-          <div v-else-if="col.key === 'teamNum'">
+          <!-- <div v-else-if="col.key === 'teamNum'">
             <el-link type="primary">{{ scope.row[col.key] }}</el-link>
-          </div>
+          </div> -->
           <div v-else-if="col.key === 'index'">
             <span>{{ scope.$index + 1 + ( listQuery.page - 1 ) * listQuery.limit }}</span>
           </div>

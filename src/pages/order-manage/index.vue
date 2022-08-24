@@ -229,12 +229,19 @@
     </el-dialog>
 
     <el-dialog :visible.sync="uploadDialogVisible" @close="fileList = []">
-      <el-upload :multiple="false" :file-list="fileList" :on-error="handleError" :on-success="hanelSuccess" :auto-upload="false" :action="action" drag>
+      <el-button style="margin-bottom: 10px;" size="small" type="primary" @click="downloadModule">下载模板</el-button>
+      <el-button style="margin-top: 10px;" size="small" type="success" @click="submitUpload">点击上传</el-button>
+      <el-upload ref="upload" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" :multiple="false" style="width: 100%;" :file-list="fileList" :on-error="handleError" :on-success="handleSuccess" :auto-upload="false" :action="action" drag>
         <i class="el-icon-upload" />
-        <div class="el-upload__text">
-          将文件拖到此处，或<em>点击上传</em>
+        <div class="el-upload__text" style="width: 100%;">
+          <em>点击选择文件</em>
         </div>
       </el-upload>
+      <div v-if="successList.length > 0">
+        <el-divider />
+        <p>上传成功的订单ID</p>
+        <p v-for="item in successList" :key="item" style="margin: 0px;margin-bottom: 10px;">{{ item }}</p>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -382,7 +389,10 @@ export default {
       expressCompany: [],
       uploadDialogVisible: false,
       fileList: [],
-      action: process.env.VUE_APP_BASE_API + '/services/importSendOrder'
+      successList: [],
+      action: 'https://api.ukshuxi.com/services/importSendOrder',
+      // action: process.env.VUE_APP_BASE_API + '/services/importSendOrder',
+      downloadUrl: 'https://api.ukshuxi.com/services/exportSendTemplate'
     }
   },
   created() {
@@ -390,7 +400,36 @@ export default {
     this.getExpressCompanyData()
   },
   methods: {
-    hanelSuccess(response, file, fileList) {
+    submitUpload() {
+      this.$refs.upload.submit()
+    },
+    downloadModule() {
+      console.log(this.downloadUrl)
+      const xhr = new XMLHttpRequest()
+      xhr.open('post', this.downloadUrl)
+      xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8')
+      xhr.responseType = 'blob'
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          // 数据在 this.response 保存
+          // excel 的 MIME 格式为 application/vnd.ms-excel
+          var blob = new Blob([this.response], {
+            type: 'application/vnd.ms-excel'
+          })
+          // 创建a链接 href链接地址 download为下载下来后文件的名称
+          var aa = document.createElement('a')
+          aa.href = URL.createObjectURL(blob)
+          aa.download = '发货模板.xlsx'
+          aa.style.display = 'none'
+          document.body.appendChild(aa)
+          aa.click()
+        }
+      }
+      xhr.send('{}')
+    },
+    handleSuccess(response, file, fileList) {
+      this.$message.success('上传成功')
+      this.successList = response.successList
       console.log(response, file, fileList)
     },
     handleError(error, file) {
@@ -665,5 +704,11 @@ export default {
 <style lang="scss" scoped>
   .divider {
     margin: 5px 0;
+  }
+  >>> .el-upload-dragger {
+    width: 100%;
+  }
+  >>> .el-upload {
+    width: 100%;
   }
 </style>

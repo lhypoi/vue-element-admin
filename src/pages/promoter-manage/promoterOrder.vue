@@ -48,7 +48,10 @@
       >
         <el-table-column v-for="col in columns" :key="col.key" :label="col.label" :prop="col.key" :fixed="col.fixed">
           <template slot-scope="scope">
-            <span>
+            <div v-if="col.key === 'source'">
+              <span>{{ sourceMap[scope.row[col.key]] }}</span>
+            </div>
+            <span v-else>
               {{ scope.row[col.key] }}
             </span>
           </template>
@@ -132,6 +135,11 @@ export default {
       dialogVisible: false,
       handleRow: null,
       updateSend: false,
+      sourceMap: {
+        '1': '自购',
+        '2': '直推',
+        '3': '间推'
+      },
       promoterRowInfo: {}
     }
   },
@@ -176,12 +184,12 @@ export default {
     handleFilter() {
       this.listQuery.page = 1
       const param = {
-        promoterId: this.promoterRowInfo.userId,
+        promoterId: this.promoterRowInfo.userId || undefined,
         startIndex: 1,
         pageSize: this.listQuery.limit,
-        phoneNumber: this.listQuery.phoneNumber,
-        orderId: this.listQuery.orderId,
-        source: this.listQuery.source
+        phoneNumber: this.listQuery.phoneNumber || undefined,
+        orderId: this.listQuery.orderId || undefined,
+        source: this.listQuery.source || undefined
       }
       this.getList(param)
     }

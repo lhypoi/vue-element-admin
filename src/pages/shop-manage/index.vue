@@ -18,6 +18,9 @@
       >
         <el-option v-for="item in areaList" :key="item.id" :value="item.id" :label="item.areaName" />
       </el-select>
+      <el-select v-model="listQuery.catId" style="width: 200px;margin-right: 20px;" class="filter-item" clearable filterable placeholder="选择商品分类">
+        <el-option v-for="item in categoryList" :key="item.id" :value="item.id" :label="item.name" />
+      </el-select>
       <el-button
         v-waves
         class="filter-item"
@@ -42,7 +45,7 @@
         :key="col.key"
         :label="col.label"
         :prop="col.key"
-        :width="col.key === 'createTime' ? 160 : col.key === 'saleTime' ? '300' : col.key === 'index' ? 50 : col.key === 'operation' ? 150 : 120"
+        :width="col.key === 'createTime' ? 160 : col.key === 'saleTime' ? '300' : col.key === 'index' ? 50 : col.key === 'operation' ? 150 : ''"
         :fixed="col.fixed"
       >
         <template slot-scope="scope">
@@ -72,7 +75,7 @@
             {{ parseTime(scope.row.createTime) }}
           </div>
           <div v-else-if="col.key === 'saleTime'">
-            {{ scope.row.saleStartTime ? (parseTime(scope.row.saleStartTime) + '-' + parseTime(scope.row.saleEndTime)) : '未开启特价' }}
+            {{ scope.row.saleStartTime ? (parseTime(scope.row.saleStartTime) + ' 至 ' + parseTime(scope.row.saleEndTime)) : '未开启特价' }}
           </div>
           <div v-else-if="col.key === 'sendStatus'">
             <span>{{ scope.row.sendStatus === "0" ? "未发货" : ( scope.row.sendStatus === "1" ? "已发货" : ( scope.row.sendStatus === "2" ? "已收货" : "") ) }}</span>
@@ -230,7 +233,8 @@ export default {
         page: 1,
         limit: 30,
         name: '',
-        area: ''
+        area: '',
+        catId: ''
       },
       recordPageParam: {},
       list: null,
@@ -336,6 +340,7 @@ export default {
       const param = {
         'wineName': this.listQuery.name || undefined,
         'areaType': this.listQuery.area || undefined,
+        'catId': this.listQuery.catId || undefined,
         'startIndex': this.listQuery.page,
         'pageSize': this.listQuery.limit
       }

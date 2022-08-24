@@ -42,7 +42,10 @@
       >
         <el-table-column v-for="col in columns" :key="col.key" :label="col.label" :prop="col.key" :fixed="col.fixed">
           <template slot-scope="scope">
-            <span>
+            <div v-if="col.key === 'auditStatus'">
+              <span>{{ statusMap[scope.row[col.key]] }}</span>
+            </div>
+            <span v-else>
               {{ scope.row[col.key] }}
             </span>
           </template>
@@ -93,6 +96,11 @@ export default {
       listLoading: false,
       listQuery: {
         userId: ''
+      },
+      statusMap: {
+        '0': '待审核',
+        '1': '已支付',
+        '2': '已驳回'
       },
       columns: [
         {

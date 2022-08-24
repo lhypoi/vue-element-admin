@@ -7,7 +7,6 @@
         placeholder="提现手机号"
         style="width: 200px;margin-right: 15px;"
         class="filter-item"
-        size="small"
         @keyup.enter.native="handleFilter"
       />
       <el-input
@@ -16,7 +15,6 @@
         placeholder="提现用户名"
         style="width: 200px;margin-right: 15px;"
         class="filter-item"
-        size="small"
         @keyup.enter.native="handleFilter"
       />
       <el-select
@@ -38,7 +36,7 @@
         size="small"
         @click="handleFilter"
       >查询</el-button>
-      <el-button
+      <!-- <el-button
         v-waves
         class="filter-item"
         style="float: right;"
@@ -46,7 +44,7 @@
         icon="el-icon-search"
         size="small"
         @click="showPromoterDialog"
-      >查询营销员提现订单</el-button>
+      >查询营销员提现订单</el-button> -->
     </div>
     <el-table
       :key="tableKey"
@@ -67,8 +65,8 @@
       >
         <template slot-scope="scope">
           <div v-if="col.key === 'operation'">
-            <el-link style="margin-right: 10px;" type="primary" @click="setPay(scope.row)">已支付</el-link>
-            <el-link type="danger" @click="setBack(scope.row)">驳回</el-link>
+            <el-link style="margin-right: 10px;" type="primary" :disabled="scope.row.auditStatus !== '0'" @click="setPay(scope.row)">已支付</el-link>
+            <el-link type="danger" :disabled="scope.row.auditStatus !== '0'" @click="setBack(scope.row)">驳回</el-link>
           </div>
           <div v-else-if="/Time/.test(col.key)">
             <span>{{ parseTime(scope.row[col.key]) }}</span>
@@ -78,6 +76,9 @@
           </div>
           <div v-else-if="col.key === 'index'">
             <span>{{ scope.$index + 1 + ( listQuery.page - 1 ) * listQuery.limit }}</span>
+          </div>
+          <div v-else-if="col.key === 'auditStatus'">
+            <span>{{ statusMap[scope.row[col.key]] }}</span>
           </div>
           <span v-else>{{ scope.row[col.key] }}</span>
         </template>
@@ -125,6 +126,11 @@ export default {
       promoterInfo: {
         phoneNumber: '',
         level: 1
+      },
+      statusMap: {
+        '0': '待审核',
+        '1': '已支付',
+        '2': '已驳回'
       },
       updateSend: false,
       curRowId: null,
@@ -181,9 +187,9 @@ export default {
       const param = {
         startIndex: 1,
         pageSize: this.listQuery.limit,
-        phoneNumber: this.listQuery.phoneNumber,
-        userName: this.listQuery.userName,
-        auditStatus: this.listQuery.auditStatus
+        phoneNumber: this.listQuery.phoneNumber || undefined,
+        userName: this.listQuery.userName || undefined,
+        auditStatus: this.listQuery.auditStatus || undefined
       }
       this.getList(param)
     },
