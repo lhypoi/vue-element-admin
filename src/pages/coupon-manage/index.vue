@@ -118,7 +118,7 @@
             </el-col>
           </el-row>
         </el-form-item>
-        <el-form-item label="有效期" prop="time">
+        <el-form-item label="领取时间" prop="time">
           <el-date-picker
             v-model="wineInfo.time"
             style="width: 100%"

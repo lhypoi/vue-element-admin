@@ -51,6 +51,18 @@
             <div v-if="col.key === 'source'">
               <span>{{ sourceMap[scope.row[col.key]] }}</span>
             </div>
+            <div v-else-if="col.key === 'wineList'">
+              <el-card v-for="wine in scope.row[col.key]" :key="wine.wineId">
+                <span>名称：</span><span>{{ wine.wineName }}</span>
+                <el-divider class="divider" />
+                <span>规格：</span><span>{{ wine.volume }}</span>
+                <el-divider class="divider" />
+                <span>价格：</span><span>{{ wine.price }}</span>
+                <el-divider class="divider" />
+                <span>数量：</span><span>{{ wine.count }}</span>
+                <el-divider class="divider" />
+              </el-card>
+            </div>
             <span v-else>
               {{ scope.row[col.key] }}
             </span>

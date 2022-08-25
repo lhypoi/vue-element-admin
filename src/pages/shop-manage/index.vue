@@ -107,7 +107,7 @@
     /> -->
     <!-- 酒信息 -->
     <el-dialog :visible.sync="dialogVisible" width="80%" title="物品信息" :close-on-click-modal="false" :close-on-press-escape="false">
-      <el-form v-loading="updateSend" :model="wineInfo" label-width="110px" label-position="left">
+      <el-form ref="shopForm" v-loading="updateSend" :model="wineInfo" :rules="rules" label-width="110px" label-position="left" hide-required-asterisk>
         <el-row :gutter="20">
           <el-col :span="8">
             <el-form-item label="选择上架板块：" prop="areaType">
@@ -129,11 +129,11 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item v-if="wineInfo.areaType !== '99'" label="是否置顶：" prop="topOrder">
+        <!-- <el-form-item v-if="wineInfo.areaType !== '99'" label="是否置顶：" prop="topOrder">
           <el-switch v-model="wineInfo.topOrder" active-value="1" inactive-value="0" />
-        </el-form-item>
+        </el-form-item> -->
         <div style="background: #F7F6F4;padding: 20px 10px;border-radius: 4px;margin-bottom: 10px;">
-          <el-form-item v-if="wineInfo.areaType === '99'" label="特价活动时间：" prop="time">
+          <el-form-item v-if="wineInfo.areaType === '99'" label="特价活动时间：" prop="saleTime">
             <el-date-picker
               v-model="wineInfo.saleTime"
               style="width: 40%"
@@ -145,22 +145,22 @@
           </el-form-item>
           <el-row v-for="(type, index) in wineInfo.wineTypeList" :key="index" :gutter="20">
             <el-col :span="wineInfo.areaType === '99' ? 6 : 8">
-              <el-form-item label="输入规格名称：" prop="volume">
+              <el-form-item :rules="{ required: true, message: '请输入规格名称', trigger: 'blur' }" label="输入规格名称：" :prop="'wineTypeList.' + index + '.volume'">
                 <el-input v-model="type.volume" />
               </el-form-item>
             </el-col>
             <el-col :span="wineInfo.areaType === '99' ? 6 : 8">
-              <el-form-item label="输入价格：" prop="price">
+              <el-form-item :rules="{ required: true, message: '请输入价格', trigger: 'blur' }" label="输入价格：" :prop="'wineTypeList.' + index + '.price'">
                 <el-input v-model="type.price" type="number" />
               </el-form-item>
             </el-col>
             <el-col :span="wineInfo.areaType === '99' ? 6 : 7">
-              <el-form-item label="输入库存：" prop="stock">
+              <el-form-item :rules="{ required: true, message: '请输入库存', trigger: 'blur' }" label="输入库存：" :prop="'wineTypeList.' + index + '.stock'">
                 <el-input v-model="type.stock" type="number" />
               </el-form-item>
             </el-col>
             <el-col v-if="wineInfo.areaType === '99'" :span="5">
-              <el-form-item label="输入特价：" prop="stock">
+              <el-form-item :rules="{ required: true, message: '请输入特价', trigger: 'blur' }" label="输入特价：" :prop="'wineTypeList.' + index + '.salePrice'">
                 <el-input v-model="type.salePrice" type="number" />
               </el-form-item>
             </el-col>
@@ -220,7 +220,7 @@ import {
 import waves from '@/directive/waves' // waves directive
 import imgInput from '@/pages/common/imgInput'
 import { getCategoryList } from '@/api/category'
-import { parseTime } from '@/utils/index'
+import { deepClone, parseTime } from '@/utils/index'
 export default {
   name: 'ShopManage',
   components: { imgInput },
@@ -241,23 +241,48 @@ export default {
       total: 0,
       columns: [],
       dialogVisible: false,
+      // wineInfo: {
+      //   areaType: '',
+      //   catId: '',
+      //   wineName: '',
+      //   words: [],
+      //   description: '',
+      //   topOrder: '0',
+      //   wineTypeList: [
+      //     { volume: null, price: null, stock: null, time: null, salePrice: null }
+      //   ],
+      //   commissionRate: 80,
+      //   promoterRate: 80,
+      //   tags: [],
+      //   wineImage: [],
+      //   detailTopImage: [],
+      //   detailImage: [],
+      //   saleTime: []
+      // },
       wineInfo: {
         areaType: '',
         catId: '',
         wineName: '',
-        words: [],
-        description: '',
-        topOrder: '0',
         wineTypeList: [
           { volume: null, price: null, stock: null, time: null, salePrice: null }
         ],
         commissionRate: 80,
         promoterRate: 80,
-        tags: [],
         wineImage: [],
         detailTopImage: [],
         detailImage: [],
         saleTime: []
+      },
+      rules: {
+        areaType: [{ required: true, message: '请选择上架板块', trigger: 'blur' }],
+        catId: [{ required: true, message: '请选择商品分类', trigger: 'blur' }],
+        wineName: [{ required: true, message: '请输入商品名称', trigger: 'blur' }],
+        commissionRate: [{ required: true, message: '请输入商品佣金比例', trigger: 'blur' }],
+        promoterRate: [{ required: true, message: '请输入推销佣金比例', trigger: 'blur' }],
+        wineImage: [{ required: true, message: '请上传商品封面图', trigger: 'blur' }],
+        detailTopImage: [{ required: true, message: '请上传商品轮播图', trigger: 'blur' }],
+        detailImage: [{ required: true, message: '请上传商品详情图', trigger: 'blur' }],
+        saleTime: [{ required: true, message: '请选择促销时间', trigger: 'blur' }]
       },
       updateSend: false,
       categoryList: [],
@@ -368,9 +393,9 @@ export default {
         wineName: '',
         words: [],
         description: '',
-        topOrder: '0',
+        // topOrder: '0',
         wineTypeList: [
-          { volume: null, price: null, stock: null, time: null, salePrice: null }
+          { volume: null, price: null, stock: null, salePrice: null }
         ],
         commissionRate: 80,
         promoterRate: 80,
@@ -396,7 +421,7 @@ export default {
           wineName: wine.wineName,
           words: wine.words,
           description: wine.description,
-          topOrder: wine.topOrder,
+          // topOrder: wine.topOrder,
           commissionRate: wine.commissionRate,
           promoterRate: wine.promoterRate,
           wineTypeList: wine.typeList.map(type => {
@@ -436,65 +461,71 @@ export default {
         this.updateSend = false
       }
     },
-    async confirmSend() {
-      const cloneData = Object.assign({}, this.wineInfo)
-      delete cloneData.saleTime
-      if (this.wineInfo.isShow === '1') {
-        this.$message({
-          type: 'warning',
-          message: `请先下架`
-        })
-        return false
-      }
-      this.updateSend = true
-      const formData = new FormData()
-      if (this.curRowId) formData.append('wineId', this.curRowId)
-      formData.append('areaType', this.wineInfo.areaType)
-      formData.append('wineName', this.wineInfo.wineName)
-      formData.append('catId', this.wineInfo.catId)
-      formData.append('promoterRate', this.wineInfo.promoterRate)
-      formData.append('commissionRate', this.wineInfo.commissionRate)
-      if (this.wineInfo.words.length) formData.append('words', this.wineInfo.words.join(','))
-      formData.append('description', this.wineInfo.description)
-      formData.append('topOrder', this.wineInfo.topOrder)
-      if (this.wineInfo.areaType === '99') {
-        formData.append('saleStartTime', this.wineInfo.saleTime[0].getTime())
-        formData.append('saleEndTime', this.wineInfo.saleTime[1].getTime())
-      }
-      // formData.append('wineTypeList', JSON.stringify(this.wineInfo.wineTypeList.filter((item, index) => this.wineInfo.areaType !== '99' || index === 0).map((item, index) => {
-      formData.append('wineTypeList', JSON.stringify(this.wineInfo.wineTypeList.map((item, index) => {
-        const wine = {
-          volume: item.volume,
-          price: item.price,
-          stock: item.stock
+    confirmSend() {
+      this.$refs.shopForm.validate(async valid => {
+        if (valid) {
+          const cloneData = Object.assign({}, this.wineInfo)
+          delete cloneData.saleTime
+          if (this.wineInfo.isShow === '1') {
+            this.$message({
+              type: 'warning',
+              message: `请先下架`
+            })
+            return false
+          }
+          this.updateSend = true
+          const formData = new FormData()
+          if (this.curRowId) formData.append('wineId', this.curRowId)
+          formData.append('areaType', this.wineInfo.areaType)
+          formData.append('wineName', this.wineInfo.wineName)
+          formData.append('catId', this.wineInfo.catId)
+          formData.append('promoterRate', this.wineInfo.promoterRate)
+          formData.append('commissionRate', this.wineInfo.commissionRate)
+          if (this.wineInfo.words.length) formData.append('words', this.wineInfo.words.join(','))
+          formData.append('description', this.wineInfo.description)
+          // formData.append('topOrder', this.wineInfo.topOrder)
+          if (this.wineInfo.areaType === '99') {
+            formData.append('saleStartTime', this.wineInfo.saleTime[0].getTime())
+            formData.append('saleEndTime', this.wineInfo.saleTime[1].getTime())
+          }
+          // formData.append('wineTypeList', JSON.stringify(this.wineInfo.wineTypeList.filter((item, index) => this.wineInfo.areaType !== '99' || index === 0).map((item, index) => {
+          formData.append('wineTypeList', JSON.stringify(this.wineInfo.wineTypeList.map((item, index) => {
+            const wine = {
+              volume: item.volume,
+              price: item.price,
+              stock: item.stock
+            }
+            // if (this.wineInfo.areaType === '99' && index === 0) {
+            if (this.wineInfo.areaType === '99') {
+              wine.salePrice = item.salePrice
+              // wine.saleStartTime = item.time[0].getTime()
+              // wine.saleEndTime = item.time[1].getTime()
+              wine.saleStartTime = this.wineInfo.saleTime[0].getTime()
+              wine.saleEndTime = this.wineInfo.saleTime[1].getTime()
+            }
+            return wine
+          })))
+          formData.append('tags', this.wineInfo.tags.join(','))
+          formData.append('wineImage', this.wineInfo.wineImage.map(item => item.response[0]).join(','))
+          // formData.append('wineImage', this.wineInfo.wineImage.map(item => item.response[0])[0])
+          formData.append('detailTopImage', this.wineInfo.detailTopImage.map(item => item.response[0]).join(','))
+          formData.append('detailImage', this.wineInfo.detailImage.map(item => item.response[0]).join(','))
+          const res = await uploadWine(formData)
+          const body = res.body || 0
+          if (body !== 0) {
+            this.updateSend = false
+            this.$message({
+              type: 'success',
+              message: `${this.curRowId ? '修改' : '上架'}成功!`
+            })
+            this.dialogVisible = false
+            this.listQuery.page = 1
+            this.getList()
+          }
+        } else {
+          this.$message.warning('信息不完整')
         }
-        // if (this.wineInfo.areaType === '99' && index === 0) {
-        if (this.wineInfo.areaType === '99') {
-          wine.salePrice = item.salePrice
-          // wine.saleStartTime = item.time[0].getTime()
-          // wine.saleEndTime = item.time[1].getTime()
-          wine.saleStartTime = this.wineInfo.saleTime[0].getTime()
-          wine.saleEndTime = this.wineInfo.saleTime[1].getTime()
-        }
-        return wine
-      })))
-      formData.append('tags', this.wineInfo.tags.join(','))
-      formData.append('wineImage', this.wineInfo.wineImage.map(item => item.response[0]).join(','))
-      // formData.append('wineImage', this.wineInfo.wineImage.map(item => item.response[0])[0])
-      formData.append('detailTopImage', this.wineInfo.detailTopImage.map(item => item.response[0]).join(','))
-      formData.append('detailImage', this.wineInfo.detailImage.map(item => item.response[0]).join(','))
-      const res = await uploadWine(formData)
-      const body = res.body || 0
-      if (body !== 0) {
-        this.updateSend = false
-        this.$message({
-          type: 'success',
-          message: `${this.curRowId ? '修改' : '上架'}成功!`
-        })
-        this.dialogVisible = false
-        this.listQuery.page = 1
-        this.getList()
-      }
+      })
     },
 
     getFileFromSrc(img) {

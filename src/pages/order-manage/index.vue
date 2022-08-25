@@ -54,7 +54,7 @@
         type="primary"
         icon="el-icon-search"
         @click="showUploadDialog"
-      >导入订单</el-button>
+      >批量发货</el-button>
       <!-- <el-button
         v-waves
         :loading="downloadLoading"
@@ -74,7 +74,7 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
-      <el-table-column v-for="col in columns" :key="col.key" :label="col.label" :prop="col.key" :width="col.key === 'wineNameList' ? 200 : col.key === 'addressLabel' ? '' : col.key === 'index' ? 50 : 120" :fixed="col.fixed">
+      <el-table-column v-for="col in columns" :key="col.key" :label="col.label" :prop="col.key" :width="col.key === 'wineNameList' ? 200 : /time/ig.test(col.key) ? 150 : col.key === 'index' ? 50 : 120" :fixed="col.fixed">
         <template slot-scope="scope">
           <div v-if="col.key === 'wineNameList'">
             <el-card v-for="wine in scope.row[col.key]" :key="wine.wineId">
@@ -99,9 +99,12 @@
           <div v-else-if="col.key === 'sendStatus'">
             <span>{{ scope.row.sendStatus === "0" ? "未发货" : ( scope.row.sendStatus === "1" ? "已发货" : ( scope.row.sendStatus === "2" ? "已收货" : "") ) }}</span>
           </div>
-          <div v-else-if="col.key === 'index'">
-            <span>{{ scope.$index + 1 + ( listQuery.page - 1 ) * listQuery.limit }}</span>
+          <div v-else-if="col.key === 'payTime'">
+            <span>{{ parseTime(scope.row.payTime) }}</span>
           </div>
+          <!-- <div v-else-if="col.key === 'index'">
+            <span>{{ scope.$index + 1 + ( listQuery.page - 1 ) * listQuery.limit }}</span>
+          </div> -->
           <span v-else>
             {{ scope.row[col.key] }}
           </span>
@@ -392,8 +395,8 @@ export default {
       successList: [],
       // action: 'https://api.ukshuxi.com/services/importSendOrder',
       action: process.env.VUE_APP_BASE_API + '/services/importSendOrder',
-      // downloadUrl: 'https://api.ukshuxi.com/services/exportSendTemplate'
-      downloadUrl: process.env.VUE_APP_BASE_API + '/services/exportSendTemplate'
+      downloadUrl: 'https://api.ukshuxi.com/services/exportSendTemplate'
+      // downloadUrl: process.env.VUE_APP_BASE_API + '/services/exportSendTemplate'
     }
   },
   created() {
@@ -401,17 +404,18 @@ export default {
     this.getExpressCompanyData()
   },
   methods: {
+    parseTime,
     submitUpload() {
       this.$refs.upload.submit()
     },
     downloadModule() {
       console.log(this.downloadUrl)
       const xhr = new XMLHttpRequest()
-      xhr.open('post', this.downloadUrl)
-      xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8')
+      xhr.open('post', this.downloadUrl, true)
       xhr.responseType = 'blob'
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4 && xhr.status === 200) {
+      xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8')
+      xhr.onload = function() {
+        if (this.status === 200) {
           // 数据在 this.response 保存
           // excel 的 MIME 格式为 application/vnd.ms-excel
           var blob = new Blob([this.response], {
@@ -474,11 +478,12 @@ export default {
           fixed: 'right',
           key: 'operation'
         })
-        columns.unshift({
-          label: '序号',
-          fixed: 'left',
-          key: 'index'
-        })
+        columns[0].fixed = 'left'
+        // columns.unshift({
+        //   label: '序号',
+        //   fixed: 'left',
+        //   key: 'index'
+        // })
         this.columns = columns
         this.list = data.orderList
         this.total = data.totalCount
