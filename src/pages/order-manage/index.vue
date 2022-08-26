@@ -97,7 +97,7 @@
             <span>{{ scope.row.isPay === "1" ? "已支付" : ( scope.row.isPay === "2" ? "待支付" : ( scope.row.isPay === "3" ? "超时未付款" : "") ) }}</span>
           </div>
           <div v-else-if="col.key === 'sendStatus'">
-            <span>{{ scope.row.sendStatus === "0" ? "未发货" : ( scope.row.sendStatus === "1" ? "已发货" : ( scope.row.sendStatus === "2" ? "已收货" : "") ) }}</span>
+            <span>{{ scope.row.sendStatus === "0" ? "未发货" : ( scope.row.sendStatus === "1" ? "已发货" : ( scope.row.sendStatus === "3" ? "已收货" : "") ) }}</span>
           </div>
           <div v-else-if="col.key === 'payTime'">
             <span>{{ parseTime(scope.row.payTime) }}</span>
@@ -645,7 +645,7 @@ export default {
     sendGood2(row) {
       row.disable = true
       this.sendInfo.orderId = row.orderId
-      this.sendInfo.state = '2'
+      this.sendInfo.state = '3'
       this.sendInfo.company = ''
       this.sendInfo.sendNumber = ''
       this.dialogVisible2 = true
@@ -694,7 +694,7 @@ export default {
             type: 'success',
             duration: 1500
           })
-          this.handleRow.sendStatus = '2'
+          this.handleRow.sendStatus = '3'
         } else {
           this.$message({
             message: '收货失败：' + res.header.resMessage,
