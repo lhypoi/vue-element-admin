@@ -70,6 +70,14 @@ module.exports = {
           [process.env.VUE_APP_BASE_API + '/uploadWine']: ''
         }
       },
+      [process.env.VUE_APP_BASE_API + '/uploadBrandInfo']: {
+        target: 'http://120.25.231.168:18089/services/uploadBrandInfo',
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          [process.env.VUE_APP_BASE_API + '/uploadBrandInfo']: ''
+        }
+      },
       [process.env.VUE_APP_BASE_API + '/uploadImg']: {
         target: 'http://120.25.231.168:18089/services/uploadImg',
         changeOrigin: true,

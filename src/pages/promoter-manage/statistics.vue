@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :visible.sync="dialogVisible" destroy-on-close width="50%" title="营销员订单汇总">
+  <el-dialog :visible.sync="dialogVisible" destroy-on-close width="50%" title="营销员订单汇总" top="10px">
     <el-form label-position="left" inline class="demo-table-expand">
       <el-form-item label="推广员上级名称：">
         <span>{{ statisticsData.parentName || '无上级' }}</span>

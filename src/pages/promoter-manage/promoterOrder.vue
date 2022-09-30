@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :visible.sync="dialogVisible" destroy-on-close width="80%" title="营销员订单">
+  <el-dialog :visible.sync="dialogVisible" destroy-on-close width="80%" title="营销员订单" top="10px">
     <div class="app-container">
       <div class="filter-container">
         <el-input

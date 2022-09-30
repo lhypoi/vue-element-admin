@@ -106,7 +106,7 @@
       @pagination="getList(listQuery.page, listQuery.limit)"
     /> -->
     <!-- 酒信息 -->
-    <el-dialog :visible.sync="dialogVisible" width="80%" title="物品信息" :close-on-click-modal="false" :close-on-press-escape="false">
+    <el-dialog :visible.sync="dialogVisible" width="80%" title="物品信息" :close-on-click-modal="false" :close-on-press-escape="false" top="10px">
       <el-form ref="shopForm" v-loading="updateSend" :model="wineInfo" :rules="rules" label-width="110px" label-position="left" hide-required-asterisk>
         <el-row :gutter="20">
           <el-col :span="8">

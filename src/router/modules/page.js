@@ -62,6 +62,26 @@ const pageRouter = [
       meta: { title: '提现管理', icon: 'table', affix: true }
     }]
   },
+  {
+    path: '/brand-manage',
+    component: Layout,
+    children: [{
+      path: '/brand-manage',
+      component: () => import('@/pages/upload-brand/index'),
+      name: '品牌管理',
+      meta: { title: '品牌管理', icon: 'table', affix: true }
+    }]
+  },
+  {
+    path: '/global-info',
+    component: Layout,
+    children: [{
+      path: '/global-info',
+      component: () => import('@/pages/global-info/index'),
+      name: '通知管理',
+      meta: { title: '通知管理', icon: 'table', affix: true }
+    }]
+  },
   // {
   //   path: '/code-manage',
   //   component: Layout,
