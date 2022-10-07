@@ -9,7 +9,7 @@ const pageRouter = [
       path: '/',
       component: () => import('@/pages/order-manage/index'),
       name: '订单管理',
-      meta: { title: '订单管理', icon: 'table', affix: true }
+      meta: { title: '订单管理', icon: 'order', affix: true }
     }]
   },
   {
@@ -19,7 +19,7 @@ const pageRouter = [
       path: '/shop-manage',
       component: () => import('@/pages/shop-manage/index'),
       name: '商品管理',
-      meta: { title: '商品管理', icon: 'table', affix: true }
+      meta: { title: '商品管理', icon: 'shop', affix: true }
     }]
   },
   {
@@ -29,7 +29,7 @@ const pageRouter = [
       path: '/category-manage',
       component: () => import('@/pages/category-manage/index'),
       name: '分类管理',
-      meta: { title: '分类管理', icon: 'table', affix: true }
+      meta: { title: '分类管理', icon: 'category', affix: true }
     }]
   },
   {
@@ -39,7 +39,7 @@ const pageRouter = [
       path: '/coupon-manage',
       component: () => import('@/pages/coupon-manage/index'),
       name: '优惠券管理',
-      meta: { title: '优惠券管理', icon: 'table', affix: true }
+      meta: { title: '优惠券管理', icon: 'coupon', affix: true }
     }]
   },
   {
@@ -49,7 +49,7 @@ const pageRouter = [
       path: '/promoter-manage',
       component: () => import('@/pages/promoter-manage/index'),
       name: '推销商管理',
-      meta: { title: '推销商管理', icon: 'table', affix: true }
+      meta: { title: '推销商管理', icon: 'promoter', affix: true }
     }]
   },
   {
@@ -59,7 +59,7 @@ const pageRouter = [
       path: '/withdraw-manage',
       component: () => import('@/pages/withdraw-manage/index'),
       name: '提现管理',
-      meta: { title: '提现管理', icon: 'table', affix: true }
+      meta: { title: '提现管理', icon: 'withdraw', affix: true }
     }]
   },
   {
@@ -68,8 +68,8 @@ const pageRouter = [
     children: [{
       path: '/brand-manage',
       component: () => import('@/pages/upload-brand/index'),
-      name: '品牌管理',
-      meta: { title: '品牌管理', icon: 'table', affix: true }
+      name: '图片管理',
+      meta: { title: '图片管理', icon: 'picture', affix: true }
     }]
   },
   {
@@ -79,7 +79,7 @@ const pageRouter = [
       path: '/global-info',
       component: () => import('@/pages/global-info/index'),
       name: '通知管理',
-      meta: { title: '通知管理', icon: 'table', affix: true }
+      meta: { title: '通知管理', icon: 'inform', affix: true }
     }]
   },
   // {

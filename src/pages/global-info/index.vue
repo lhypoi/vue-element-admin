@@ -1,11 +1,9 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-button v-waves class="filter-item" style="float: right; margin-left: 10px;" type="primary" @click="editMessage">添加全局消息</el-button>
+      <el-button v-waves class="filter-item" style="float: right; margin-left: 10px;" type="primary" @click="updateInfo">更新通知信息</el-button>
     </div>
     <el-table
-      :key="tableKey"
-      v-loading="listLoading"
       :data="infoList"
       border
       fit
@@ -20,13 +18,13 @@
       >
         <template slot-scope="scope">
           <div>
-            <el-link @click="editMessage(scope.row)">更新</el-link>
+            <!-- <el-link @click="editMessage(scope.row)">更新</el-link> -->
             <el-link style="margin-left: 15px" @click="handleDelete(scope.row)">删除</el-link>
           </div>
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog :visible.sync="dialogVisible" width="80%" title="上传图片" :close-on-click-modal="false" :close-on-press-escape="false" top="10px">
+    <el-dialog :visible.sync="dialogVisible" width="80%" title="更新通知" :close-on-click-modal="false" :close-on-press-escape="false" top="10px">
       <el-form ref="shopForm" v-loading="updateSend" :model="wineInfo" label-width="150px" label-position="left" hide-required-asterisk>
         <el-form-item label="输入通知内容" prop="description">
           <el-input v-model="wineInfo.description" type="textarea" />
@@ -77,8 +75,21 @@ export default {
         type: '1'
       }).then(res => {
         this.infoList = res.body || []
+        if (this.infoList.length > 0) {
+          this.editId = this.infoList[0].id
+          this.wineInfo = {
+            description: this.infoList[0].message || ''
+          }
+          console.log(this.infoList.length, this.editId, this.wineInfo)
+        } else {
+          this.editId = ''
+          this.wineInfo = { description: '' }
+        }
         console.log(res)
       })
+    },
+    async updateInfo() {
+      this.dialogVisible = true
     },
     async editMessage(row = {}) {
       if (row.id) {
