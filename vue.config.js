@@ -85,6 +85,14 @@ module.exports = {
         pathRewrite: {
           [process.env.VUE_APP_BASE_API + '/uploadImg']: ''
         }
+      },
+      [process.env.VUE_APP_BASE_API + '/data']: {
+        target: 'https://api.ukshuxi.com/ticket/data',
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          [process.env.VUE_APP_BASE_API + '/data']: ''
+        }
       }
     }
   },

@@ -1,43 +1,17 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <!-- <el-input
-        v-model="listQuery.mobile"
-        clearable
-        placeholder="手机号"
-        style="width: 200px;margin-right: 20px;"
-        class="filter-item"
-        @keyup.enter.native="handleFilter"
-      />
-      <el-input
-        v-model="listQuery.orderId"
-        clearable
-        placeholder=" 订单号"
-        style="width: 200px;margin-right: 20px;"
-        class="filter-item"
-        @keyup.enter.native="handleFilter"
-      /> -->
-      <!-- <el-select
-        v-model="listQuery.isPay"
-        clearable
-        style="width: 200px;margin-right: 20px;"
-        class="filter-item"
-        placeholder="支付状态"
-      >
-        <el-option value="1" label="已支付" />
-        <el-option value="2" label="已退款" />
-        <el-option value="3" label="超时未支付" />
-      </el-select> -->
       <el-select
-        v-model="listQuery.isPay"
+        v-model="listQuery.wineId"
         clearable
         style="width: 200px;margin-right: 20px;"
         class="filter-item"
         placeholder="票务类型"
       >
 
-        <el-option v-for="key in ticketDict" :key="key" :value="key" :label="ticketDict[key]" />
+        <el-option v-for="item in ticketOptions" :key="item.key" :value="item.key" :label="item.label" />
       </el-select>
+      {{ ticketDict }}
       <el-date-picker
         v-model="listQuery.time"
         clearable
@@ -58,13 +32,6 @@
         icon="el-icon-search"
         @click="handleFilter"
       >查询</el-button>
-      <!-- <el-button
-        v-waves
-        class="filter-item"
-        type="primary"
-        icon="el-icon-search"
-        @click="showUploadDialog"
-      >批量发货</el-button> -->
       <el-button
         v-waves
         :loading="downloadLoading"
@@ -86,36 +53,7 @@
     >
       <el-table-column v-for="col in columns" :key="col.key" :label="col.label" :prop="col.key" :width="col.width || 'auto'" :fixed="col.fixed">
         <template slot-scope="scope">
-          <div v-if="col.key === 'wineNameList'">
-            <el-card v-for="(wine, index) in scope.row[col.key]" :key="index + '_' + wine.wineId">
-              <span>名称：</span><span>{{ wine.wineName }}</span>
-              <el-divider class="divider" />
-              <span>规格：</span><span>{{ wine.volume }}</span>
-              <el-divider class="divider" />
-              <span>价格：</span><span>{{ wine.price }}</span>
-              <el-divider class="divider" />
-              <span>数量：</span><span>{{ wine.count }}</span>
-              <el-divider class="divider" />
-            </el-card>
-          </div>
-          <div v-else-if="col.key === 'operation'">
-            <el-button type="success" :disabled="scope.row.sendStatus != '0'" @click="sendGood(scope.row)">发货通知</el-button>
-            <br>
-            <el-button type="danger" style="margin-top: 5px" :disabled="scope.row.sendStatus != '1'" @click="sendGood2(scope.row)">到货通知</el-button>
-          </div>
-          <div v-else-if="col.key === 'isPay'">
-            <span>{{ scope.row.isPay === "1" ? "已支付" : ( scope.row.isPay === "2" ? "待支付" : ( scope.row.isPay === "3" ? "超时未付款" : "") ) }}</span>
-          </div>
-          <div v-else-if="col.key === 'sendStatus'">
-            <span>{{ scope.row.sendStatus === "0" ? "未发货" : ( scope.row.sendStatus === "1" ? "已发货" : ( scope.row.sendStatus === "3" ? "已收货" : "") ) }}</span>
-          </div>
-          <div v-else-if="col.key === 'payTime'">
-            <span>{{ parseTime(scope.row.payTime) }}</span>
-          </div>
-          <!-- <div v-else-if="col.key === 'index'">
-            <span>{{ scope.$index + 1 + ( listQuery.page - 1 ) * listQuery.limit }}</span>
-          </div> -->
-          <span v-else>
+          <span>
             {{ scope.row[col.key] }}
           </span>
         </template>
@@ -131,182 +69,23 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
-    <!-- 发货 -->
-    <el-dialog
-      title="物流信息"
-      :visible.sync="dialogVisible"
-      width="30%"
-    >
-      <el-form
-        :model="sendInfo"
-        label-width="80px"
-      >
-        <el-form-item label="物流公司" prop="company">
-          <el-select
-            v-model="sendInfo.company"
-            clearable
-            class="filter-item"
-            placeholder="选择物流公司"
-            filterable
-          >
-            <el-option v-for="item in expressCompany" :key="item.id" :value="item.name" :label="item.name + ' —— ' + item.type" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="物流单号" prop="sendNumber">
-          <el-input v-model="sendInfo.sendNumber" />
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" :loading="updateSend" @click="confirmSend">确 定</el-button>
-      </span>
-    </el-dialog>
-
-    <!-- 收货 -->
-    <el-dialog
-      title="确定收货？"
-      :visible.sync="dialogVisible2"
-      width="30%"
-    >
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible2 = false">取 消</el-button>
-        <el-button type="primary" :loading="updateSend" @click="confirmSend2">确 定</el-button>
-      </span>
-    </el-dialog>
-
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form
-        ref="dataForm"
-        :rules="rules"
-        :model="temp"
-        label-position="left"
-        label-width="70px"
-        style="width: 400px; margin-left:50px;"
-      >
-        <el-form-item label="Type" prop="type">
-          <el-select v-model="temp.type" class="filter-item" placeholder="Please select">
-            <el-option
-              v-for="item in calendarTypeOptions"
-              :key="item.key"
-              :label="item.display_name"
-              :value="item.key"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="Date" prop="timestamp">
-          <el-date-picker
-            v-model="temp.timestamp"
-            type="datetime"
-            placeholder="Please pick a date"
-          />
-        </el-form-item>
-        <el-form-item label="Title" prop="title">
-          <el-input v-model="temp.title" />
-        </el-form-item>
-        <el-form-item label="Status">
-          <el-select v-model="temp.status" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="Imp">
-          <el-rate
-            v-model="temp.importance"
-            :colors="['#99A9BF', '#F7BA2A', '#FF9900']"
-            :max="3"
-            style="margin-top:8px;"
-          />
-        </el-form-item>
-        <el-form-item label="Remark">
-          <el-input
-            v-model="temp.remark"
-            :autosize="{ minRows: 2, maxRows: 4}"
-            type="textarea"
-            placeholder="Please input"
-          />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">Confirm</el-button>
-      </div>
-    </el-dialog>
-
-    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
-      <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
-        <el-table-column prop="key" label="Channel" />
-        <el-table-column prop="pv" label="Pv" />
-      </el-table>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogPvVisible = false">Confirm</el-button>
-      </span>
-    </el-dialog>
-
-    <el-dialog :visible.sync="uploadDialogVisible" @close="fileList = []">
-      <el-button style="margin-bottom: 10px;" size="small" type="primary" @click="downloadModule">下载模板</el-button>
-      <el-button style="margin-top: 10px;" size="small" type="success" @click="submitUpload">点击上传</el-button>
-      <el-upload ref="upload" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" :multiple="false" style="width: 100%;" :file-list="fileList" :on-error="handleError" :on-success="handleSuccess" :auto-upload="false" :action="action" drag>
-        <i class="el-icon-upload" />
-        <div class="el-upload__text" style="width: 100%;">
-          <em>点击选择文件</em>
-        </div>
-      </el-upload>
-      <div v-if="successList.length > 0">
-        <el-divider />
-        <p>上传成功的订单ID</p>
-        <p v-for="item in successList" :key="item" style="margin: 0px;margin-bottom: 10px;">{{ item }}</p>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
 import {
-  fetchPv,
-  createArticle,
-  updateArticle
-} from '@/api/article'
-import {
-  orderManage, updateSendState, getExpressCompanyList
-} from '@/api/order'
+  getOrderByPage,
+  getWineList
+} from '@/api/ticket'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
-
-const calendarTypeOptions = [
-  { key: 'CN', display_name: 'China' },
-  { key: 'US', display_name: 'USA' },
-  { key: 'JP', display_name: 'Japan' },
-  { key: 'EU', display_name: 'Eurozone' }
-]
-
-// arr to obj, such as { CN : "China", US : "USA" }
-const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
-  return acc
-}, {})
 
 export default {
   name: 'OrderManage',
   directives: { waves },
-  filters: {
-    statusFilter(status) {
-      const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
-      }
-      return statusMap[status]
-    },
-    typeFilter(type) {
-      return calendarTypeKeyValue[type]
-    }
-  },
   data() {
     return {
-      ticketDict: {
-        '1': '票务1',
-        '2': '票务2',
-        '3': '票务3'
-      },
+      ticketOptions: [],
       pickerOptions: {
         shortcuts: [
           {
@@ -345,20 +124,10 @@ export default {
       listQuery: {
         page: 1,
         limit: 30,
-        mobile: '',
-        orderId: '',
-        isPay: '',
-        time: []
+        time: [],
+        wineId: ''
       },
       recordPageParam: {},
-      importanceOptions: [1, 2, 3],
-      calendarTypeOptions,
-      sortOptions: [
-        { label: 'ID Ascending', key: '+id' },
-        { label: 'ID Descending', key: '-id' }
-      ],
-      statusOptions: ['published', 'draft', 'deleted'],
-      showReviewer: false,
       temp: {
         id: undefined,
         importance: 1,
@@ -393,78 +162,14 @@ export default {
         ]
       },
       downloadLoading: false,
-      columns: [],
-      dialogVisible: false,
-      dialogVisible2: false,
-      sendInfo: {
-        'orderId': '',
-        'state': '',
-        'company': '',
-        'sendNumber': ''
-      },
-      handleRow: null,
-      updateSend: false,
-      expressCompany: [],
-      uploadDialogVisible: false,
-      fileList: [],
-      successList: [],
-      // action: 'https://api.ukshuxi.com/services/importSendOrder',
-      action: process.env.VUE_APP_BASE_API + '/services/importSendOrder',
-      downloadUrl: 'https://api.ukshuxi.com/services/exportSendTemplate'
-      // downloadUrl: process.env.VUE_APP_BASE_API + '/services/exportSendTemplate'
+      columns: []
     }
   },
   created() {
     this.getList()
-    this.getExpressCompanyData()
   },
   methods: {
     parseTime,
-    submitUpload() {
-      this.$refs.upload.submit()
-    },
-    downloadModule() {
-      console.log(this.downloadUrl)
-      const xhr = new XMLHttpRequest()
-      xhr.open('post', this.downloadUrl, true)
-      xhr.responseType = 'blob'
-      xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8')
-      xhr.onload = function() {
-        if (this.status === 200) {
-          // 数据在 this.response 保存
-          // excel 的 MIME 格式为 application/vnd.ms-excel
-          var blob = new Blob([this.response], {
-            type: 'application/vnd.ms-excel'
-          })
-          // 创建a链接 href链接地址 download为下载下来后文件的名称
-          var aa = document.createElement('a')
-          aa.href = URL.createObjectURL(blob)
-          aa.download = '发货模板.xlsx'
-          aa.style.display = 'none'
-          document.body.appendChild(aa)
-          aa.click()
-        }
-      }
-      xhr.send('{}')
-    },
-    handleSuccess(response, file, fileList) {
-      this.$message.success('上传成功')
-      this.successList = response.successList
-      console.log(response, file, fileList)
-    },
-    handleError(error, file) {
-      console.log(error, file)
-    },
-    showUploadDialog() {
-      this.uploadDialogVisible = true
-    },
-    getExpressCompanyData() {
-      getExpressCompanyList({})
-        .then(res => {
-          const data = res.body || []
-          this.expressCompany = data
-        })
-    },
     handleSizeChange(val) {
       const data = Object.assign({}, this.recordPageParam)
       data.pageSize = val
@@ -477,46 +182,37 @@ export default {
       this.listQuery.page = val
       this.getList(data)
     },
-    getList(obj = undefined) {
+    async getList(obj = undefined) {
       this.listLoading = true
+      if (this.ticketOptions.length === 0) {
+        const ticketOptionsRes = await getWineList()
+        this.ticketOptions = ticketOptionsRes.map((item) => {
+          return {
+            key: item.wineId,
+            label: item.wineName
+          }
+        }, {})
+      }
       const param = obj || {
         startIndex: this.listQuery.page,
         pageSize: this.listQuery.limit
       }
-      orderManage(param).then(response => {
+      getOrderByPage(param).then(response => {
         this.recordPageParam = param
-        const data = response.body
-        data.columns = [{
-          key: 'payNum',
-          label: '支付单号'
-        }, {
-          key: 'payTime',
-          label: '支付时间'
-        }, {
-          key: 'ticketType',
-          label: '票务类型'
-        }, {
-          key: 'price',
-          label: '价格'
-        }]
+        const data = response
         data.hideTitle = data.hideTitle.concat('id')
-        const columns = data.columns.filter(col => data.hideTitle.indexOf(col.key) === -1)
-        // columns.push({
-        //   label: '操作',
-        //   fixed: 'right',
-        //   key: 'operation'
-        // })
+        const columns = data.columns.filter(col => data.hideTitle.indexOf(col.key) === -1).map(item => {
+          if (item.key === 'transactionId') {
+            item.width = 250
+          }
+          return item
+        })
+
         columns[0].fixed = 'left'
-        // columns.unshift({
-        //   label: '序号',
-        //   fixed: 'left',
-        //   key: 'index'
-        // })
         this.columns = columns
-        this.list = data.orderList
+        this.list = data.list
         this.total = data.totalCount
 
-        // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
         }, 1.5 * 1000)
@@ -530,16 +226,10 @@ export default {
         'startIndex': this.listQuery.page,
         'pageSize': this.listQuery.limit,
         'startTime': this.listQuery.time[0] ? new Date(this.listQuery.time[0]).getTime() : undefined,
-        'endTime': this.listQuery.time[1] ? new Date(this.listQuery.time[1]).getTime() : undefined
+        'endTime': this.listQuery.time[1] ? new Date(this.listQuery.time[1]).getTime() : undefined,
+        'wineId': this.listQuery.wineId || undefined
       }
       this.getList(param)
-    },
-    handleModifyStatus(row, status) {
-      this.$message({
-        message: '操作Success',
-        type: 'success'
-      })
-      row.status = status
     },
     sortChange(data) {
       const { prop, order } = data
@@ -554,86 +244,6 @@ export default {
         this.listQuery.sort = '-id'
       }
       this.handleFilter()
-    },
-    resetTemp() {
-      this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        status: 'published',
-        type: ''
-      }
-    },
-    handleCreate() {
-      this.resetTemp()
-      this.dialogStatus = 'create'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
-    },
-    createData() {
-      this.$refs['dataForm'].validate(valid => {
-        if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'vue-element-admin'
-          createArticle(this.temp).then(() => {
-            this.list.unshift(this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: 'Success',
-              message: 'Created Successfully',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
-      })
-    },
-    handleUpdate(row) {
-      this.temp = Object.assign({}, row) // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp)
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
-    },
-    updateData() {
-      this.$refs['dataForm'].validate(valid => {
-        if (valid) {
-          const tempData = Object.assign({}, this.temp)
-          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateArticle(tempData).then(() => {
-            const index = this.list.findIndex(v => v.id === this.temp.id)
-            this.list.splice(index, 1, this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: 'Success',
-              message: 'Update Successfully',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
-      })
-    },
-    handleDelete(row, index) {
-      this.$notify({
-        title: 'Success',
-        message: 'Delete Successfully',
-        type: 'success',
-        duration: 2000
-      })
-      this.list.splice(index, 1)
-    },
-    handleFetchPv(pv) {
-      fetchPv(pv).then(response => {
-        this.pvData = response.data.pvData
-        this.dialogPvVisible = true
-      })
     },
     handleDownload() {
       this.downloadLoading = true
@@ -659,78 +269,6 @@ export default {
           }
         })
       )
-    },
-    getSortClass: function(key) {
-      const sort = this.listQuery.sort
-      return sort === `+${key}` ? 'ascending' : 'descending'
-    },
-    sendGood(row) {
-      this.sendInfo.orderId = row.orderId
-      this.sendInfo.state = '1'
-      this.dialogVisible = true
-      this.handleRow = row
-    },
-    sendGood2(row) {
-      row.disable = true
-      this.sendInfo.orderId = row.orderId
-      this.sendInfo.state = '3'
-      this.sendInfo.company = ''
-      this.sendInfo.sendNumber = ''
-      this.dialogVisible2 = true
-      this.handleRow = row
-    },
-    confirmSend() {
-      if (this.sendInfo.company.trim() && this.sendInfo.sendNumber.trim()) {
-        const companyData = this.expressCompany.find(item => item.name.trim() === this.sendInfo.company.trim()) || []
-        this.sendInfo.companyCode = companyData.code
-        console.log(111, this.sendInfo)
-        this.updateSend = true
-        updateSendState(this.sendInfo).then(res => {
-          this.updateSend = false
-          this.dialogVisible = false
-          if (res.header.resCode === '0000') {
-            this.$message({
-              message: '发货成功',
-              type: 'success',
-              duration: 1500
-            })
-            this.handleRow.sendStatus = '1'
-          } else {
-            this.$message({
-              message: '发货失败：' + res.header.resMessage,
-              type: 'error',
-              duration: 1500
-            })
-          }
-        })
-      } else {
-        this.$message({
-          message: '请填写物流信息',
-          type: 'error',
-          duration: 1500
-        })
-      }
-    },
-    confirmSend2() {
-      this.updateSend = true
-      updateSendState(this.sendInfo).then(res => {
-        this.updateSend = false
-        this.dialogVisible2 = false
-        if (res.header.resCode === '0000') {
-          this.$message({
-            message: '收货成功',
-            type: 'success',
-            duration: 1500
-          })
-          this.handleRow.sendStatus = '3'
-        } else {
-          this.$message({
-            message: '收货失败：' + res.header.resMessage,
-            type: 'error',
-            duration: 1500
-          })
-        }
-      })
     }
   }
 }
