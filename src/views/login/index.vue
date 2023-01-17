@@ -96,9 +96,10 @@ export default {
       }
     }
     return {
+      password: 'QTi3kkNfcLX6JqpV',
       loginForm: {
         username: 'admin',
-        password: '111111'
+        password: ''
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -131,7 +132,7 @@ export default {
     if (this.loginForm.username === '') {
       this.$refs.username.focus()
     } else if (this.loginForm.password === '') {
-      this.$refs.password.focus()
+      // this.$refs.password.focus()
     }
   },
   destroyed() {
@@ -156,6 +157,14 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
+          if (this.loginForm.password !== this.password) {
+            this.$message({
+              type: 'error',
+              message: '密码错误'
+            })
+            this.loading = false
+            return
+          }
           this.$store.dispatch('user/login', this.loginForm)
             .then(() => {
               this.$router.push({ path: this.redirect || '/', query: this.otherQuery })

@@ -11,7 +11,6 @@
 
         <el-option v-for="item in ticketOptions" :key="item.key" :value="item.key" :label="item.label" />
       </el-select>
-      {{ ticketDict }}
       <el-date-picker
         v-model="listQuery.time"
         clearable
@@ -247,17 +246,37 @@ export default {
     },
     handleDownload() {
       this.downloadLoading = true
-      import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = this.columns.filter(col => col.key !== 'operation').map(({ label }) => label)
-        const filterVal = this.columns.filter(col => col.key !== 'operation').map(({ key }) => key)
-        const data = this.formatJson(filterVal)
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: '订单'
-        })
-        this.downloadLoading = false
-      })
+      const self = this
+      const param = {
+        'startTime': this.listQuery.time[0] ? new Date(this.listQuery.time[0]).getTime() : '',
+        'endTime': this.listQuery.time[1] ? new Date(this.listQuery.time[1]).getTime() : '',
+        'wineId': this.listQuery.wineId || ''
+      }
+      const paramText = Object.keys(param).map(key => key + '=' + param[key]).join('&')
+      const xhr = new XMLHttpRequest()
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          self.downloadLoading = false
+          console.log(xhr)
+          var blob = new Blob([xhr.response], {
+            type: 'application/vnd.ms-excel'
+          })
+          var aa = document.createElement('a')
+          aa.href = URL.createObjectURL(blob)
+          aa.download = '二维码消耗纪录.xlsx'
+          aa.style.display = 'none'
+          document.body.appendChild(aa)
+          aa.click()
+        }
+      }
+      xhr.onerror = () => {
+        self.downloadLoading = false
+        this.$message.error('发生错误，请重试')
+      }
+      xhr.open('GET', 'https://api.ukshuxi.com/ticket/data/exportTicketLog?' + paramText, true)
+      xhr.setRequestHeader('token', this.$store.getters.token)
+      xhr.responseType = 'blob'
+      xhr.send()
     },
     formatJson(filterVal) {
       return this.list.map(v =>
