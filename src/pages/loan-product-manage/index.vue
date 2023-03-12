@@ -715,7 +715,7 @@ export default {
         const func = this.wineInfo.id ? updateProduct : insertProduct
         func({
           ...this.wineInfo,
-          id: undefined,
+          id: this.wineInfo.id || undefined,
           bgImage: this.wineInfo.imageList[0] ? this.wineInfo.imageList[0].response[0] : ''
         }).then(res => {
           this.updateSend = false
@@ -817,10 +817,10 @@ export default {
   .divider {
     margin: 5px 0;
   }
-  >>> .el-upload-dragger {
-    width: 100%;
-  }
-  >>> .el-upload {
-    width: 100%;
-  }
+  // >>> .el-upload-dragger {
+  //   width: 100%;
+  // }
+  // >>> .el-upload {
+  //   width: 100%;
+  // }
 </style>
