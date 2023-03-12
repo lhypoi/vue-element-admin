@@ -7,21 +7,31 @@ const pageRouter = [
     component: Layout,
     children: [{
       path: '/order-manage',
-      component: () => import('@/pages/order-manage2/index'),
-      name: '小程序订单管理',
-      meta: { title: '小程序订单管理', icon: 'order', affix: true }
+      component: () => import('@/pages/order-manage/index'),
+      name: '用户管理',
+      meta: { title: '用户管理', icon: 'order', affix: true }
     }]
   },
   {
-    path: '/qr-code-consume',
+    path: '/loan-product-manage',
     component: Layout,
     children: [{
-      path: '/qr-code-consume',
-      component: () => import('@/pages/qr-code-consume/index'),
-      name: '二维码消耗记录',
-      meta: { title: '二维码消耗记录', icon: 'category', affix: true }
+      path: '/loan-product-manage',
+      component: () => import('@/pages/loan-product-manage/index'),
+      name: '贷款产品管理',
+      meta: { title: '贷款产品管理', icon: 'category', affix: true }
     }]
   }
+  // {
+  //   path: '/qr-code-consume',
+  //   component: Layout,
+  //   children: [{
+  //     path: '/qr-code-consume',
+  //     component: () => import('@/pages/qr-code-consume/index'),
+  //     name: '二维码消耗记录',
+  //     meta: { title: '二维码消耗记录', icon: 'category', affix: true }
+  //   }]
+  // }
   // {
   //   path: '/order-manage2',
   //   component: Layout,

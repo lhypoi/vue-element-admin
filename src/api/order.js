@@ -245,3 +245,73 @@ export function getExpressCompanyList(query) {
     }
   })
 }
+
+export function getUserListByPage(query) {
+  return request({
+    url: '/loan',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'getUserListByPage',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
+
+export function getProductList(query) {
+  return request({
+    url: '/loan',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'getProductList',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
+
+export function updateProduct(query) {
+  return request({
+    url: '/loan',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'updateProduct',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
+
+export function insertProduct(query) {
+  return request({
+    url: '/loan',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'insertProduct',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
+
+export function deleteProduct(query) {
+  return request({
+    url: '/loan',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'deleteProduct',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}

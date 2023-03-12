@@ -395,7 +395,7 @@ export const constantRoutes = [
 export const asyncRoutes = []
 
 const createRouter = () => new Router({
-  base: '/llj/',
+  base: '/loanManage/',
   // mode: 'history', // require service support
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes

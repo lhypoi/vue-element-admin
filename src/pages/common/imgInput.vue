@@ -51,8 +51,8 @@ export default {
       } else {
         this.fileList = fileList.slice(-1)
       }
-      this.$emit('change', fileList)
-      console.log(fileList)
+      this.$emit('change', this.fileList)
+      console.log(this.fileList)
     }
   }
 }

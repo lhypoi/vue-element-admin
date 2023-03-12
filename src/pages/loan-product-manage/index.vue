@@ -1,22 +1,22 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input
-        v-model="listQuery.phoneNumber"
-        clearable
-        placeholder="用户号码"
-        style="width: 200px;margin-right: 20px;"
-        class="filter-item"
-        @keyup.enter.native="handleFilter"
-      />
-      <el-input
+      <!-- <el-input
         v-model="listQuery.name"
         clearable
-        placeholder="姓名"
+        placeholder="名称"
         style="width: 200px;margin-right: 20px;"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
+      <el-input
+        v-model="listQuery.link"
+        clearable
+        placeholder="链接"
+        style="width: 200px;margin-right: 20px;"
+        class="filter-item"
+        @keyup.enter.native="handleFilter"
+      /> -->
       <!-- <el-select
         v-model="listQuery.isPay"
         clearable
@@ -48,6 +48,13 @@
         icon="el-icon-search"
         @click="handleFilter"
       >查询</el-button>
+      <el-button
+        v-waves
+        class="filter-item"
+        type="success"
+        icon="el-icon-upload"
+        @click="addRow"
+      >添加</el-button>
       <!-- <el-button
         v-waves
         class="filter-item"
@@ -246,52 +253,32 @@
         <p v-for="item in successList" :key="item" style="margin: 0px;margin-bottom: 10px;">{{ item }}</p>
       </div>
     </el-dialog>
-    <!-- 用户信息 -->
-    <el-dialog :visible.sync="dialogVisible" width="600px" title="详细信息" :close-on-click-modal="false" :close-on-press-escape="false" top="20px">
-      <el-form ref="shopForm" :model="wineInfo" disabled label-width="110px" label-position="left" hide-required-asterisk>
-        <el-form-item label="姓名：" prop="name">
+    <!-- 详细信息 -->
+    <el-dialog v-if="dialogVisible" :visible.sync="dialogVisible" width="800px" title="详细信息" :close-on-click-modal="false" :close-on-press-escape="false" top="20px">
+      <el-form ref="shopForm" :model="wineInfo" label-width="110px" label-position="left" hide-required-asterisk>
+        <el-form-item label="名称：" prop="name">
           <el-input v-model="wineInfo.name" />
         </el-form-item>
-        <el-form-item label="身份证：" prop="idCard">
-          <el-input v-model="wineInfo.idCard" />
+        <el-form-item label="链接：" prop="link">
+          <el-input v-model="wineInfo.link" />
         </el-form-item>
-        <el-row>
-          <div style="color: #303133; padding-top: 10px; padding-bottom: 10px;">详细资料</div>
-        </el-row>
-        <el-form-item label="婚姻状况：" prop="marriage">
-          <el-input v-model="wineInfo.marriage" />
+        <el-form-item label="优先级：" prop="priority">
+          <el-input v-model="wineInfo.priority" type="number" />
         </el-form-item>
-        <el-form-item label="学历状况：" prop="education">
-          <el-input v-model="wineInfo.education" />
+        <el-form-item label="利率" prop="interestRate">
+          <el-input v-model="wineInfo.interestRate" />
         </el-form-item>
-        <el-form-item label="工作单位：" prop="companyName">
-          <el-input v-model="wineInfo.companyName" />
+        <el-form-item label="最高额度：" prop="limitation">
+          <el-input v-model="wineInfo.limitation" type="number" />
         </el-form-item>
-        <el-form-item label="年收入情况：" prop="monthIncome">
-          <el-input v-model="wineInfo.monthIncome" />
-        </el-form-item>
-        <el-form-item label="购车情况：" prop="buyCar">
-          <el-input v-model="wineInfo.buyCar" />
-        </el-form-item>
-        <el-form-item label="住房情况：" prop="houseType">
-          <el-input v-model="wineInfo.houseType" />
-        </el-form-item>
-        <el-row>
-          <div style="color: #303133; padding-top: 10px; padding-bottom: 10px;">紧急联系人</div>
-        </el-row>
-        <el-form-item label="姓名：" prop="sosContactName">
-          <el-input v-model="wineInfo.sosContactName" />
-        </el-form-item>
-        <el-form-item label="电话号码：" prop="sosContactPhoneNumber">
-          <el-input v-model="wineInfo.sosContactPhoneNumber" />
-        </el-form-item>
-        <el-form-item label="关系：" prop="sosContactRelation">
-          <el-input v-model="wineInfo.sosContactRelation" />
+        <el-form-item label="背景图：" prop="imageList">
+          <img-input :img-list="wineInfo.imageList" :multi="false" @change="list => wineInfo.imageList = list" />
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-        <!-- <el-button type="primary" :loading="updateSend" @click="confirmSend">{{ curRowId ? '修 改' : '上 架' }}</el-button> -->
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button v-if=" wineInfo.id" type="danger" @click="handleDele">删 除</el-button>
+        <el-button type="primary" :loading="updateSend" @click="confirmSend">{{ wineInfo.id ? '更 新' : '添 加' }}</el-button>
       </span>
     </el-dialog>
   </div>
@@ -303,8 +290,9 @@ import {
   createArticle,
   updateArticle
 } from '@/api/article'
+import imgInput from '@/pages/common/imgInput'
 import {
-  getUserListByPage, updateSendState, getExpressCompanyList
+  getProductList, updateSendState, getExpressCompanyList, updateProduct, insertProduct, deleteProduct
 } from '@/api/order'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
@@ -324,6 +312,7 @@ const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
 
 export default {
   name: 'OrderManage',
+  components: { imgInput },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -384,7 +373,8 @@ export default {
         isPay: '',
         time: [],
         phoneNumber: '',
-        name: ''
+        name: '',
+        link: ''
       },
       recordPageParam: {},
       importanceOptions: [1, 2, 3],
@@ -519,24 +509,23 @@ export default {
         startIndex: this.listQuery.page,
         pageSize: 999999 || this.listQuery.limit
       }
-      getUserListByPage(param).then(response => {
+      getProductList(param).then(response => {
         this.recordPageParam = param
         const data = response.body
         // data.hideTitle = data.hideTitle.concat('id')
         // const columns = data.columns.filter(col => data.hideTitle.indexOf(col.key) === -1)
         const columns = [
           {
-            label: '用户号码',
-            key: 'phoneNumber'
-          },
-          {
-            label: '姓名',
+            label: '名称',
             key: 'name'
           },
           {
-            label: '身份证号码',
-            key: 'idCard',
-            width: 400
+            label: '链接',
+            key: 'link'
+          },
+          {
+            label: '优先级',
+            key: 'priority'
           }
         ]
         columns.push({
@@ -567,6 +556,7 @@ export default {
         'isPay': this.listQuery.isPay || undefined,
         'phoneNumber': this.listQuery.phoneNumber || undefined,
         'name': this.listQuery.name || undefined,
+        'link': this.listQuery.link || undefined,
         'startIndex': this.listQuery.page,
         'pageSize': this.listQuery.limit,
         'startTime': this.listQuery.time[0] ? new Date(this.listQuery.time[0]).getTime() : undefined,
@@ -720,24 +710,26 @@ export default {
       this.handleRow = row
     },
     confirmSend() {
-      if (this.sendInfo.company.trim() && this.sendInfo.sendNumber.trim()) {
-        const companyData = this.expressCompany.find(item => item.name.trim() === this.sendInfo.company.trim()) || []
-        this.sendInfo.companyCode = companyData.code
-        console.log(111, this.sendInfo)
+      if (this.wineInfo.name.trim()) {
         this.updateSend = true
-        updateSendState(this.sendInfo).then(res => {
+        const func = this.wineInfo.id ? updateProduct : insertProduct
+        func({
+          ...this.wineInfo,
+          id: undefined,
+          bgImage: this.wineInfo.imageList[0] ? this.wineInfo.imageList[0].response[0] : ''
+        }).then(res => {
           this.updateSend = false
           this.dialogVisible = false
           if (res.header.resCode === '0000') {
             this.$message({
-              message: '发货成功',
+              message: '成功',
               type: 'success',
               duration: 1500
             })
-            this.handleRow.sendStatus = '1'
+            this.handleFilter()
           } else {
             this.$message({
-              message: '发货失败：' + res.header.resMessage,
+              message: '失败：' + res.header.resMessage,
               type: 'error',
               duration: 1500
             })
@@ -745,7 +737,7 @@ export default {
         })
       } else {
         this.$message({
-          message: '请填写物流信息',
+          message: '请填写产品名',
           type: 'error',
           duration: 1500
         })
@@ -773,8 +765,50 @@ export default {
       })
     },
     showRow(row) {
-      this.wineInfo = row
+      this.wineInfo = {
+        ...row,
+        imageList: row.bgImage ? [{
+          url: `http://8.134.57.187/productImage/${row.bgImage}`,
+          response: [row.bgImage]
+        }] : []
+      }
       this.dialogVisible = true
+    },
+    addRow() {
+      this.wineInfo = {
+        'id': '',
+        'name': '',
+        'link': '',
+        'interestRate': '',
+        'limitation': '',
+        'priority': '',
+        imageList: []
+      }
+      this.dialogVisible = true
+    },
+    handleDele() {
+      this.$confirm('确定删除?')
+        .then(async() => {
+          this.updateSend = true
+          const res = await deleteProduct({
+            id: this.wineInfo.id
+          })
+          this.updateSend = false
+          if (res.body === 1) {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
+            this.dialogVisible = false
+            this.handleFilter()
+          } else {
+            this.$message({
+              type: 'warning',
+              message: '删除失败!'
+            })
+          }
+        })
+        .catch(err => { console.log(err) })
     }
   }
 }

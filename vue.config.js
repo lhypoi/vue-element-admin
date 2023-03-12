@@ -24,8 +24,8 @@ module.exports = {
    * In most cases please use '/' !!!
    * Detail: https://cli.vuejs.org/config/#publicpath
    */
-  publicPath: '/ticket',
-  outputDir: 'dist',
+  publicPath: '/loanManage',
+  outputDir: 'loanManage',
   assetsDir: 'static',
   lintOnSave: process.env.NODE_ENV === 'development',
   productionSourceMap: false,
@@ -38,60 +38,20 @@ module.exports = {
     },
     before: require('./mock/mock-server.js'),
     proxy: {
-      [process.env.VUE_APP_BASE_API + '/wine']: {
-        target: 'http://120.25.231.168:18089/services/wine',
+      [process.env.VUE_APP_BASE_API + '/loan']: {
+        target: 'http://8.134.57.187/services/loan',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
-          [process.env.VUE_APP_BASE_API + '/wine']: ''
-        }
-      },
-      [process.env.VUE_APP_BASE_API + '/promoter']: {
-        target: 'http://120.25.231.168:18089/services/promoter',
-        changeOrigin: true,
-        ws: true,
-        pathRewrite: {
-          [process.env.VUE_APP_BASE_API + '/promoter']: ''
-        }
-      },
-      [process.env.VUE_APP_BASE_API + '/code']: {
-        target: 'http://120.25.231.168:18089/services/code',
-        changeOrigin: true,
-        ws: true,
-        pathRewrite: {
-          [process.env.VUE_APP_BASE_API + '/code']: ''
-        }
-      },
-      [process.env.VUE_APP_BASE_API + '/uploadWine']: {
-        target: 'http://120.25.231.168:18089/services/uploadWine',
-        changeOrigin: true,
-        ws: true,
-        pathRewrite: {
-          [process.env.VUE_APP_BASE_API + '/uploadWine']: ''
-        }
-      },
-      [process.env.VUE_APP_BASE_API + '/uploadBrandInfo']: {
-        target: 'http://120.25.231.168:18089/services/uploadBrandInfo',
-        changeOrigin: true,
-        ws: true,
-        pathRewrite: {
-          [process.env.VUE_APP_BASE_API + '/uploadBrandInfo']: ''
+          [process.env.VUE_APP_BASE_API + '/loan']: ''
         }
       },
       [process.env.VUE_APP_BASE_API + '/uploadImg']: {
-        target: 'http://120.25.231.168:18089/services/uploadImg',
+        target: 'http://8.134.57.187/services/uploadImg',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
           [process.env.VUE_APP_BASE_API + '/uploadImg']: ''
-        }
-      },
-      [process.env.VUE_APP_BASE_API + '/data']: {
-        target: 'https://api.ukshuxi.com/ticket/data',
-        changeOrigin: true,
-        ws: true,
-        pathRewrite: {
-          [process.env.VUE_APP_BASE_API + '/data']: ''
         }
       }
     }
