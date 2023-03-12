@@ -28,7 +28,7 @@ export default {
   },
   data() {
     return {
-      title: '展翠',
+      title: '小花信用',
       logo: ''
       // logo: 'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
     }

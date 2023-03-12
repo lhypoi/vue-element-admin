@@ -1,5 +1,5 @@
 module.exports = {
-  title: '展翠',
+  title: '小花信用',
 
   /**
    * @type {boolean} true | false
