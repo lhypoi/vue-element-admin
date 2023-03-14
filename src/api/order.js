@@ -315,3 +315,31 @@ export function deleteProduct(query) {
     }
   })
 }
+
+export function getChannelListByPage(query) {
+  return request({
+    url: '/loan',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'getChannelListByPage',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
+
+export function insertChannel(query) {
+  return request({
+    url: '/loan',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'insertChannel',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}

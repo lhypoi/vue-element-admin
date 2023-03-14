@@ -21,6 +21,16 @@ const pageRouter = [
       name: '贷款产品管理',
       meta: { title: '贷款产品管理', icon: 'category', affix: true }
     }]
+  },
+  {
+    path: '/channel-manage',
+    component: Layout,
+    children: [{
+      path: '/channel-manage',
+      component: () => import('@/pages/channel-manage/index'),
+      name: '渠道管理',
+      meta: { title: '渠道管理', icon: 'shop', affix: true }
+    }]
   }
   // {
   //   path: '/qr-code-consume',
