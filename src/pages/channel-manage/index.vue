@@ -97,7 +97,8 @@
           </div>
           <div v-else-if="col.key === 'operation'">
             <!-- <el-button type="success" @click="showRow(scope.row)">详细信息</el-button> -->
-            <el-button type="success">查看下载号码明细</el-button>
+            <!-- <el-button type="success" @click="showPhonePopup(scope.row)">查看下载号码明细</el-button> -->
+            <el-button type="success" :loading="scope.row.loading" @click="exportPhoneRow(scope.row)">查看下载号码明细</el-button>
             <!-- <br> -->
             <!-- <el-button type="danger" style="margin-top: 5px" :disabled="scope.row.sendStatus != '1'" @click="sendGood2(scope.row)">到货通知</el-button> -->
           </div>
@@ -282,6 +283,90 @@
         <el-button type="primary" :loading="updateSend" @click="confirmSend">{{ wineInfo.id ? '更 新' : '添 加' }}</el-button>
       </span>
     </el-dialog>
+    <!-- 下载用户的弹窗表格 S -->
+    <el-dialog
+      v-if="phonePopupData.show"
+      :visible.sync="phonePopupData.show"
+      :title="phonePopupData.title"
+      top="20px"
+      width="800px"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+    >
+      <div class="filter-container">
+        <el-input
+          v-model="phonePopupData.search.phoneNumber"
+          clearable
+          placeholder="手机号"
+          style="width: 200px;margin-right: 20px;"
+          class="filter-item"
+          @keyup.enter.native="phonePopupSearch"
+        />
+        <el-date-picker
+          v-model="phonePopupData.search.time"
+          clearable
+          class="filter-item"
+          style="margin-right: 20px;"
+          type="daterange"
+          align="right"
+          unlink-panels
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          :picker-options="pickerOptions"
+        />
+        <el-button
+          v-waves
+          class="filter-item"
+          type="primary"
+          icon="el-icon-search"
+          @click="phonePopupSearch"
+        >查询</el-button>
+      </div>
+      <el-table
+        v-loading="phonePopupData.loading"
+        :data="phonePopupData.list"
+        border
+        fit
+        highlight-current-row
+      >
+        <el-table-column
+          v-for="col in phonePopupData.columns"
+          :key="col.key"
+          :prop="col.key"
+          :label="col.label"
+          :width="col.width"
+          :align="col.align"
+          :fixed="col.fixed"
+        >
+          <template slot-scope="scope">
+            <div v-if="col.key === 'index'">
+              <span>{{ scope.$index + 1 + ( phonePopupData.search.startIndex - 1 ) * phonePopupData.search.pageSize }}</span>
+            </div>
+            <div v-else-if="col.type === 'time'">
+              <span>{{ parseTime(scope.row[col.key]) }}</span>
+            </div>
+            <span v-else>
+              {{ scope.row[col.key] }}
+            </span>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-pagination
+        style="margin-top: 15px;;"
+        :current-page="phonePopupData.search.startIndex"
+        :page-size="phonePopupData.search.pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :page-sizes="[10, 20, 30, 50]"
+        :total="phonePopupData.total"
+        @current-change="val => phonePopupPageChange('startIndex', val)"
+        @size-change="val => phonePopupPageChange('pageSize', val)"
+      />
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="phonePopupData.show = false">关 闭</el-button>
+      </span>
+    </el-dialog>
+    <!-- 下载用户的弹窗表格 E -->
   </div>
 </template>
 
@@ -297,6 +382,7 @@ import {
 } from '@/api/order'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
+import request from '@/utils/request'
 
 const calendarTypeOptions = [
   { key: 'CN', display_name: 'China' },
@@ -331,6 +417,22 @@ export default {
   data() {
     return {
       wineInfo: {},
+      phonePopupData: {
+        show: false,
+        title: '下载明细',
+        loading: false,
+        initSearch: {
+          phoneNumber: '',
+          time: '',
+          startIndex: 1,
+          pageSize: 30
+        },
+        search: {
+        },
+        columns: [],
+        list: [],
+        total: 0
+      },
       pickerOptions: {
         shortcuts: [
           {
@@ -811,7 +913,102 @@ export default {
           }
         })
         .catch(err => { console.log(err) })
+    },
+    // 弹窗表格-下载号码明细 S
+    showPhonePopup(rowData) {
+      this.phonePopupData = {
+        ...this.phonePopupData,
+        search: {
+          ...this.phonePopupData.initSearch,
+          id: rowData.id
+        },
+        list: [],
+        total: 0
+      }
+      this.phonePopupData.show = true
+      this.phonePopupRequest()
+    },
+    async phonePopupRequest() {
+      this.phonePopupData.loading = true
+      try {
+        const time = this.phonePopupData.search.time || ''
+        const params = {
+          ...this.phonePopupData.search,
+          startTime: time[0] ? new Date(time[0]).getTime() : undefined,
+          endTime: time[1] ? new Date(time[1]).getTime() : undefined
+        }
+        delete params.time
+        const response = await getChannelListByPage(params)
+        const resContent = response.body
+        const columns = [
+          {
+            label: '序号',
+            fixed: 'left',
+            key: 'index',
+            width: 50,
+            align: 'center'
+          },
+          {
+            label: '号码',
+            key: 'channelName'
+          },
+          {
+            label: '下载时间',
+            key: 'createTime',
+            type: 'time'
+          }
+        ]
+        this.phonePopupData = {
+          ...this.phonePopupData,
+          columns,
+          list: resContent.data,
+          total: resContent.totalCount
+        }
+      } catch (error) {
+        console.log(error)
+      }
+      this.phonePopupData.loading = false
+    },
+    phonePopupSearch() {
+      this.phonePopupData.search = {
+        ...this.phonePopupData.search,
+        startIndex: 1
+      }
+      this.phonePopupRequest()
+    },
+    phonePopupPageChange(key, val) {
+      this.phonePopupData.search[key] = val
+      this.phonePopupRequest()
+    },
+    // 弹窗表格-下载号码明细 E
+    // 导出-下载号码明细 S
+    async exportPhoneRow(row) {
+      const targetRow = this.list.find(item => item.id === row.id)
+      this.$set(targetRow, 'loading', true)
+      targetRow.loading = true
+      try {
+        const channelCode = row.channelCode
+        const params = {
+          channelCode: channelCode
+        }
+        const response = await request({
+          url: 'http://8.134.57.187/services/exportDownload',
+          method: 'post',
+          responseType: 'blob',
+          data: params
+        })
+        const url = window.URL.createObjectURL(new Blob([response]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', `${channelCode}.xlsx`)
+        document.body.appendChild(link)
+        link.click()
+      } catch (error) {
+        console.log(error)
+      }
+      this.$set(targetRow, 'loading', false)
     }
+    // 导出-下载号码明细 E
   }
 }
 </script>
