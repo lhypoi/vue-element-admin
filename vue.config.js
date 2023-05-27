@@ -40,7 +40,7 @@ module.exports = {
     before: require('./mock/mock-server.js'),
     proxy: {
       [process.env.VUE_APP_BASE_API + '/loan']: {
-        target: 'http://8.134.57.187/services/loan',
+        target: 'https://xiaohuaxinyong.cn/services/loan',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
@@ -48,7 +48,7 @@ module.exports = {
         }
       },
       [process.env.VUE_APP_BASE_API + '/uploadImg']: {
-        target: 'http://8.134.57.187/services/uploadImg',
+        target: 'https://xiaohuaxinyong.cn/services/uploadImg',
         changeOrigin: true,
         ws: true,
         pathRewrite: {

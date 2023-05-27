@@ -768,7 +768,7 @@ export default {
       this.wineInfo = {
         ...row,
         imageList: row.bgImage ? [{
-          url: `http://8.134.57.187/productImage/${row.bgImage}`,
+          url: `https://xiaohuaxinyong.cn/productImage/${row.bgImage}`,
           response: [row.bgImage]
         }] : []
       }
