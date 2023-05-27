@@ -265,12 +265,12 @@
         <el-form-item label="优先级：" prop="priority">
           <el-input v-model="wineInfo.priority" type="number" />
         </el-form-item>
-        <el-form-item label="利率" prop="interestRate">
+        <!-- <el-form-item label="利率" prop="interestRate">
           <el-input v-model="wineInfo.interestRate" />
         </el-form-item>
         <el-form-item label="最高额度：" prop="limitation">
           <el-input v-model="wineInfo.limitation" type="number" />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="背景图：" prop="imageList">
           <img-input :img-list="wineInfo.imageList" :multi="false" @change="list => wineInfo.imageList = list" />
         </el-form-item>
