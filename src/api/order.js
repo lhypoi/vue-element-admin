@@ -343,3 +343,17 @@ export function insertChannel(query) {
     }
   })
 }
+
+export function deleteChannel(query) {
+  return request({
+    url: '/loan',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'deleteChannel',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}

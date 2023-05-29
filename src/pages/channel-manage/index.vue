@@ -98,9 +98,10 @@
           <div v-else-if="col.key === 'operation'">
             <!-- <el-button type="success" @click="showRow(scope.row)">详细信息</el-button> -->
             <!-- <el-button type="success" @click="showPhonePopup(scope.row)">查看下载号码明细</el-button> -->
-            <el-button type="success" :loading="scope.row.loading" @click="exportPhoneRow(scope.row)">查看下载号码明细</el-button>
+            <!-- <el-button type="success" :loading="scope.row.loading" @click="exportPhoneRow(scope.row)">查看下载号码明细</el-button> -->
             <!-- <br> -->
             <!-- <el-button type="danger" style="margin-top: 5px" :disabled="scope.row.sendStatus != '1'" @click="sendGood2(scope.row)">到货通知</el-button> -->
+            <el-button type="danger" :loading="updateSend" @click="handleDele(scope.row)">删 除</el-button>
           </div>
           <div v-else-if="col.key === 'isPay'">
             <span>{{ scope.row.isPay === "1" ? "已支付" : ( scope.row.isPay === "2" ? "待支付" : ( scope.row.isPay === "3" ? "超时未付款" : "") ) }}</span>
@@ -378,7 +379,7 @@ import {
 } from '@/api/article'
 // import imgInput from '@/pages/common/imgInput'
 import {
-  getChannelListByPage, updateSendState, getExpressCompanyList, updateProduct, insertChannel, deleteProduct
+  getChannelListByPage, updateSendState, getExpressCompanyList, updateProduct, insertChannel, deleteChannel
 } from '@/api/order'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
@@ -636,11 +637,11 @@ export default {
             key: 'downloadCount'
           }
         ]
-        // columns.push({
-        //   label: '操作',
-        //   fixed: 'right',
-        //   key: 'operation'
-        // })
+        columns.push({
+          label: '操作',
+          fixed: 'right',
+          key: 'operation'
+        })
         // columns[0].fixed = 'left'
         columns.unshift({
           label: '序号',
@@ -890,12 +891,12 @@ export default {
       }
       this.dialogVisible = true
     },
-    handleDele() {
+    handleDele(row) {
       this.$confirm('确定删除?')
         .then(async() => {
           this.updateSend = true
-          const res = await deleteProduct({
-            id: this.wineInfo.id
+          const res = await deleteChannel({
+            channelCode: row.channelCode
           })
           this.updateSend = false
           if (res.body === 1) {
@@ -903,7 +904,6 @@ export default {
               type: 'success',
               message: '删除成功!'
             })
-            this.dialogVisible = false
             this.handleFilter()
           } else {
             this.$message({
