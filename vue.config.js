@@ -40,7 +40,7 @@ module.exports = {
     before: require('./mock/mock-server.js'),
     proxy: {
       [process.env.VUE_APP_BASE_API + '/loan']: {
-        target: 'https://xiaohuaxinyong.cn/services/loan',
+        target: 'https://www.xiaohuaxinyong.cn/services/loan',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
@@ -48,11 +48,19 @@ module.exports = {
         }
       },
       [process.env.VUE_APP_BASE_API + '/uploadImg']: {
-        target: 'https://xiaohuaxinyong.cn/services/uploadImg',
+        target: 'https://www.xiaohuaxinyong.cn/services/uploadImg',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
           [process.env.VUE_APP_BASE_API + '/uploadImg']: ''
+        }
+      },
+      [process.env.VUE_APP_BASE_API + '/exportDownload']: {
+        target: 'https://www.xiaohuaxinyong.cn/services/exportDownload',
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          [process.env.VUE_APP_BASE_API + '/exportDownload']: ''
         }
       }
     }

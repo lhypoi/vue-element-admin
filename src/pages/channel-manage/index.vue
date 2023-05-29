@@ -877,7 +877,7 @@ export default {
       this.wineInfo = {
         ...row,
         imageList: row.bgImage ? [{
-          url: `https://xiaohuaxinyong.cn/productImage/${row.bgImage}`,
+          url: `https://www.xiaohuaxinyong.cn/productImage/${row.bgImage}`,
           response: [row.bgImage]
         }] : []
       }
@@ -992,7 +992,7 @@ export default {
           channelCode: channelCode
         }
         const response = await request({
-          url: 'https://xiaohuaxinyong.cn/services/exportDownload',
+          url: 'https://www.xiaohuaxinyong.cn/services/exportDownload',
           method: 'post',
           responseType: 'blob',
           data: params
