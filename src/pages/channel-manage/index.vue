@@ -636,11 +636,11 @@ export default {
             key: 'downloadCount'
           }
         ]
-        columns.push({
-          label: '操作',
-          fixed: 'right',
-          key: 'operation'
-        })
+        // columns.push({
+        //   label: '操作',
+        //   fixed: 'right',
+        //   key: 'operation'
+        // })
         // columns[0].fixed = 'left'
         columns.unshift({
           label: '序号',
