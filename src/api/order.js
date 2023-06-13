@@ -357,3 +357,31 @@ export function deleteChannel(query) {
     }
   })
 }
+
+export function getLink(query) {
+  return request({
+    url: '/loan',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'getLink',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
+
+export function updateLink(query) {
+  return request({
+    url: '/loan',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'updateLink',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}

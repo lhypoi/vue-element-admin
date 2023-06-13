@@ -55,6 +55,20 @@
         icon="el-icon-upload"
         @click="addRow"
       >添加</el-button>
+      <div class="filter-item appUrlBox">
+        <el-input
+          v-model="appUrl"
+          placeholder="填写下载地址"
+        >
+          <template #prepend>下载链接</template>
+        </el-input>
+        <el-button
+          v-waves
+          :loading="appUrlSaving"
+          type="success"
+          @click="handleSaveAppUrl"
+        >更新</el-button>
+      </div>
       <!-- <el-button
         v-waves
         class="filter-item"
@@ -379,7 +393,7 @@ import {
 } from '@/api/article'
 // import imgInput from '@/pages/common/imgInput'
 import {
-  getChannelListByPage, updateSendState, getExpressCompanyList, updateProduct, insertChannel, deleteChannel
+  getChannelListByPage, updateSendState, getExpressCompanyList, updateProduct, insertChannel, deleteChannel, getLink, updateLink
 } from '@/api/order'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
@@ -417,6 +431,9 @@ export default {
   },
   data() {
     return {
+      appUrl: '',
+      appUrlRes: null,
+      appUrlSaving: false,
       wineInfo: {},
       phonePopupData: {
         show: false,
@@ -546,11 +563,53 @@ export default {
     }
   },
   created() {
+    this.getAppUrl()
     this.getList()
     // this.getExpressCompanyData()
   },
   methods: {
     parseTime,
+    async getAppUrl() {
+      try {
+        const res = await getLink({})
+        if (res && res.body && Array.isArray(res.body) && res.body[0]) {
+          this.appUrlRes = res.body
+          this.appUrl = res.body[0] ? res.body[0].link : ''
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async handleSaveAppUrl() {
+      this.appUrlSaving = true
+      try {
+        if (!this.appUrlRes) {
+          this.$message({
+            type: 'warning',
+            message: '缺失id，更新失败'
+          })
+          return
+        }
+        const res = await updateLink({
+          id: this.appUrlRes[0].id,
+          link: this.appUrl
+        })
+        if (res.body === 1) {
+          this.$message({
+            type: 'success',
+            message: '更新成功!'
+          })
+        } else {
+          this.$message({
+            type: 'warning',
+            message: '更新失败!'
+          })
+        }
+      } catch (error) {
+        console.log(error)
+      }
+      this.appUrlSaving = false
+    },
     submitUpload() {
       this.$refs.upload.submit()
     },
@@ -1022,4 +1081,16 @@ export default {
   // >>> .el-upload {
   //   width: 100%;
   // }
+
+  .appUrlBox {
+    display: inline-flex;
+    flex-direction: row;
+    padding-left: 20px;
+    float: right;
+
+    .el-input {
+      width: 600px;
+      margin-right: 4px;
+    }
+  }
 </style>
