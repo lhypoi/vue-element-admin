@@ -123,7 +123,7 @@
           </el-col>
           <el-col :span="8">
             <el-form-item label="选择商品分类：" prop="catId">
-              <el-select v-model="wineInfo.catId" size="small" style="width: 100%;" filterable placeholder="选择商品分类">
+              <el-select v-model="wineInfo.catId" size="small" style="width: 100%;" filterable clearable placeholder="选择商品分类">
                 <el-option v-for="item in categoryList" :key="item.id" :value="item.id" :label="item.name" />
               </el-select>
             </el-form-item>
@@ -150,7 +150,7 @@
               </el-form-item>
             </el-col> -->
             <el-col :span="wineInfo.areaType === '99' ? 6 : 8">
-              <el-form-item :rules="{ required: true, message: '请输入价格', trigger: 'blur' }" label="输入价格：" :prop="'wineTypeList.' + index + '.price'">
+              <el-form-item :rules="{ required: true, message: '请输入积分', trigger: 'blur' }" label="输入积分：" :prop="'wineTypeList.' + index + '.price'">
                 <el-input v-model="type.price" type="number" />
               </el-form-item>
             </el-col>
