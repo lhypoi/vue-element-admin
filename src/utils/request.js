@@ -48,6 +48,7 @@ service.interceptors.response.use(
    */
   response => {
     const res = response.data
+    res.header = res.header || {}
 
     // if the custom code is not 20000, it is judged as an error.
     if (res.code !== 20000 && res.header.resCode !== '0000') {

@@ -29,8 +29,8 @@ module.exports = [
     url: '/vue-element-admin/user/login',
     type: 'post',
     response: config => {
-      const { username } = config.body
-      const token = tokens[username]
+      const { username, password } = config.body
+      const token = password !== 'c3VUgK34Gi' ? '' : tokens[username]
 
       // mock error
       if (!token) {
