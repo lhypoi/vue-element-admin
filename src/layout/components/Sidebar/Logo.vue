@@ -14,9 +14,9 @@
 </template>
 
 <script>
-import defaultSettings from '@/settings'
+// import defaultSettings from '@/settings'
 
-const { isTestApi } = defaultSettings
+// const { isTestApi } = defaultSettings
 
 export default {
   name: 'SidebarLogo',
@@ -28,7 +28,7 @@ export default {
   },
   data() {
     return {
-      title: '创尊优品',
+      title: '甜菜严选',
       logo: ''
       // logo: 'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
     }

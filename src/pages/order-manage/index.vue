@@ -17,7 +17,7 @@
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
-      <el-select
+      <!-- <el-select
         v-model="listQuery.isPay"
         clearable
         style="width: 200px;margin-right: 20px;"
@@ -27,7 +27,7 @@
         <el-option value="1" label="已支付" />
         <el-option value="2" label="已退款" />
         <el-option value="3" label="超时未支付" />
-      </el-select>
+      </el-select> -->
       <el-date-picker
         v-model="listQuery.time"
         clearable
@@ -44,17 +44,17 @@
       <el-button
         v-waves
         class="filter-item"
-        type="primary"
+        type="warning"
         icon="el-icon-search"
         @click="handleFilter"
       >查询</el-button>
-      <el-button
+      <!-- <el-button
         v-waves
         class="filter-item"
         type="primary"
         icon="el-icon-search"
         @click="showUploadDialog"
-      >批量发货</el-button>
+      >批量发货</el-button> -->
       <!-- <el-button
         v-waves
         :loading="downloadLoading"
@@ -74,24 +74,24 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
-      <el-table-column v-for="col in columns" :key="col.key" :label="col.label" :prop="col.key" :width="col.key === 'wineNameList' ? 200 : /time/ig.test(col.key) ? 150 : col.key === 'index' ? 50 : 120" :fixed="col.fixed">
+      <el-table-column v-for="col in columns" :key="col.key" :label="col.label" :prop="col.key" :width="col.key === 'wineNameList' ? 200 : /time/ig.test(col.key) ? 160 : col.key === 'index' ? 50 : 'auto'" :fixed="col.fixed">
         <template slot-scope="scope">
           <div v-if="col.key === 'wineNameList'">
             <el-card v-for="wine in scope.row[col.key]" :key="wine.wineId">
               <span>名称：</span><span>{{ wine.wineName }}</span>
+              <!-- <el-divider class="divider" /> -->
+              <!-- <span>规格：</span><span>{{ wine.volume }}</span> -->
               <el-divider class="divider" />
-              <span>规格：</span><span>{{ wine.volume }}</span>
-              <el-divider class="divider" />
-              <span>价格：</span><span>{{ wine.price }}</span>
+              <span>积分：</span><span>{{ wine.price }}</span>
               <el-divider class="divider" />
               <span>数量：</span><span>{{ wine.count }}</span>
               <el-divider class="divider" />
             </el-card>
           </div>
           <div v-else-if="col.key === 'operation'">
-            <el-button type="success" :disabled="scope.row.sendStatus != '0'" @click="sendGood(scope.row)">发货通知</el-button>
-            <br>
-            <el-button type="danger" style="margin-top: 5px" :disabled="scope.row.sendStatus != '1'" @click="sendGood2(scope.row)">到货通知</el-button>
+            <el-button type="success" @click="sendGood(scope.row)">发货通知</el-button>
+            <!-- <br> -->
+            <!-- <el-button type="danger" style="margin-top: 5px" :disabled="scope.row.sendStatus != '1'" @click="sendGood2(scope.row)">到货通知</el-button> -->
           </div>
           <div v-else-if="col.key === 'isPay'">
             <span>{{ scope.row.isPay === "1" ? "已支付" : ( scope.row.isPay === "2" ? "待支付" : ( scope.row.isPay === "3" ? "超时未付款" : "") ) }}</span>
@@ -130,6 +130,7 @@
       <el-form
         :model="sendInfo"
         label-width="80px"
+        :disabled="handleRow && handleRow.sendStatus !== '0'"
       >
         <el-form-item label="物流公司" prop="company">
           <el-select
@@ -332,7 +333,7 @@ export default {
         limit: 30,
         mobile: '',
         orderId: '',
-        isPay: '',
+        isPay: '1',
         time: []
       },
       recordPageParam: {},
@@ -400,7 +401,7 @@ export default {
     }
   },
   created() {
-    this.getList()
+    this.handleFilter()
     this.getExpressCompanyData()
   },
   methods: {
@@ -472,13 +473,20 @@ export default {
         this.recordPageParam = param
         const data = response.body
         data.hideTitle = data.hideTitle.concat('id')
+        data.hideTitle = data.hideTitle.concat('saleInfo')
+        data.hideTitle = data.hideTitle.concat('isPay')
+        data.hideTitle = data.hideTitle.concat('payId')
+        data.hideTitle = data.hideTitle.concat('payTime')
+        data.hideTitle = data.hideTitle.concat('sendStatus')
+        data.hideTitle = data.hideTitle.concat('transactionId')
         const columns = data.columns.filter(col => data.hideTitle.indexOf(col.key) === -1)
+        columns.find(col => col.key === 'price').label = '总积分'
         columns.push({
           label: '操作',
-          fixed: 'right',
+          // fixed: 'right',
           key: 'operation'
         })
-        columns[0].fixed = 'left'
+        // columns[0].fixed = 'left'
         // columns.unshift({
         //   label: '序号',
         //   fixed: 'left',
@@ -639,6 +647,8 @@ export default {
     sendGood(row) {
       this.sendInfo.orderId = row.orderId
       this.sendInfo.state = '1'
+      this.sendInfo.company = row.tradeCompany || ''
+      this.sendInfo.sendNumber = row.tradeNum || ''
       this.dialogVisible = true
       this.handleRow = row
     },
@@ -652,6 +662,10 @@ export default {
       this.handleRow = row
     },
     confirmSend() {
+      if (this.handleRow.sendStatus !== '0') {
+        this.dialogVisible = false
+        return
+      }
       if (this.sendInfo.company.trim() && this.sendInfo.sendNumber.trim()) {
         const companyData = this.expressCompany.find(item => item.name.trim() === this.sendInfo.company.trim()) || []
         this.sendInfo.companyCode = companyData.code
@@ -667,6 +681,7 @@ export default {
               duration: 1500
             })
             this.handleRow.sendStatus = '1'
+            this.handleFilter()
           } else {
             this.$message({
               message: '发货失败：' + res.header.resMessage,

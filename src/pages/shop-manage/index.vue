@@ -9,7 +9,7 @@
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
-      <el-select
+      <!-- <el-select
         v-model="listQuery.area"
         clearable
         style="width: 200px;margin-right: 20px;"
@@ -17,7 +17,7 @@
         placeholder="选择模块"
       >
         <el-option v-for="item in areaList" :key="item.id" :value="item.id" :label="item.areaName" />
-      </el-select>
+      </el-select> -->
       <el-select v-model="listQuery.catId" style="width: 200px;margin-right: 20px;" class="filter-item" clearable filterable placeholder="选择商品分类">
         <el-option v-for="item in categoryList" :key="item.id" :value="item.id" :label="item.name" />
       </el-select>
@@ -109,13 +109,13 @@
     <el-dialog :visible.sync="dialogVisible" width="80%" title="物品信息" :close-on-click-modal="false" :close-on-press-escape="false" top="10px">
       <el-form ref="shopForm" v-loading="updateSend" :model="wineInfo" :rules="rules" label-width="110px" label-position="left" hide-required-asterisk>
         <el-row :gutter="20">
-          <el-col :span="8">
+          <!-- <el-col :span="8">
             <el-form-item label="选择上架板块：" prop="areaType">
               <el-select v-model="wineInfo.areaType" size="small" style="width: 100%;" placeholder="选择上架板块">
                 <el-option v-for="item in areaList" :key="item.id" :value="item.id" :label="item.areaName" />
               </el-select>
             </el-form-item>
-          </el-col>
+          </el-col> -->
           <el-col :span="8">
             <el-form-item label="输入商品名称：" prop="wineName">
               <el-input v-model="wineInfo.wineName" size="small" placeholder="输入商品名称" />
@@ -132,7 +132,7 @@
         <!-- <el-form-item v-if="wineInfo.areaType !== '99'" label="是否置顶：" prop="topOrder">
           <el-switch v-model="wineInfo.topOrder" active-value="1" inactive-value="0" />
         </el-form-item> -->
-        <div style="background: #F7F6F4;padding: 20px 10px;border-radius: 4px;margin-bottom: 10px;">
+        <div style="">
           <el-form-item v-if="wineInfo.areaType === '99'" label="特价活动时间：" prop="saleTime">
             <el-date-picker
               v-model="wineInfo.saleTime"
@@ -144,11 +144,11 @@
             />
           </el-form-item>
           <el-row v-for="(type, index) in wineInfo.wineTypeList" :key="index" :gutter="20">
-            <el-col :span="wineInfo.areaType === '99' ? 6 : 8">
+            <!-- <el-col :span="wineInfo.areaType === '99' ? 6 : 8">
               <el-form-item :rules="{ required: true, message: '请输入规格名称', trigger: 'blur' }" label="输入规格名称：" :prop="'wineTypeList.' + index + '.volume'">
                 <el-input v-model="type.volume" />
               </el-form-item>
-            </el-col>
+            </el-col> -->
             <el-col :span="wineInfo.areaType === '99' ? 6 : 8">
               <el-form-item :rules="{ required: true, message: '请输入价格', trigger: 'blur' }" label="输入价格：" :prop="'wineTypeList.' + index + '.price'">
                 <el-input v-model="type.price" type="number" />
@@ -175,24 +175,24 @@
               />
             </el-col>
           </el-row>
-          <el-button
+          <!-- <el-button
             type="primary"
             size="small"
             @click="() => {
               wineInfo.wineTypeList.push({ volume: null, price: null, stock: null, time: null, salePrice: null })
             }"
-          >添加规格</el-button>
+          >添加规格</el-button> -->
         </div>
-        <el-form-item label="商品佣金比例：" prop="commissionRate">
+        <!-- <el-form-item label="商品佣金比例：" prop="commissionRate">
           <el-input v-model="wineInfo.commissionRate" style="width: 40%;" type="number">
             <span slot="append">%</span>
           </el-input>
-        </el-form-item>
-        <el-form-item label="推销佣金比例：" prop="promoterRate">
+        </el-form-item> -->
+        <!-- <el-form-item label="推销佣金比例：" prop="promoterRate">
           <el-input v-model="wineInfo.promoterRate" style="width: 40%;" type="number">
             <span slot="append">%</span>
           </el-input>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="上传封面图：" prop="wineImage">
           <!-- <img-input :img-list="wineInfo.wineImage" :multi="false" @change="list => wineInfo.wineImage = list" /> -->
           <img-input :img-list="wineInfo.wineImage" :multi="false" @change="list => wineInfo.wineImage = list" />
@@ -220,7 +220,7 @@ import {
 import waves from '@/directive/waves' // waves directive
 import imgInput from '@/pages/common/imgInput'
 import { getCategoryList } from '@/api/category'
-import { deepClone, parseTime } from '@/utils/index'
+import { parseTime } from '@/utils/index'
 export default {
   name: 'ShopManage',
   components: { imgInput },
@@ -290,13 +290,13 @@ export default {
       areaList: [],
       tableColumns: [
         { label: '商品名称', key: 'wineName', fixed: 'left' },
-        { label: '所属板块', key: 'areaName' },
+        // { label: '所属板块', key: 'areaName' },
         { label: '商品分类', key: 'catName' },
-        { label: '商品价格', key: 'price' },
-        { label: '特价价格', key: 'salePrice' },
-        { label: '特价活动时间', key: 'saleTime' },
-        { label: '商品佣金', key: 'commission' },
-        { label: '推销佣金', key: 'promoterCommission' },
+        { label: '商品积分', key: 'price' },
+        // { label: '特价价格', key: 'salePrice' },
+        // { label: '特价活动时间', key: 'saleTime' },
+        // { label: '商品佣金', key: 'commission' },
+        // { label: '推销佣金', key: 'promoterCommission' },
         { label: '商品状态', key: 'isShow' },
         { label: '添加时间', key: 'createTime' },
         { label: '操作', key: 'operation', fixed: 'right' }
@@ -580,7 +580,7 @@ export default {
               type: 'success',
               message: '上架成功!'
             })
-            row.isShow = '1'
+            this.$set(row, 'isShow', '1')
           }
         })
         .catch(err => { console.log(err) })
@@ -599,7 +599,7 @@ export default {
               type: 'success',
               message: '下架成功!'
             })
-            row.isShow = '0'
+            this.$set(row, 'isShow', '0')
           }
         })
         .catch(err => { console.log(err) })
