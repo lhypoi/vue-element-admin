@@ -112,6 +112,9 @@
           <div v-else-if="col.key === 'payTime'">
             <span>{{ parseTime(scope.row.payTime) }}</span>
           </div>
+          <div v-else-if="col.key === 'userName'">
+            <span>{{ scope.row.userName + ' ' + JSON.parse(scope.row.address).phoneNumber }}</span>
+          </div>
           <!-- <div v-else-if="col.key === 'index'">
             <span>{{ scope.$index + 1 + ( listQuery.page - 1 ) * listQuery.limit }}</span>
           </div> -->
@@ -488,10 +491,12 @@ export default {
         data.hideTitle = data.hideTitle.concat('isPay')
         data.hideTitle = data.hideTitle.concat('payId')
         data.hideTitle = data.hideTitle.concat('payTime')
+        data.hideTitle = data.hideTitle.concat('userId')
         // data.hideTitle = data.hideTitle.concat('sendStatus')
         data.hideTitle = data.hideTitle.concat('transactionId')
         const columns = data.columns.filter(col => data.hideTitle.indexOf(col.key) === -1)
         columns.find(col => col.key === 'price').label = '总积分'
+        columns.find(col => col.key === 'phoneNumber').label = '下单人'
         columns.push({
           label: '操作',
           // fixed: 'right',
