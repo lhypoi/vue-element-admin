@@ -99,7 +99,7 @@
 </template>
 
 <script>
-import { getPromoterList, insertPromoter } from '@/api/promoter'
+import { getUserListByPage, insertPromoter, addUserPoint } from '@/api/promoter'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils/index'
 import promoterOrder from './promoterOrder'
@@ -158,9 +158,10 @@ export default {
       this.listLoading = true
       const param = obj || {
         startIndex: this.listQuery.page,
-        pageSize: this.listQuery.limit
+        pageSize: this.listQuery.limit,
+        phoneNumber: this.listQuery.phoneNumber || undefined
       }
-      getPromoterList(param).then(response => {
+      getUserListByPage(param).then(response => {
         this.recordPageParam = param
         const data = response.body
         data.columns = [
@@ -169,7 +170,7 @@ export default {
             label: '手机号'
           },
           {
-            key: 'totalTurnover',
+            key: 'point',
             label: '剩余积分'
           }
         ]
@@ -180,8 +181,8 @@ export default {
           key: 'operation'
         })
         this.columns = columns
-        this.list = data.promoterList
-        this.total = data.totalCount
+        this.list = data.data
+        this.total = data.total
 
         // Just to simulate the time of the request
         setTimeout(() => {
@@ -194,7 +195,7 @@ export default {
       const param = {
         startIndex: 1,
         pageSize: this.listQuery.limit,
-        phoneNumber: this.listQuery.phoneNumber
+        phoneNumber: this.listQuery.phoneNumber || undefined
       }
       this.getList(param)
     },
@@ -267,17 +268,23 @@ export default {
       }
       this.pointsModal.submitting = true
       try {
-        await new Promise((resolve) => {
-          setTimeout(() => {
-            resolve()
-          }, 300)
+        const res = await addUserPoint({
+          'userId': this.pointsModal.row.userId,
+          'point': this.pointsModal.points
         })
-        this.$message({
-          type: 'success',
-          message: '假装充值成功'
-        })
-        this.pointsModal.show = false
-        this.handleFilter()
+        if (res && res.body === 1) {
+          this.$message({
+            type: 'success',
+            message: '充值成功'
+          })
+          this.pointsModal.show = false
+          this.handleFilter()
+        } else {
+          this.$message({
+            type: 'error',
+            message: '充值失败'
+          })
+        }
       } catch (error) {
         console.log(error)
       }

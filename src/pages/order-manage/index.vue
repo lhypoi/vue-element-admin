@@ -17,6 +17,16 @@
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
+      <el-select
+        v-model="listQuery.sendStatus"
+        clearable
+        style="width: 200px;margin-right: 20px;"
+        class="filter-item"
+        placeholder="发货状态"
+      >
+        <el-option value="0" label="未发货" />
+        <el-option value="1" label="已发货" />
+      </el-select>
       <!-- <el-select
         v-model="listQuery.isPay"
         clearable
@@ -89,7 +99,7 @@
             </el-card>
           </div>
           <div v-else-if="col.key === 'operation'">
-            <el-button type="success" @click="sendGood(scope.row)">发货通知</el-button>
+            <el-button type="success" @click="sendGood(scope.row)">{{ scope.row.sendStatus === '1' ? '查看发货单号' : '发货通知' }}</el-button>
             <!-- <br> -->
             <!-- <el-button type="danger" style="margin-top: 5px" :disabled="scope.row.sendStatus != '1'" @click="sendGood2(scope.row)">到货通知</el-button> -->
           </div>
@@ -334,7 +344,8 @@ export default {
         mobile: '',
         orderId: '',
         isPay: '1',
-        time: []
+        time: [],
+        sendStatus: ''
       },
       recordPageParam: {},
       importanceOptions: [1, 2, 3],
@@ -477,7 +488,7 @@ export default {
         data.hideTitle = data.hideTitle.concat('isPay')
         data.hideTitle = data.hideTitle.concat('payId')
         data.hideTitle = data.hideTitle.concat('payTime')
-        data.hideTitle = data.hideTitle.concat('sendStatus')
+        // data.hideTitle = data.hideTitle.concat('sendStatus')
         data.hideTitle = data.hideTitle.concat('transactionId')
         const columns = data.columns.filter(col => data.hideTitle.indexOf(col.key) === -1)
         columns.find(col => col.key === 'price').label = '总积分'
@@ -507,6 +518,7 @@ export default {
         'mobile': this.listQuery.mobile || undefined,
         'orderId': this.listQuery.orderId || undefined,
         'isPay': this.listQuery.isPay || undefined,
+        'sendStatus': this.listQuery.sendStatus || undefined,
         'startIndex': this.listQuery.page,
         'pageSize': this.listQuery.limit,
         'startTime': this.listQuery.time[0] ? new Date(this.listQuery.time[0]).getTime() : undefined,

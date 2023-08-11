@@ -264,7 +264,7 @@ export default {
         catId: '',
         wineName: '',
         wineTypeList: [
-          { volume: null, price: null, stock: null, time: null, salePrice: null }
+          { volume: '标准', price: null, stock: null, time: null, salePrice: null }
         ],
         commissionRate: 80,
         promoterRate: 80,
@@ -395,7 +395,7 @@ export default {
         description: '',
         // topOrder: '0',
         wineTypeList: [
-          { volume: null, price: null, stock: null, salePrice: null }
+          { volume: '标准', price: null, stock: null, salePrice: null }
         ],
         commissionRate: 80,
         promoterRate: 80,

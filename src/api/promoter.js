@@ -125,3 +125,45 @@ export function getPromoterWithdrawal(query) {
     }
   })
 }
+
+export function getUserListByPage(query) {
+  return request({
+    url: '/wine',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'getUserListByPage',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
+
+export function addUserPoint(query) {
+  return request({
+    url: '/wine',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'addUserPoint',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
+
+export function getRechargeByPage(query) {
+  return request({
+    url: '/wine',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'getRechargeByPage',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}

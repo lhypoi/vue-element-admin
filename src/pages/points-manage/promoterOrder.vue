@@ -63,6 +63,9 @@
                 <el-divider class="divider" />
               </el-card>
             </div>
+            <div v-else-if="/Time/.test(col.key)">
+              <span>{{ parseTime(scope.row[col.key]) }}</span>
+            </div>
             <span v-else>
               {{ scope.row[col.key] }}
             </span>
@@ -84,8 +87,9 @@
 </template>
 
 <script>
-import { getPromoterOrder } from '@/api/promoter'
+import { getRechargeByPage } from '@/api/promoter'
 import waves from '@/directive/waves' // waves directive
+import { parseTime } from '@/utils/index'
 
 const calendarTypeOptions = [
   { key: 'CN', display_name: 'China' },
@@ -156,6 +160,7 @@ export default {
     }
   },
   methods: {
+    parseTime,
     showDialog(row) {
       this.promoterRowInfo = row
       this.getList()
@@ -176,27 +181,31 @@ export default {
     getList(obj = undefined) {
       this.listLoading = true
       const param = obj || {
-        promoterId: this.promoterRowInfo.userId,
+        userId: this.promoterRowInfo.userId,
         startIndex: this.listQuery.page,
         pageSize: this.listQuery.limit
       }
-      getPromoterOrder(param).then(response => {
+      getRechargeByPage(param).then(response => {
         this.recordPageParam = param
         const data = response.body
         data.columns = [
           {
-            key: 'orderId',
+            key: 'createTime',
             label: '充值时间'
           },
           {
-            key: 'totalPrice',
+            key: 'point',
             label: '充值积分'
+          },
+          {
+            key: 'afterPoint',
+            label: '充值后积分'
           }
         ]
         const columns = data.columns
         this.columns = columns
-        this.list = data.orderList
-        this.total = data.totalCount
+        this.list = data.data
+        this.total = data.total
         this.listLoading = false
         // // Just to simulate the time of the request
         // setTimeout(() => {
@@ -206,7 +215,7 @@ export default {
     handleFilter() {
       this.listQuery.page = 1
       const param = {
-        promoterId: this.promoterRowInfo.userId || undefined,
+        userId: this.promoterRowInfo.userId || undefined,
         startIndex: 1,
         pageSize: this.listQuery.limit,
         phoneNumber: this.listQuery.phoneNumber || undefined,
