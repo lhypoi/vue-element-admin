@@ -45,7 +45,7 @@
         :key="col.key"
         :label="col.label"
         :prop="col.key"
-        :width="col.key === 'createTime' ? 160 : col.key === 'saleTime' ? '300' : col.key === 'index' ? 50 : col.key === 'operation' ? 150 : ''"
+        :width="col.key === 'createTime' ? 160 : col.key === 'saleTime' ? '300' : col.key === 'index' ? 50 : col.key === 'operation' ? 200 : ''"
         :fixed="col.fixed"
       >
         <template slot-scope="scope">
@@ -66,6 +66,7 @@
             <el-link :type="scope.row.isShow === '0' ? 'warning' : ''" :disabled="scope.row.isShow === '1'" @click="handleUp(scope.row)">上架</el-link>
             <el-link :type="scope.row.isShow === '1' ? 'warning' : ''" :disabled="scope.row.isShow === '0'" style="margin-left: 15px" @click="handleDown(scope.row)">下架</el-link>
             <el-link type="primary" style="margin-left: 15px" @click="handleShowInfo(scope.row)">详情</el-link>
+            <el-link type="danger" style="margin-left: 15px" @click="handleDele(scope.row)">删除</el-link>
           </div>
           <div v-else-if="col.key === 'isShow'">
             <el-tag v-if="scope.row.isShow === '1'" type="success">已上架</el-tag>
@@ -604,18 +605,22 @@ export default {
         })
         .catch(err => { console.log(err) })
     },
-    handleDele() {
-      this.$confirm('确定删除?')
+    handleDele(row) {
+      this.$confirm('确定删除【' + row.wineName + '】?')
         .then(async() => {
-          await new Promise((resolve) => {
-            setTimeout(() => {
-              resolve()
-            }, 300)
+          const res = await updateWine({
+            data: {
+              wineId: row.wineId,
+              isDelete: '1'
+            }
           })
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
-          })
+          if (res.body === 1) {
+            this.$message({
+              type: 'success',
+              message: '删除成功'
+            })
+            this.handleFilter()
+          }
         })
         .catch(err => { console.log(err) })
     }
