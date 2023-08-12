@@ -39,7 +39,7 @@ module.exports = {
     before: require('./mock/mock-server.js'),
     proxy: {
       [process.env.VUE_APP_BASE_API + '/wine']: {
-        target: 'http://120.25.231.168:8080/services/wine',
+        target: 'http://119.23.56.151/services/wine',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
@@ -47,7 +47,7 @@ module.exports = {
         }
       },
       [process.env.VUE_APP_BASE_API + '/promoter']: {
-        target: 'http://120.25.231.168:8080/services/promoter',
+        target: 'http://119.23.56.151/services/promoter',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
@@ -55,7 +55,7 @@ module.exports = {
         }
       },
       [process.env.VUE_APP_BASE_API + '/code']: {
-        target: 'http://120.25.231.168:8080/services/code',
+        target: 'http://119.23.56.151/services/code',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
@@ -63,7 +63,7 @@ module.exports = {
         }
       },
       [process.env.VUE_APP_BASE_API + '/uploadWine']: {
-        target: 'http://120.25.231.168:8080/services/uploadWine',
+        target: 'http://119.23.56.151/services/uploadWine',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
@@ -71,7 +71,7 @@ module.exports = {
         }
       },
       [process.env.VUE_APP_BASE_API + '/uploadBrandInfo']: {
-        target: 'http://120.25.231.168:8080/services/uploadBrandInfo',
+        target: 'http://119.23.56.151/services/uploadBrandInfo',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
@@ -79,7 +79,7 @@ module.exports = {
         }
       },
       [process.env.VUE_APP_BASE_API + '/uploadImg']: {
-        target: 'http://120.25.231.168:8080/services/uploadImg',
+        target: 'http://119.23.56.151/services/uploadImg',
         changeOrigin: true,
         ws: true,
         pathRewrite: {

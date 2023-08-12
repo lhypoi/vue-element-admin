@@ -10,7 +10,7 @@
       <p>首页banner轮播图</p>
       <div style="display: flex;flex-wrap: wrap;">
         <div v-for="item in bannerImageList" :key="item" style="display: inline-block; padding: 5px; border: solid 1px rgba(0,0,0,0.3);margin-right: 20px;">
-          <img style="width: 200px;height: 200px;" :src="'https://api.ukshuxi.com/brandImg/' + item">
+          <img style="width: 200px;height: 200px;" :src="'/brandImg/' + item">
         </div>
       </div>
     </div>
@@ -18,7 +18,7 @@
       <p>首页底部背景图片</p>
       <div style="display: flex;flex-wrap: wrap;">
         <div v-for="item in bottomImageList" :key="item" style="display: inline-block; padding: 5px; border: solid 1px rgba(0,0,0,0.3);margin-right: 20px;">
-          <img style="width: 200px;height: 200px;" :src="'https://api.ukshuxi.com/brandImg/' + item">
+          <img style="width: 200px;height: 200px;" :src="'/brandImg/' + item">
         </div>
       </div>
     </div>
@@ -26,7 +26,7 @@
       <p>品牌介绍图片</p>
       <div style="display: flex;flex-wrap: wrap;">
         <div v-for="item in brandImageList" :key="item" style="display: inline-block; padding: 5px; border: solid 1px rgba(0,0,0,0.3);margin-right: 20px;">
-          <img style="width: 200px;height: 200px;" :src="'https://api.ukshuxi.com/brandImg/' + item">
+          <img style="width: 200px;height: 200px;" :src="'/brandImg/' + item">
         </div>
       </div>
     </div>
@@ -34,7 +34,7 @@
       <p>售后须知图片</p>
       <div style="display: flex;flex-wrap: wrap;">
         <div v-for="item in soldKnowImageList" :key="item" style="display: inline-block; padding: 5px; border: solid 1px rgba(0,0,0,0.3);margin-right: 20px;">
-          <img style="width: 200px;height: 200px;" :src="'https://api.ukshuxi.com/brandImg/' + item">
+          <img style="width: 200px;height: 200px;" :src="'/brandImg/' + item">
         </div>
       </div>
     </div>
@@ -57,7 +57,7 @@ import { getBrandInfoList, uploadBrandInfo } from '@/api/brand'
 import waves from '@/directive/waves' // waves directive
 import imgInput from '@/pages/common/imgInput'
 import { getCategoryList } from '@/api/category'
-import { deepClone, parseTime } from '@/utils/index'
+import { parseTime } from '@/utils/index'
 export default {
   name: 'ShopManage',
   components: { imgInput },
@@ -132,9 +132,9 @@ export default {
       this.wineInfo = {
         imageList: await Promise.all(tempImageList.map(async name => {
           return {
-            url: `https://api.ukshuxi.com/brandImg/${name}`,
+            url: `/brandImg/${name}`,
             response: [`${name}`]
-            // raw: await this.getFileFromSrc(`https://api.ukshuxi.com/goodDetailImg/${wine.wineId}/${name.src}.png`)
+            // raw: await this.getFileFromSrc(`/goodDetailImg/${wine.wineId}/${name.src}.png`)
           }
         }))
       }

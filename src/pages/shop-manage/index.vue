@@ -439,22 +439,22 @@ export default {
           }),
           tags: wine.tags,
           wineImage: [{
-            url: `https://api.ukshuxi.com/goodsImg/${wine.wineId}.png`,
+            url: `/goodsImg/${wine.wineId}.png`,
             response: [`${wine.wineId}.png`]
-            // raw: await this.getFileFromSrc(`https://api.ukshuxi.com/goodsImg/${wine.wineId}.png`)
+            // raw: await this.getFileFromSrc(`/goodsImg/${wine.wineId}.png`)
           }],
           detailTopImage: await Promise.all(wine.detailTopImage.map(async name => {
             return {
-              url: `https://api.ukshuxi.com/goodsDetailTopImg/${wine.wineId}/${name}`,
+              url: `/goodsDetailTopImg/${wine.wineId}/${name}`,
               response: [`${name}`]
-              // raw: await this.getFileFromSrc(`https://api.ukshuxi.com/goodDetailTopImg/${wine.wineId}/${name}`)
+              // raw: await this.getFileFromSrc(`/goodDetailTopImg/${wine.wineId}/${name}`)
             }
           })),
           detailImage: await Promise.all(wine.detail.map(async name => {
             return {
-              url: `https://api.ukshuxi.com/goodsDetailImg/${wine.wineId}/${name.src}.png`,
+              url: `/goodsDetailImg/${wine.wineId}/${name.src}.png`,
               response: [`${name.src}.png`]
-              // raw: await this.getFileFromSrc(`https://api.ukshuxi.com/goodDetailImg/${wine.wineId}/${name.src}.png`)
+              // raw: await this.getFileFromSrc(`/goodDetailImg/${wine.wineId}/${name.src}.png`)
             }
           }))
         }

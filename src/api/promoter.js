@@ -167,3 +167,17 @@ export function getRechargeByPage(query) {
     }
   })
 }
+
+export function addUserPointByPhone(query) {
+  return request({
+    url: '/wine',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'addUserPointByPhone',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}

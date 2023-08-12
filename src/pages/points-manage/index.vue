@@ -18,7 +18,7 @@
         size="small"
         @click="handleFilter"
       >查询</el-button>
-      <!-- <el-button v-waves class="filter-item" size="small" style="float: right;" type="primary" @click="handleShowInfo">添加一级分销员</el-button> -->
+      <el-button v-waves class="filter-item" size="small" style="float: right;" type="primary" @click="showAddNewPointsModal">手机充分</el-button>
     </div>
     <el-table
       :key="tableKey"
@@ -93,13 +93,27 @@
         <el-button type="primary" :loading="pointsModal.submitting" @click="handlePointsModalSubmit">确 定</el-button>
       </div>
     </el-dialog>
+    <el-dialog title="手机充分" :visible.sync="newPointsModal.show">
+      <el-form>
+        <el-form-item label="手机号">
+          <el-input v-model="newPointsModal.phoneNumber" />
+        </el-form-item>
+        <el-form-item label="积分数量">
+          <el-input v-model="newPointsModal.points" type="number" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer">
+        <el-button @click="newPointsModal.show = false">取 消</el-button>
+        <el-button type="primary" :loading="newPointsModal.submitting" @click="handleNewPointsModalSubmit">确 定</el-button>
+      </div>
+    </el-dialog>
     <promoterOrder ref="promoterOrder" />
     <statistics ref="statistics" />
   </div>
 </template>
 
 <script>
-import { getUserListByPage, insertPromoter, addUserPoint } from '@/api/promoter'
+import { getUserListByPage, insertPromoter, addUserPoint, addUserPointByPhone } from '@/api/promoter'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils/index'
 import promoterOrder from './promoterOrder'
@@ -132,6 +146,12 @@ export default {
       pointsModal: {
         show: false,
         row: null,
+        points: '',
+        submitting: false
+      },
+      newPointsModal: {
+        show: false,
+        phoneNumber: '',
         points: '',
         submitting: false
       }
@@ -289,6 +309,43 @@ export default {
         console.log(error)
       }
       this.pointsModal.submitting = false
+    },
+    showAddNewPointsModal() {
+      this.newPointsModal.phoneNumber = ''
+      this.newPointsModal.points = ''
+      this.newPointsModal.show = true
+    },
+    async handleNewPointsModalSubmit() {
+      if (!this.newPointsModal.points || !this.newPointsModal.phoneNumber) {
+        this.$message({
+          type: 'warning',
+          message: '请输入手机号和充值积分'
+        })
+        return
+      }
+      this.newPointsModal.submitting = true
+      try {
+        const res = await addUserPointByPhone({
+          'phoneNumber': this.newPointsModal.phoneNumber,
+          'point': this.newPointsModal.points
+        })
+        if (res && res.body === 1) {
+          this.$message({
+            type: 'success',
+            message: '充值成功'
+          })
+          this.newPointsModal.show = false
+          this.handleFilter()
+        } else {
+          this.$message({
+            type: 'error',
+            message: '充值失败'
+          })
+        }
+      } catch (error) {
+        console.log(error)
+      }
+      this.newPointsModal.submitting = false
     }
   }
 }
