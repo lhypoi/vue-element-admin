@@ -522,6 +522,12 @@ export default {
             this.dialogVisible = false
             this.listQuery.page = 1
             this.getList()
+          } else {
+            this.updateSend = false
+            this.$message({
+              type: 'error',
+              message: res.header.resMessage
+            })
           }
         } else {
           this.$message.warning('信息不完整')
