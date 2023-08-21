@@ -86,8 +86,8 @@
     >
       <el-table-column v-for="col in columns" :key="col.key" :label="col.label" :prop="col.key" :width="col.key === 'wineNameList' ? 200 : /time/ig.test(col.key) ? 160 : col.key === 'index' ? 50 : 'auto'" :fixed="col.fixed">
         <template slot-scope="scope">
-          <div v-if="col.key === 'wineNameList'">
-            <el-card v-for="wine in scope.row[col.key]" :key="wine.wineId">
+          <div v-if="col.key === 'wineNameList'" style="display: flex; flex-direction: column; gap: 8px;">
+            <el-card v-for="wine in scope.row[col.key]" :key="wine.cartId">
               <span>名称：</span><span>{{ wine.wineName }}</span>
               <!-- <el-divider class="divider" /> -->
               <!-- <span>规格：</span><span>{{ wine.volume }}</span> -->
@@ -100,8 +100,12 @@
           </div>
           <div v-else-if="col.key === 'operation'">
             <el-button type="success" @click="sendGood(scope.row)">{{ scope.row.sendStatus === '1' ? '查看发货单号' : '发货通知' }}</el-button>
-            <!-- <br> -->
             <!-- <el-button type="danger" style="margin-top: 5px" :disabled="scope.row.sendStatus != '1'" @click="sendGood2(scope.row)">到货通知</el-button> -->
+            <br>
+            <el-button type="danger" style="margin-top: 5px" :disabled="scope.row.isPay === '4'" @click="handleCancelOrder(scope.row)">
+              {{ scope.row.isPay != '4' ? '取消订单' : '订单已取消' }}
+            </el-button>
+            <!-- handleCancelOrder -->
           </div>
           <div v-else-if="col.key === 'isPay'">
             <span>{{ scope.row.isPay === "1" ? "已支付" : ( scope.row.isPay === "2" ? "待支付" : ( scope.row.isPay === "3" ? "超时未付款" : "") ) }}</span>
@@ -270,7 +274,7 @@ import {
   updateArticle
 } from '@/api/article'
 import {
-  orderManage, updateSendState, getExpressCompanyList
+  orderManage, updateSendState, getExpressCompanyList, cancelOrderById
 } from '@/api/order'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
@@ -735,6 +739,22 @@ export default {
           })
         }
       })
+    },
+    handleCancelOrder(row) {
+      this.$confirm('确定取消订单【' + row.orderId + '】?')
+        .then(async() => {
+          const res = await cancelOrderById({
+            orderId: row.orderId
+          })
+          if (res.body === 1) {
+            this.$message({
+              type: 'success',
+              message: '取消成功'
+            })
+            this.handleFilter()
+          }
+        })
+        .catch(err => { console.log(err) })
     }
   }
 }

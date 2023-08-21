@@ -245,3 +245,17 @@ export function getExpressCompanyList(query) {
     }
   })
 }
+
+export function cancelOrderById(query) {
+  return request({
+    url: '/wine',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'cancelOrderById',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
