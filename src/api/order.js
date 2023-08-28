@@ -259,3 +259,17 @@ export function cancelOrderById(query) {
     }
   })
 }
+
+export function updateOrderInfo(query) {
+  return request({
+    url: '/wine',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'updateOrderInfo',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}

@@ -102,6 +102,10 @@
             <el-button type="success" @click="sendGood(scope.row)">{{ scope.row.sendStatus === '1' ? '查看发货单号' : '发货通知' }}</el-button>
             <!-- <el-button type="danger" style="margin-top: 5px" :disabled="scope.row.sendStatus != '1'" @click="sendGood2(scope.row)">到货通知</el-button> -->
             <br>
+            <el-button type="success" style="margin-top: 5px" @click="handleRemarksModalShow(scope.row)">
+              修改备注
+            </el-button>
+            <br>
             <el-button type="danger" style="margin-top: 5px" :disabled="scope.row.isPay === '4'" @click="handleCancelOrder(scope.row)">
               {{ scope.row.isPay != '4' ? '取消订单' : '订单已取消' }}
             </el-button>
@@ -264,6 +268,26 @@
         <p v-for="item in successList" :key="item" style="margin: 0px;margin-bottom: 10px;">{{ item }}</p>
       </div>
     </el-dialog>
+
+    <!-- 修改备注 -->
+    <el-dialog
+      :title="`【订单：${handleRow && handleRow.orderId}】`"
+      :visible.sync="remarksModal.show"
+      width="30%"
+    >
+      <el-form
+        :model="remarksModal.formData"
+        label-width="80px"
+      >
+        <el-form-item label="备注信息" prop="remarks">
+          <el-input v-model="remarksModal.formData.remarks" />
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="remarksModal.show = false">取 消</el-button>
+        <el-button type="primary" :loading="remarksModal.submitting" @click="handleRemarksModalSubmit">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -274,7 +298,7 @@ import {
   updateArticle
 } from '@/api/article'
 import {
-  orderManage, updateSendState, getExpressCompanyList, cancelOrderById
+  orderManage, updateSendState, getExpressCompanyList, cancelOrderById, updateOrderInfo
 } from '@/api/order'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
@@ -412,6 +436,13 @@ export default {
       uploadDialogVisible: false,
       fileList: [],
       successList: [],
+      remarksModal: {
+        show: false,
+        submitting: false,
+        formData: {
+          remarks: ''
+        }
+      },
       // action: '/services/importSendOrder',
       action: process.env.VUE_APP_BASE_API + '/services/importSendOrder',
       downloadUrl: '/services/exportSendTemplate'
@@ -739,6 +770,42 @@ export default {
           })
         }
       })
+    },
+    handleRemarksModalShow(row) {
+      this.remarksModal.formData.remarks = row.remarks
+      this.handleRow = row
+      this.remarksModal.submitting = false
+      this.remarksModal.show = true
+    },
+    async handleRemarksModalSubmit() {
+      this.remarksModal.submitting = true
+      try {
+        const res = await updateOrderInfo({
+          data: {
+            orderId: this.handleRow.orderId,
+            remarks: this.remarksModal.formData.remarks
+          }
+        })
+        if (res && res.header && res.header.resCode === '0000') {
+          this.$message({
+            message: '修改成功',
+            type: 'success',
+            duration: 1500
+          })
+          this.remarksModal.show = false
+          this.handleFilter()
+        } else {
+          throw new Error(res.header.resMessage)
+        }
+      } catch (error) {
+        this.$message({
+          message: '修改失败：' + error.message,
+          type: 'error',
+          duration: 1500
+        })
+        console.log(error)
+      }
+      this.remarksModal.submitting = false
     },
     handleCancelOrder(row) {
       this.$confirm('确定取消订单【' + row.orderId + '】?')
