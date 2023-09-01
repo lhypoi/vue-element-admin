@@ -554,6 +554,7 @@ export default {
       })
     },
     handleFilter() {
+      this.listQuery.page = 1
       const param = {
         'mobile': this.listQuery.mobile || undefined,
         'orderId': this.listQuery.orderId || undefined,
