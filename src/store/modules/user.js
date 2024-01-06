@@ -7,7 +7,59 @@ const state = {
   name: '',
   avatar: '',
   introduction: '',
-  roles: []
+  roles: [],
+  dictObj: {
+    userType: {
+      '1': '普通用户',
+      '2': '减脂老师',
+      '3': '私密老师',
+      '4': '减脂、私密老师',
+      '5': '代理商'
+    },
+    userTeacherType: {
+      '2': '减脂老师',
+      '3': '私密老师',
+      '4': '减脂、私密老师'
+    },
+    courseStatus: {
+      '0': '未开始',
+      '1': '进行中',
+      '2': '已结束'
+    },
+    gender: {
+      '1': '男',
+      '2': '女'
+    },
+    boolean: {
+      '1': '是',
+      '2': '否'
+    },
+    courseType: {
+      '2': '减脂',
+      '3': '私密'
+    },
+    shitTimes: {
+      '1': '0次',
+      '2': '1-3次',
+      '3': '3次以上'
+    },
+    drinkMeasure: {
+      '1': '1500毫升以下',
+      '2': '1500-2000毫升',
+      '3': '2000-2500毫升',
+      '4': '2500毫升以上'
+    },
+    plan: {
+      '1': '匀速',
+      '2': '高速'
+    },
+    evaluation: {
+      '1': '很满意',
+      '2': '较为满意',
+      '3': '不满意',
+      '4': '很不满意'
+    }
+  }
 }
 
 const mutations = {
@@ -123,9 +175,22 @@ const actions = {
   }
 }
 
+const getters = {
+  dictFormOptions(state) {
+    return Object.keys(state.dictObj).reduce((listObj, dictName) => ({
+      ...listObj,
+      [dictName]: Object.keys(state.dictObj[dictName]).map(key => ({
+        id: key,
+        name: state.dictObj[dictName][key]
+      }))
+    }), {})
+  }
+}
+
 export default {
   namespaced: true,
   state,
   mutations,
-  actions
+  actions,
+  getters
 }

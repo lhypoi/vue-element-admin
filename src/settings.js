@@ -1,5 +1,5 @@
 module.exports = {
-  title: '甜菜严选',
+  title: '健康打卡',
 
   /**
    * @type {boolean} true | false

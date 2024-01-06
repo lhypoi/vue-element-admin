@@ -3,35 +3,65 @@ import Layout from '@/layout'
 
 const pageRouter = [
   {
-    path: '/shop-manage',
+    path: '/teacher-manage',
     component: Layout,
     children: [{
-      path: '/shop-manage',
-      component: () => import('@/pages/shop-manage/index'),
-      name: '商品管理',
-      meta: { title: '商品管理', icon: 'shop', affix: true }
+      path: '/teacher-manage',
+      component: () => import('@/pages/jkdk/teacher-manage'),
+      name: '老师管理',
+      meta: { title: '老师管理', icon: 'shop', affix: true }
     }]
   },
   {
-    path: '/order-manage',
+    path: '/agent-manage',
     component: Layout,
     children: [{
-      path: '/order-manage',
-      component: () => import('@/pages/order-manage/index'),
-      name: '订单管理',
-      meta: { title: '订单管理', icon: 'order', affix: true }
+      path: '/agent-manage',
+      component: () => import('@/pages/jkdk/agent-manage'),
+      name: '代理商管理',
+      meta: { title: '代理商管理', icon: 'promoter', affix: true }
     }]
   },
   {
-    path: '/points-manage',
+    path: '/course-manage',
     component: Layout,
     children: [{
-      path: '/points-manage',
-      component: () => import('@/pages/points-manage/index'),
-      name: '积分管理',
-      meta: { title: '积分管理', icon: 'promoter', affix: true }
+      path: '/course-manage',
+      component: () => import('@/pages/jkdk/course-manage'),
+      name: '课程管理',
+      meta: { title: '课程管理', icon: 'category', affix: true }
     }]
   }
+  // {
+  //   path: '/shop-manage',
+  //   component: Layout,
+  //   children: [{
+  //     path: '/shop-manage',
+  //     component: () => import('@/pages/shop-manage/index'),
+  //     name: '商品管理',
+  //     meta: { title: '商品管理', icon: 'shop', affix: true }
+  //   }]
+  // },
+  // {
+  //   path: '/order-manage',
+  //   component: Layout,
+  //   children: [{
+  //     path: '/order-manage',
+  //     component: () => import('@/pages/order-manage/index'),
+  //     name: '订单管理',
+  //     meta: { title: '订单管理', icon: 'order', affix: true }
+  //   }]
+  // },
+  // {
+  //   path: '/points-manage',
+  //   component: Layout,
+  //   children: [{
+  //     path: '/points-manage',
+  //     component: () => import('@/pages/points-manage/index'),
+  //     name: '积分管理',
+  //     meta: { title: '积分管理', icon: 'promoter', affix: true }
+  //   }]
+  // }
   // {
   //   path: '/category-manage',
   //   component: Layout,

@@ -24,7 +24,7 @@ module.exports = {
    * In most cases please use '/' !!!
    * Detail: https://cli.vuejs.org/config/#publicpath
    */
-  publicPath: '/points-mall-manage',
+  publicPath: '/health-record-manage',
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: process.env.NODE_ENV === 'development',
@@ -99,6 +99,14 @@ module.exports = {
         ws: true,
         pathRewrite: {
           [process.env.VUE_APP_BASE_API + '/uploadImg']: ''
+        }
+      },
+      [process.env.VUE_APP_BASE_API]: {
+        target: 'https://whale.api.ukshuxi.com',
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          [process.env.VUE_APP_BASE_API]: ''
         }
       }
     }

@@ -30,7 +30,7 @@ module.exports = [
     type: 'post',
     response: config => {
       const { username, password } = config.body
-      const token = password !== 'tcyx8888' ? '' : tokens[username]
+      const token = password !== 'jkdk8888' ? '' : tokens[username]
 
       // mock error
       if (!token) {
