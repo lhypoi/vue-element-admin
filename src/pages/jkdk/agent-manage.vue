@@ -15,7 +15,7 @@
         icon="el-icon-search"
         @click="handleFilter"
       >查询</el-button>
-      <el-button v-waves class="filter-item" style="float: right;" type="success" @click="handleShowTeacherModal">添加老师</el-button>
+      <!-- <el-button v-waves class="filter-item" style="float: right;" type="success" @click="handleShowTeacherModal">添加老师</el-button> -->
     </div>
     <el-table
       :key="tableKey"
@@ -49,7 +49,7 @@
           <!-- 操作列 -->
           <div v-else-if="col.key === 'operation'">
             <div style="display: flex; column-gap: 12px;">
-              <el-button type="primary" @click="handleShowTeacherModal(scope.row)">查看详情</el-button>
+              <!-- <el-button type="primary" @click="handleShowTeacherModal(scope.row)">查看详情</el-button> -->
               <el-button type="danger" @click="handleDele(scope.row)">删除</el-button>
             </div>
           </div>
@@ -126,13 +126,14 @@ export default {
         limit: 30,
         phoneNumber: ''
       },
-      list: null,
+      list: [],
       total: 0,
       tableColumns: [
         { label: '序号', key: 'index', width: 60, align: 'center' },
         { label: '手机号', key: 'phoneNumber' },
+        { label: '邀请人手机号', key: 'invitorPhoneNumber' },
         { label: '创建时间', key: 'createTime', width: 160, renderType: 'time' },
-        { label: '操作', key: 'operation', width: 240, fixed: 'right' }
+        { label: '操作', key: 'operation', width: 120, fixed: 'right' }
       ]
     }
   },
@@ -220,10 +221,10 @@ export default {
     },
     handleDele(row) {
       this.$confirm(
-        '此操作将删除老师【' + row.phoneNumber + '】, 是否继续?',
+        '此操作将删除代理商【' + row.phoneNumber + '】, 是否继续?',
         '提示'
       ).then(async() => {
-        const res = await jkdkApi.deleteTeacher({
+        const res = await jkdkApi.deleteAgent({
           phoneNumber: row.phoneNumber
         })
         if (res?.body === 1) {

@@ -126,7 +126,7 @@ export default {
         limit: 30,
         phoneNumber: ''
       },
-      list: null,
+      list: [],
       total: 0,
       tableColumns: [
         { label: '序号', key: 'index', width: 60, align: 'center' },

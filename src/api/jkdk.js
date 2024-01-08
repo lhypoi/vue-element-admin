@@ -50,9 +50,9 @@ export default {
       data: params
     })
   },
-  createCourse(params) {
+  insertCourse(params) {
     return request({
-      url: 'https://whale.api.ukshuxi.com/healthy/createCourse',
+      url: 'https://whale.api.ukshuxi.com/healthy/insertCourse',
       method: 'post',
       data: params
     })
@@ -69,6 +69,37 @@ export default {
       url: 'https://whale.api.ukshuxi.com/healthy/deleteByCourseIdAndPhone',
       method: 'post',
       data: params
+    })
+  },
+  deleteCourse(params) {
+    return request({
+      url: 'https://whale.api.ukshuxi.com/healthy/deleteCourse',
+      method: 'post',
+      data: params
+    })
+  },
+  exportCourseRecordList(params) {
+    return request({
+      url: 'https://whale.api.ukshuxi.com/healthy/exportCourseRecordList',
+      method: 'post',
+      data: params,
+      responseType: 'blob'
+    })
+  },
+  exportCourseRecordListByDate(params) {
+    return request({
+      url: 'https://whale.api.ukshuxi.com/healthy/exportCourseRecordListByDate',
+      method: 'post',
+      data: params,
+      responseType: 'blob'
+    })
+  },
+  exportUnRecordUserList(params) {
+    return request({
+      url: 'https://whale.api.ukshuxi.com/healthy/exportUnRecordUserList',
+      method: 'post',
+      data: params,
+      responseType: 'blob'
     })
   }
 }

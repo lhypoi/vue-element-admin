@@ -38,9 +38,9 @@
       <el-button v-waves class="filter-item" style="float: right;" type="success" @click="handleShowCourseModal">添加课程</el-button>
     </div>
     <el-table
-      :key="tableKey"
       v-loading="listLoading"
       :data="list"
+      row-key="courseId"
       border
       fit
       highlight-current-row
@@ -195,6 +195,9 @@
         </el-table>
       </div>
       <span slot="footer" class="dialog-footer">
+        <el-button type="success" @click="handleExportUnRecordUserList">导出今日未打卡学员</el-button>
+        <el-button type="success" @click="handleExportCourseRecordListByDate">导出今日打卡记录</el-button>
+        <el-button type="success" @click="handleExportCourseRecordList">导出全部打卡记录</el-button>
         <el-button @click="courseUserModalParams.show = false">关 闭</el-button>
       </span>
     </el-dialog>
@@ -206,6 +209,7 @@ import waves from '@/directive/waves' // waves directive
 import jkdkApi from '@/api/jkdk'
 import { parseTime } from '@/utils/index'
 import { mapState, mapGetters } from 'vuex'
+import { downloadByStream } from '@/utils'
 
 export default {
   name: 'CourseManage',
@@ -220,7 +224,7 @@ export default {
           { label: '序号', key: 'index', width: 60, align: 'center' },
           { label: '名称', key: 'userName' },
           { label: '手机号', key: 'phoneNumber', width: 160 },
-          { label: '操作', key: 'operation', width: 240, fixed: 'right' }
+          { label: '操作', key: 'operation', width: 120, fixed: 'right' }
         ],
         rows: []
       },
@@ -251,7 +255,7 @@ export default {
         status: undefined,
         time: []
       },
-      list: null,
+      list: [],
       total: 0,
       tableColumns: [
         { label: '序号', key: 'index', width: 60, align: 'center' },
@@ -356,7 +360,7 @@ export default {
           startTime: (formData.time || [])[0]?.getTime(),
           endTime: (formData.time || [])[1]?.getTime()
         }
-        const res = await jkdkApi.createCourse(params)
+        const res = await jkdkApi.insertCourse(params)
         if (res?.body === 1) {
           this.$message({
             type: 'success',
@@ -371,13 +375,12 @@ export default {
       this.courseModalParams.submitting = false
     },
     handleDele(row) {
-      if (row) return
       this.$confirm(
-        '此操作将删除老师【' + row.phoneNumber + '】, 是否继续?',
+        '此操作将删除课程【' + row.courseName + '】, 是否继续?',
         '提示'
       ).then(async() => {
-        const res = await jkdkApi.deleteTeacher({
-          phoneNumber: row.phoneNumber
+        const res = await jkdkApi.deleteCourse({
+          courseId: row.courseId
         })
         if (res?.body === 1) {
           this.$message({
@@ -423,6 +426,41 @@ export default {
           })
           this.handleShowCourseUserModal(this.courseUserModalParams.courseInfo)
         }
+      }).catch(err => { console.log(err) })
+    },
+    handleExportCourseRecordList() {
+      this.$confirm(
+        '此操作将导出【' + this.courseUserModalParams.courseInfo.courseName + '】全部打卡记录, 是否继续?',
+        '提示'
+      ).then(async() => {
+        const res = await jkdkApi.exportCourseRecordList({
+          courseId: this.courseUserModalParams.courseInfo.courseId
+        })
+        downloadByStream(res, '【' + this.courseUserModalParams.courseInfo.courseName + '】全部打卡记录.xlsx')
+      }).catch(err => { console.log(err) })
+    },
+    handleExportCourseRecordListByDate() {
+      this.$confirm(
+        '此操作将导出【' + this.courseUserModalParams.courseInfo.courseName + '】今日打卡记录, 是否继续?',
+        '提示'
+      ).then(async() => {
+        const res = await jkdkApi.exportCourseRecordListByDate({
+          courseId: this.courseUserModalParams.courseInfo.courseId,
+          queryDate: new Date(new Date().setHours(0, 0, 0, 0)).getTime()
+        })
+        downloadByStream(res, '【' + this.courseUserModalParams.courseInfo.courseName + '】今日打卡记录.xlsx')
+      }).catch(err => { console.log(err) })
+    },
+    handleExportUnRecordUserList() {
+      this.$confirm(
+        '此操作将导出【' + this.courseUserModalParams.courseInfo.courseName + '】今日未打卡学员, 是否继续?',
+        '提示'
+      ).then(async() => {
+        const res = await jkdkApi.exportUnRecordUserList({
+          courseId: this.courseUserModalParams.courseInfo.courseId,
+          queryDate: new Date(new Date().setHours(0, 0, 0, 0)).getTime()
+        })
+        downloadByStream(res, '【' + this.courseUserModalParams.courseInfo.courseName + '】今日未打卡学员.xlsx')
       }).catch(err => { console.log(err) })
     }
   }

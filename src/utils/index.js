@@ -1,6 +1,7 @@
 /**
  * Created by PanJiaChen on 16/11/18.
  */
+import { Message } from 'element-ui'
 
 /**
  * Parse the time to string
@@ -354,4 +355,17 @@ export function removeClass(ele, cls) {
     const reg = new RegExp('(\\s|^)' + cls + '(\\s|$)')
     ele.className = ele.className.replace(reg, ' ')
   }
+}
+
+export function downloadByStream(stream, fileName) {
+  Message({
+    type: 'success',
+    message: '文件下载中，请稍后点击保存...'
+  })
+  const url = window.URL.createObjectURL(new Blob([stream]))
+  const link = document.createElement('a')
+  link.href = url
+  link.setAttribute('download', fileName)
+  document.body.appendChild(link)
+  link.click()
 }

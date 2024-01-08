@@ -47,6 +47,9 @@ service.interceptors.response.use(
    * You can also judge the status by HTTP Status Code
    */
   response => {
+    if (response.config.url.includes('export')) {
+      return response.data
+    }
     const res = response.data
     res.header = res.header || {}
 
