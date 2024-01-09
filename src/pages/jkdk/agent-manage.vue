@@ -131,6 +131,7 @@ export default {
       tableColumns: [
         { label: '序号', key: 'index', width: 60, align: 'center' },
         { label: '手机号', key: 'phoneNumber' },
+        { label: '昵称', key: 'userName', width: 240 },
         { label: '邀请人手机号', key: 'invitorPhoneNumber' },
         { label: '创建时间', key: 'createTime', width: 160, renderType: 'time' },
         { label: '操作', key: 'operation', width: 120, fixed: 'right' }
