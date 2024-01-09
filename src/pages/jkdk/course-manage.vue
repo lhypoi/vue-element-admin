@@ -446,7 +446,7 @@ export default {
       ).then(async() => {
         const res = await jkdkApi.exportCourseRecordListByDate({
           courseId: this.courseUserModalParams.courseInfo.courseId,
-          queryDate: new Date(new Date().setHours(0, 0, 0, 0)).getTime()
+          queryDate: parseTime(new Date(new Date().setHours(0, 0, 0, 0)).getTime(), '{y}-{m}-{d}')
         })
         downloadByStream(res, '【' + this.courseUserModalParams.courseInfo.courseName + '】今日打卡记录.xlsx')
       }).catch(err => { console.log(err) })
@@ -458,7 +458,7 @@ export default {
       ).then(async() => {
         const res = await jkdkApi.exportUnRecordUserList({
           courseId: this.courseUserModalParams.courseInfo.courseId,
-          queryDate: new Date(new Date().setHours(0, 0, 0, 0)).getTime()
+          queryDate: parseTime(new Date(new Date().setHours(0, 0, 0, 0)).getTime(), '{y}-{m}-{d}')
         })
         downloadByStream(res, '【' + this.courseUserModalParams.courseInfo.courseName + '】今日未打卡学员.xlsx')
       }).catch(err => { console.log(err) })
