@@ -101,5 +101,12 @@ export default {
       data: params,
       responseType: 'blob'
     })
+  },
+  selectUserCourseRecordList(params) {
+    return request({
+      url: 'https://whale.api.ukshuxi.com/healthy/selectUserCourseRecordList',
+      method: 'post',
+      data: params
+    })
   }
 }
