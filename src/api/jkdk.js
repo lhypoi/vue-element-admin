@@ -3,84 +3,84 @@ import request from '@/utils/request'
 export default {
   getTeacherList(params) {
     return request({
-      url: 'https://whale.api.ukshuxi.com/healthy/getTeacherList',
+      url: '/healthy/getTeacherList',
       method: 'post',
       data: params
     })
   },
   getAgentList(params) {
     return request({
-      url: 'https://whale.api.ukshuxi.com/healthy/getAgentList',
+      url: '/healthy/getAgentList',
       method: 'post',
       data: params
     })
   },
   getAllCourseList(params) {
     return request({
-      url: 'https://whale.api.ukshuxi.com/healthy/getAllCourseList',
+      url: '/healthy/getAllCourseList',
       method: 'post',
       data: params
     })
   },
   updateTeacher(params) {
     return request({
-      url: 'https://whale.api.ukshuxi.com/healthy/updateTeacher',
+      url: '/healthy/updateTeacher',
       method: 'post',
       data: params
     })
   },
   deleteTeacher(params) {
     return request({
-      url: 'https://whale.api.ukshuxi.com/healthy/deleteTeacher',
+      url: '/healthy/deleteTeacher',
       method: 'post',
       data: params
     })
   },
   insertTeacher(params) {
     return request({
-      url: 'https://whale.api.ukshuxi.com/healthy/insertTeacher',
+      url: '/healthy/insertTeacher',
       method: 'post',
       data: params
     })
   },
   deleteAgent(params) {
     return request({
-      url: 'https://whale.api.ukshuxi.com/healthy/deleteAgent',
+      url: '/healthy/deleteAgent',
       method: 'post',
       data: params
     })
   },
   insertCourse(params) {
     return request({
-      url: 'https://whale.api.ukshuxi.com/healthy/insertCourse',
+      url: '/healthy/insertCourse',
       method: 'post',
       data: params
     })
   },
   selectCourseUserList(params) {
     return request({
-      url: 'https://whale.api.ukshuxi.com/healthy/selectCourseUserList',
+      url: '/healthy/selectCourseUserList',
       method: 'post',
       data: params
     })
   },
   deleteByCourseIdAndPhone(params) {
     return request({
-      url: 'https://whale.api.ukshuxi.com/healthy/deleteByCourseIdAndPhone',
+      url: '/healthy/deleteByCourseIdAndPhone',
       method: 'post',
       data: params
     })
   },
   deleteCourse(params) {
     return request({
-      url: 'https://whale.api.ukshuxi.com/healthy/deleteCourse',
+      url: '/healthy/deleteCourse',
       method: 'post',
       data: params
     })
   },
   exportCourseRecordList(params) {
     return request({
-      url: 'https://whale.api.ukshuxi.com/healthy/exportCourseRecordList',
+      url: '/healthy/exportCourseRecordList',
       method: 'post',
       data: params,
       responseType: 'blob'
@@ -88,7 +88,7 @@ export default {
   },
   exportCourseRecordListByDate(params) {
     return request({
-      url: 'https://whale.api.ukshuxi.com/healthy/exportCourseRecordListByDate',
+      url: '/healthy/exportCourseRecordListByDate',
       method: 'post',
       data: params,
       responseType: 'blob'
@@ -96,7 +96,7 @@ export default {
   },
   exportUnRecordUserList(params) {
     return request({
-      url: 'https://whale.api.ukshuxi.com/healthy/exportUnRecordUserList',
+      url: '/healthy/exportUnRecordUserList',
       method: 'post',
       data: params,
       responseType: 'blob'
@@ -104,7 +104,7 @@ export default {
   },
   selectUserCourseRecordList(params) {
     return request({
-      url: 'https://whale.api.ukshuxi.com/healthy/selectUserCourseRecordList',
+      url: '/healthy/selectUserCourseRecordList',
       method: 'post',
       data: params
     })

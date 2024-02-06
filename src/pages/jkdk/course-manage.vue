@@ -571,7 +571,7 @@ export default {
           ...row,
           imageList: (row.imageList && row.imageList.split(',').map(name => ({
             name: name,
-            url: `https://whale.api.ukshuxi.com/healthyImg/${name}`,
+            url: `${process.env.VUE_APP_BASE_API}/healthyImg/${name}`,
             uuid: name + Math.random()
           }))) || []
         }))

@@ -38,75 +38,13 @@ module.exports = {
     },
     before: require('./mock/mock-server.js'),
     proxy: {
-      [process.env.VUE_APP_BASE_API + '/wine']: {
-        target: 'http://120.25.231.168:8080/services/wine',
-        changeOrigin: true,
-        ws: true,
-        pathRewrite: {
-          [process.env.VUE_APP_BASE_API + '/wine']: ''
-        }
-      },
-      '/goodsImg': {
-        target: 'http://120.25.231.168:8080',
-        changeOrigin: true,
-        ws: true
-      },
-      '/goodsDetailTopImg': {
-        target: 'http://120.25.231.168:8080',
-        changeOrigin: true,
-        ws: true
-      },
-      '/goodsDetailImg': {
-        target: 'http://120.25.231.168:8080',
-        changeOrigin: true,
-        ws: true
-      },
-      [process.env.VUE_APP_BASE_API + '/promoter']: {
-        target: 'http://120.25.231.168:8080/services/promoter',
-        changeOrigin: true,
-        ws: true,
-        pathRewrite: {
-          [process.env.VUE_APP_BASE_API + '/promoter']: ''
-        }
-      },
-      [process.env.VUE_APP_BASE_API + '/code']: {
-        target: 'http://120.25.231.168:8080/services/code',
-        changeOrigin: true,
-        ws: true,
-        pathRewrite: {
-          [process.env.VUE_APP_BASE_API + '/code']: ''
-        }
-      },
-      [process.env.VUE_APP_BASE_API + '/uploadWine']: {
-        target: 'http://120.25.231.168:8080/services/uploadWine',
-        changeOrigin: true,
-        ws: true,
-        pathRewrite: {
-          [process.env.VUE_APP_BASE_API + '/uploadWine']: ''
-        }
-      },
-      [process.env.VUE_APP_BASE_API + '/uploadBrandInfo']: {
-        target: 'http://120.25.231.168:8080/services/uploadBrandInfo',
-        changeOrigin: true,
-        ws: true,
-        pathRewrite: {
-          [process.env.VUE_APP_BASE_API + '/uploadBrandInfo']: ''
-        }
-      },
-      [process.env.VUE_APP_BASE_API + '/uploadImg']: {
-        target: 'http://120.25.231.168:8080/services/uploadImg',
-        changeOrigin: true,
-        ws: true,
-        pathRewrite: {
-          [process.env.VUE_APP_BASE_API + '/uploadImg']: ''
-        }
-      },
-      [process.env.VUE_APP_BASE_API]: {
+      '/dev-api': {
         target: 'https://whale.api.ukshuxi.com',
         changeOrigin: true,
         ws: true,
+        logLevel: 'debug',
         pathRewrite: {
-          [process.env.VUE_APP_BASE_API]: ''
+          '^/dev-api': ''
         }
       }
     }
