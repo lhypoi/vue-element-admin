@@ -35,7 +35,7 @@
         icon="el-icon-search"
         @click="handleFilter"
       >查询</el-button>
-      <el-button v-waves class="filter-item" style="float: right;" type="success" @click="handleShowCourseModal">添加课程</el-button>
+      <el-button v-waves class="filter-item" style="float: right;" type="success" @click="handleShowCourseModal()">添加课程</el-button>
     </div>
     <el-table
       v-loading="listLoading"
@@ -83,6 +83,7 @@
           <!-- 操作列 -->
           <div v-else-if="col.key === 'operation'">
             <div style="display: flex; column-gap: 12px;">
+              <el-button v-if="scope.row.canEdit" type="success" @click="handleShowCourseModal(scope.row)">修改课程</el-button>
               <el-button type="primary" @click="handleShowCourseUserModal(scope.row)">查看学员</el-button>
               <el-button type="danger" @click="handleDele(scope.row)">删除</el-button>
             </div>
@@ -116,12 +117,12 @@
           <el-input v-model="courseModalParams.formData.courseName" size="small" placeholder="请输入" />
         </el-form-item>
         <el-form-item label="开放的导师：" prop="openUser">
-          <el-select v-model="courseModalParams.formData.openUser" multiple size="small" style="width: 100%;" filterable clearable placeholder="不选择则默认开放给所有导师">
+          <el-select v-model="courseModalParams.formData.openUser" :disabled="!!courseModalParams.formData.courseId" multiple size="small" style="width: 100%;" filterable clearable placeholder="不选择则默认开放给所有导师">
             <el-option v-for="item in dynamicFormOptions['openUser']" :key="item.id" :value="item.id" :label="item.name" />
           </el-select>
         </el-form-item>
         <el-form-item label="课程类型：" prop="type">
-          <el-select v-model="courseModalParams.formData.type" size="small" style="width: 100%;" filterable clearable placeholder="请选择">
+          <el-select v-model="courseModalParams.formData.type" :disabled="!!courseModalParams.formData.courseId" size="small" style="width: 100%;" filterable clearable placeholder="请选择">
             <el-option v-for="item in dictFormOptions['courseType']" :key="item.id" :value="item.id" :label="item.name" />
           </el-select>
         </el-form-item>
@@ -139,7 +140,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="courseModalParams.show = false">取 消</el-button>
-        <el-button type="primary" :loading="courseModalParams.submitting" @click="handleCourseModalSubmit">{{ '添 加' }}</el-button>
+        <el-button type="primary" :loading="courseModalParams.submitting" @click="handleCourseModalSubmit">{{ !!courseModalParams.formData.courseId ? '修 改' : '添 加' }}</el-button>
       </span>
     </el-dialog>
     <!-- 课程学员列表弹窗 -->
@@ -327,6 +328,7 @@ export default {
       courseModalParams: {
         show: false,
         formData: {
+          courseId: '',
           courseName: '',
           openUser: [],
           type: undefined,
@@ -362,7 +364,7 @@ export default {
         { label: '开始时间', key: 'startTime', width: 100, renderType: 'time', timeFormat: '{y}-{m}-{d}' },
         { label: '结束时间', key: 'endTime', width: 100, renderType: 'time', timeFormat: '{y}-{m}-{d}' },
         { label: '创建时间', key: 'createTime', width: 160, renderType: 'time' },
-        { label: '操作', key: 'operation', width: 240, fixed: 'right' }
+        { label: '操作', key: 'operation', width: 328, fixed: 'right' }
       ]
     }
   },
@@ -411,7 +413,12 @@ export default {
         }
         const res = await jkdkApi.getAllCourseList(param)
         const data = res.body
-        this.list = data.list
+        this.list = data.list.map(row => {
+          return {
+            canEdit: new Date(new Date().setHours(0, 0, 0, 0)).getTime() < parseInt(row.startTime),
+            ...row
+          }
+        })
         this.total = data.total
       } catch (error) {
         console.log(error)
@@ -422,15 +429,19 @@ export default {
       this.listQuery.page = 1
       this.getList()
     },
-    handleShowCourseModal() {
+    handleShowCourseModal(row) {
       this.courseModalParams = {
         ...this.courseModalParams,
         show: true,
         formData: {
-          courseName: '',
-          openUser: [],
-          type: undefined,
-          time: []
+          courseId: row?.courseId || '',
+          courseName: row?.courseName || '',
+          openUser: row?.openUser ? row.openUser.split(',') : undefined,
+          type: row?.type || undefined,
+          time: (row?.startTime && row?.endTime) ? [
+            new Date(new Date(parseInt(row?.startTime)).setHours(0, 0, 0, 0)),
+            new Date(new Date(parseInt(row?.endTime)).setHours(23, 59, 59, 999))
+          ] : []
         },
         submitting: false
       }
@@ -450,17 +461,18 @@ export default {
       try {
         const formData = this.courseModalParams.formData
         const params = {
-          courseName: formData.courseName,
-          openUser: (formData.openUser || []).join(','),
-          type: formData.type,
-          startTime: (formData.time || [])[0]?.getTime(),
-          endTime: (formData.time || [])[1]?.getTime()
+          courseId: formData.courseId || undefined,
+          courseName: formData.courseName || undefined,
+          openUser: (formData.openUser || []).join(',') || undefined,
+          type: formData.type || undefined,
+          startTime: (formData.time || [])[0] ? new Date(new Date(formData.time[0]).setHours(0, 0, 0, 0)).getTime() : undefined,
+          endTime: (formData.time || [])[1] ? new Date(new Date(formData.time[1]).setHours(23, 59, 59, 999)).getTime() : undefined
         }
-        const res = await jkdkApi.insertCourse(params)
+        const res = formData.courseId ? await jkdkApi.updateCourse(params) : await jkdkApi.insertCourse(params)
         if (res?.body === 1) {
           this.$message({
             type: 'success',
-            message: `${'添加'}成功!`
+            message: `${formData.courseId ? '修改' : '添加'}成功!`
           })
           this.courseModalParams.show = false
           this.handleFilter()

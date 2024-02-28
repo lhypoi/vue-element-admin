@@ -3,84 +3,84 @@ import request from '@/utils/request'
 export default {
   getTeacherList(params) {
     return request({
-      url: '/healthy/getTeacherList',
+      url: process.env.VUE_APP_BASE_API2 + '/healthy/getTeacherList',
       method: 'post',
       data: params
     })
   },
   getAgentList(params) {
     return request({
-      url: '/healthy/getAgentList',
+      url: process.env.VUE_APP_BASE_API2 + '/healthy/getAgentList',
       method: 'post',
       data: params
     })
   },
   getAllCourseList(params) {
     return request({
-      url: '/healthy/getAllCourseList',
+      url: process.env.VUE_APP_BASE_API2 + '/healthy/getAllCourseList',
       method: 'post',
       data: params
     })
   },
   updateTeacher(params) {
     return request({
-      url: '/healthy/updateTeacher',
+      url: process.env.VUE_APP_BASE_API2 + '/healthy/updateTeacher',
       method: 'post',
       data: params
     })
   },
   deleteTeacher(params) {
     return request({
-      url: '/healthy/deleteTeacher',
+      url: process.env.VUE_APP_BASE_API2 + '/healthy/deleteTeacher',
       method: 'post',
       data: params
     })
   },
   insertTeacher(params) {
     return request({
-      url: '/healthy/insertTeacher',
+      url: process.env.VUE_APP_BASE_API2 + '/healthy/insertTeacher',
       method: 'post',
       data: params
     })
   },
   deleteAgent(params) {
     return request({
-      url: '/healthy/deleteAgent',
+      url: process.env.VUE_APP_BASE_API2 + '/healthy/deleteAgent',
       method: 'post',
       data: params
     })
   },
   insertCourse(params) {
     return request({
-      url: '/healthy/insertCourse',
+      url: process.env.VUE_APP_BASE_API2 + '/healthy/insertCourse',
       method: 'post',
       data: params
     })
   },
   selectCourseUserList(params) {
     return request({
-      url: '/healthy/selectCourseUserList',
+      url: process.env.VUE_APP_BASE_API2 + '/healthy/selectCourseUserList',
       method: 'post',
       data: params
     })
   },
   deleteByCourseIdAndPhone(params) {
     return request({
-      url: '/healthy/deleteByCourseIdAndPhone',
+      url: process.env.VUE_APP_BASE_API2 + '/healthy/deleteByCourseIdAndPhone',
       method: 'post',
       data: params
     })
   },
   deleteCourse(params) {
     return request({
-      url: '/healthy/deleteCourse',
+      url: process.env.VUE_APP_BASE_API2 + '/healthy/deleteCourse',
       method: 'post',
       data: params
     })
   },
   exportCourseRecordList(params) {
     return request({
-      url: '/healthy/exportCourseRecordList',
+      url: process.env.VUE_APP_BASE_API2 + '/healthy/exportCourseRecordList',
       method: 'post',
       data: params,
       responseType: 'blob'
@@ -88,7 +88,7 @@ export default {
   },
   exportCourseRecordListByDate(params) {
     return request({
-      url: '/healthy/exportCourseRecordListByDate',
+      url: process.env.VUE_APP_BASE_API2 + '/healthy/exportCourseRecordListByDate',
       method: 'post',
       data: params,
       responseType: 'blob'
@@ -96,7 +96,7 @@ export default {
   },
   exportUnRecordUserList(params) {
     return request({
-      url: '/healthy/exportUnRecordUserList',
+      url: process.env.VUE_APP_BASE_API2 + '/healthy/exportUnRecordUserList',
       method: 'post',
       data: params,
       responseType: 'blob'
@@ -104,7 +104,14 @@ export default {
   },
   selectUserCourseRecordList(params) {
     return request({
-      url: '/healthy/selectUserCourseRecordList',
+      url: process.env.VUE_APP_BASE_API2 + '/healthy/selectUserCourseRecordList',
+      method: 'post',
+      data: params
+    })
+  },
+  updateCourse(params) {
+    return request({
+      url: process.env.VUE_APP_BASE_API2 + '/healthy/updateCourse',
       method: 'post',
       data: params
     })
