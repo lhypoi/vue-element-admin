@@ -82,8 +82,9 @@
           </div>
           <!-- 操作列 -->
           <div v-else-if="col.key === 'operation'">
-            <div style="display: flex; column-gap: 12px;">
+            <div style="display: flex;">
               <el-button v-if="scope.row.canEdit" type="success" @click="handleShowCourseModal(scope.row)">修改课程</el-button>
+              <el-button type="success" @click="handleShowPlaybillModal(scope.row)">分享</el-button>
               <el-button type="primary" @click="handleShowCourseUserModal(scope.row)">查看学员</el-button>
               <el-button type="danger" @click="handleDele(scope.row)">删除</el-button>
             </div>
@@ -283,6 +284,28 @@
         <el-button @click="userCourseRecordModalParams.show = false">关 闭</el-button>
       </span>
     </el-dialog>
+    <!-- 课程分享弹窗 -->
+    <el-dialog
+      v-if="playbillModalParams.show"
+      :visible="true"
+      width="600px"
+      title="生成二维码"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      @close="playbillModalParams.show = false"
+    >
+      <el-form ref="playbillModalForm" :model="playbillModalParams.formData" :rules="playbillModalParams.formRules" label-width="100px" label-position="left">
+        <el-form-item label="选择导师：" prop="openUser">
+          <el-select v-model="playbillModalParams.formData.openUser" size="small" style="width: 100%;" filterable clearable placeholder="选择导师">
+            <el-option v-for="item in dynamicFormOptions['openUser'].filter(row => !!row.userId)" :key="item.id" :value="item.id" :label="item.name" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="playbillModalParams.show = false">取 消</el-button>
+        <el-button type="primary" :loading="playbillModalParams.submitting" @click="handlePlaybillModalSubmit">{{ '生成' }}</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -341,6 +364,18 @@ export default {
         },
         submitting: false
       },
+      playbillModalParams: {
+        show: false,
+        formData: {
+          courseId: '',
+          courseName: '',
+          openUser: []
+        },
+        formRules: {
+          openUser: [{ required: true, message: '请选择' }]
+        },
+        submitting: false
+      },
       dynamicFormOptions: {
         openUser: []
       },
@@ -364,7 +399,7 @@ export default {
         { label: '开始时间', key: 'startTime', width: 100, renderType: 'time', timeFormat: '{y}-{m}-{d}' },
         { label: '结束时间', key: 'endTime', width: 100, renderType: 'time', timeFormat: '{y}-{m}-{d}' },
         { label: '创建时间', key: 'createTime', width: 160, renderType: 'time' },
-        { label: '操作', key: 'operation', width: 328, fixed: 'right' }
+        { label: '操作', key: 'operation', width: 380, fixed: 'right' }
       ]
     }
   },
@@ -386,7 +421,8 @@ export default {
         })
         this.dynamicFormOptions['openUser'] = teacherListRes.body.list.map(row => ({
           id: row.phoneNumber,
-          name: row.phoneNumber
+          name: row.phoneNumber,
+          userId: row.userId
         }))
       } catch (error) {
         console.log(error)
@@ -609,6 +645,46 @@ export default {
           this.handleShowCourseUserModal(this.courseUserModalParams.courseInfo)
         }
       }).catch(err => { console.log(err) })
+    },
+    handleShowPlaybillModal(row) {
+      this.playbillModalParams = {
+        ...this.playbillModalParams,
+        show: true,
+        formData: {
+          courseId: row?.courseId || '',
+          courseName: row?.courseName || '',
+          openUser: undefined
+        },
+        submitting: false
+      }
+    },
+    async handlePlaybillModalSubmit() {
+      let valid = false
+      try {
+        valid = await this.$refs.playbillModalForm.validate()
+      } catch (error) {
+        console.log(error)
+      }
+      if (!valid) {
+        this.$message.warning('请填完必填项')
+        return
+      }
+      this.playbillModalParams.submitting = true
+      try {
+        const formData = this.playbillModalParams.formData
+        const userObj = this.dynamicFormOptions['openUser'].find(item => item.id === formData.openUser)
+        const params = {
+          courseId: formData.courseId,
+          invitorId: userObj.userId
+        }
+        const res = await jkdkApi.getQrCode({
+          path: `/pages/healthRecord/home/home?invitorId=${params.invitorId}&courseId=${params.courseId}`
+        })
+        downloadByStream(res, `【${formData.courseName}】-${formData.openUser}.png`)
+      } catch (error) {
+        console.log(error)
+      }
+      this.playbillModalParams.submitting = false
     },
     handleExportCourseRecordList() {
       this.$confirm(

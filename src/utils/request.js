@@ -47,7 +47,7 @@ service.interceptors.response.use(
    * You can also judge the status by HTTP Status Code
    */
   response => {
-    if (response.config.url.includes('export')) {
+    if (response.config.url.includes('export') || response.config.url.includes('getQrCode')) {
       return response.data
     }
     const res = response.data
