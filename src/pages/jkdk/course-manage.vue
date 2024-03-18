@@ -297,7 +297,7 @@
       <el-form ref="playbillModalForm" :model="playbillModalParams.formData" :rules="playbillModalParams.formRules" label-width="100px" label-position="left">
         <el-form-item label="选择导师：" prop="openUser">
           <el-select v-model="playbillModalParams.formData.openUser" size="small" style="width: 100%;" filterable clearable placeholder="选择导师">
-            <el-option v-for="item in dynamicFormOptions['openUser']" :key="item.id" :value="item.id" :label="item.name" />
+            <el-option v-for="item in dynamicFormOptions['openUser'].filter(row => !!row.userId)" :key="item.id" :value="item.id" :label="item.name" />
           </el-select>
         </el-form-item>
       </el-form>
@@ -672,14 +672,13 @@ export default {
       this.playbillModalParams.submitting = true
       try {
         const formData = this.playbillModalParams.formData
-        const userId = this.dynamicFormOptions['openUser'].find(item => item.id === formData.openUser)
+        const userObj = this.dynamicFormOptions['openUser'].find(item => item.id === formData.openUser)
         const params = {
           courseId: formData.courseId,
-          invitorId: userId
+          invitorId: userObj.userId
         }
-        const res = await jkdkApi.exportCourseRecordListByDate({
-          courseId: params.courseId,
-          queryDate: parseTime(new Date(new Date().setHours(0, 0, 0, 0)).getTime(), '{y}-{m}-{d}')
+        const res = await jkdkApi.getQrCode({
+          path: `/pages/healthRecord/home/home?invitorId=${params.invitorId}&courseId=${params.courseId}`
         })
         downloadByStream(res, `【${formData.courseName}】-${formData.openUser}.png`)
       } catch (error) {

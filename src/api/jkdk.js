@@ -115,5 +115,13 @@ export default {
       method: 'post',
       data: params
     })
+  },
+  getQrCode(params) {
+    return request({
+      url: process.env.VUE_APP_BASE_API2 + '/healthy/getQrCode',
+      method: 'get',
+      params: params,
+      responseType: 'blob'
+    })
   }
 }
