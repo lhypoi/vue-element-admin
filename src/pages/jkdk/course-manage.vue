@@ -5,22 +5,27 @@
         v-model="listQuery.courseName"
         clearable
         placeholder="课程名搜索"
-        style="width: 200px;margin-right: 20px;"
+        style="width: 200px; margin-right: 20px"
         class="filter-item"
       />
       <el-select
         v-model="listQuery.status"
-        style="width: 200px;margin-right: 20px;"
+        style="width: 200px; margin-right: 20px"
         class="filter-item"
         clearable
         filterable
         placeholder="课程状态"
       >
-        <el-option v-for="item in dictFormOptions['courseStatus']" :key="item.id" :value="item.id" :label="item.name" />
+        <el-option
+          v-for="item in dictFormOptions['courseStatus']"
+          :key="item.id"
+          :value="item.id"
+          :label="item.name"
+        />
       </el-select>
       <el-date-picker
         v-model="listQuery.time"
-        style="width: 260px;margin-right: 20px;"
+        style="width: 260px; margin-right: 20px"
         class="filter-item"
         type="daterange"
         range-separator="至"
@@ -35,7 +40,13 @@
         icon="el-icon-search"
         @click="handleFilter"
       >查询</el-button>
-      <el-button v-waves class="filter-item" style="float: right;" type="success" @click="handleShowCourseModal()">添加课程</el-button>
+      <el-button
+        v-waves
+        class="filter-item"
+        style="float: right"
+        type="success"
+        @click="handleShowCourseModal()"
+      >添加课程</el-button>
     </div>
     <el-table
       v-loading="listLoading"
@@ -44,7 +55,7 @@
       border
       fit
       highlight-current-row
-      style="width: 100%;"
+      style="width: 100%"
     >
       <el-table-column
         v-for="col in tableColumns"
@@ -58,7 +69,9 @@
         <template slot-scope="scope">
           <!-- 模板列 -->
           <div v-if="col.key === 'index'">
-            <span>{{ scope.$index + 1 + ( listQuery.page - 1 ) * listQuery.limit }}</span>
+            <span>{{
+              scope.$index + 1 + (listQuery.page - 1) * listQuery.limit
+            }}</span>
           </div>
           <div v-else-if="col.renderType === 'dict'">
             <span>{{ dictObj[col.dictObjKey][scope.row[col.key]] }}</span>
@@ -71,7 +84,15 @@
             <div v-if="!scope.row[col.key]">
               <el-tag type="success">全部</el-tag>
             </div>
-            <div v-else style="display: flex; flex-direction: column; row-gap: 8px; align-items: center;">
+            <div
+              v-else
+              style="
+                display: flex;
+                flex-direction: column;
+                row-gap: 8px;
+                align-items: center;
+              "
+            >
               <el-tag
                 v-for="(tagName, index) in scope.row[col.key].split(',')"
                 :key="index"
@@ -82,11 +103,24 @@
           </div>
           <!-- 操作列 -->
           <div v-else-if="col.key === 'operation'">
-            <div style="display: flex;">
-              <el-button v-if="scope.row.canEdit" type="success" @click="handleShowCourseModal(scope.row)">修改课程</el-button>
-              <el-button type="success" @click="handleShowPlaybillModal(scope.row)">分享</el-button>
-              <el-button type="primary" @click="handleShowCourseUserModal(scope.row)">查看学员</el-button>
-              <el-button type="danger" @click="handleDele(scope.row)">删除</el-button>
+            <div style="display: flex">
+              <el-button
+                v-if="scope.row.canEdit"
+                type="success"
+                @click="handleShowCourseModal(scope.row)"
+              >修改课程</el-button>
+              <el-button
+                type="success"
+                @click="handleShowPlaybillModal(scope.row)"
+              >分享</el-button>
+              <el-button
+                type="primary"
+                @click="handleShowCourseUserModal(scope.row)"
+              >查看学员</el-button>
+              <el-button
+                type="danger"
+                @click="handleDele(scope.row)"
+              >删除</el-button>
             </div>
           </div>
           <span v-else>{{ scope.row[col.key] }}</span>
@@ -94,7 +128,7 @@
       </el-table-column>
     </el-table>
     <el-pagination
-      style="margin-top: 15px;;"
+      style="margin-top: 15px"
       :current-page="listQuery.page"
       :page-size="listQuery.limit"
       layout="total, sizes, prev, pager, next, jumper"
@@ -113,25 +147,62 @@
       :close-on-press-escape="false"
       @close="courseModalParams.show = false"
     >
-      <el-form ref="courseModalForm" :model="courseModalParams.formData" :rules="courseModalParams.formRules" label-width="100px" label-position="left">
+      <el-form
+        ref="courseModalForm"
+        :model="courseModalParams.formData"
+        :rules="courseModalParams.formRules"
+        label-width="100px"
+        label-position="left"
+      >
         <el-form-item label="课程名：" prop="courseName">
-          <el-input v-model="courseModalParams.formData.courseName" size="small" placeholder="请输入" />
+          <el-input
+            v-model="courseModalParams.formData.courseName"
+            size="small"
+            placeholder="请输入"
+          />
         </el-form-item>
         <el-form-item label="开放的导师：" prop="openUser">
-          <el-select v-model="courseModalParams.formData.openUser" :disabled="!!courseModalParams.formData.courseId" multiple size="small" style="width: 100%;" filterable clearable placeholder="不选择则默认开放给所有导师">
-            <el-option v-for="item in dynamicFormOptions['openUser']" :key="item.id" :value="item.id" :label="item.name" />
+          <el-select
+            v-model="courseModalParams.formData.openUser"
+            :disabled="!!courseModalParams.formData.courseId"
+            multiple
+            size="small"
+            style="width: 100%"
+            filterable
+            clearable
+            placeholder="不选择则默认开放给所有导师"
+          >
+            <el-option
+              v-for="item in dynamicFormOptions['openUser']"
+              :key="item.id"
+              :value="item.id"
+              :label="item.name"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="课程类型：" prop="type">
-          <el-select v-model="courseModalParams.formData.type" :disabled="!!courseModalParams.formData.courseId" size="small" style="width: 100%;" filterable clearable placeholder="请选择">
-            <el-option v-for="item in dictFormOptions['courseType']" :key="item.id" :value="item.id" :label="item.name" />
+          <el-select
+            v-model="courseModalParams.formData.type"
+            :disabled="!!courseModalParams.formData.courseId"
+            size="small"
+            style="width: 100%"
+            filterable
+            clearable
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in dictFormOptions['courseType']"
+              :key="item.id"
+              :value="item.id"
+              :label="item.name"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="课程时间：" prop="time">
           <el-date-picker
             v-model="courseModalParams.formData.time"
             type="daterange"
-            style="width: 100%;"
+            style="width: 100%"
             range-separator="至"
             start-placeholder="开始日期"
             end-placeholder="结束日期"
@@ -141,7 +212,13 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="courseModalParams.show = false">取 消</el-button>
-        <el-button type="primary" :loading="courseModalParams.submitting" @click="handleCourseModalSubmit">{{ !!courseModalParams.formData.courseId ? '修 改' : '添 加' }}</el-button>
+        <el-button
+          type="primary"
+          :loading="courseModalParams.submitting"
+          @click="handleCourseModalSubmit"
+        >{{
+          !!courseModalParams.formData.courseId ? "修 改" : "添 加"
+        }}</el-button>
       </span>
     </el-dialog>
     <!-- 课程学员列表弹窗 -->
@@ -160,7 +237,7 @@
             v-model="courseUserModalParams.formData.userName"
             clearable
             placeholder="学员名搜索"
-            style="width: 200px;margin-right: 20px;"
+            style="width: 200px; margin-right: 20px"
             class="filter-item"
           />
           <el-button
@@ -168,7 +245,12 @@
             class="filter-item"
             type="primary"
             icon="el-icon-search"
-            @click="handleShowCourseUserModal(courseUserModalParams.courseInfo, courseUserModalParams.formData)"
+            @click="
+              handleShowCourseUserModal(
+                courseUserModalParams.courseInfo,
+                courseUserModalParams.formData
+              )
+            "
           >查询</el-button>
         </div>
         <el-table
@@ -178,7 +260,7 @@
           border
           fit
           highlight-current-row
-          style="width: 100%;"
+          style="width: 100%"
         >
           <el-table-column
             v-for="col in courseUserModalParams.columns"
@@ -192,7 +274,9 @@
             <template slot-scope="scope">
               <!-- 模板列 -->
               <div v-if="col.key === 'index'">
-                <span>{{ scope.$index + 1 + ( listQuery.page - 1 ) * listQuery.limit }}</span>
+                <span>{{
+                  scope.$index + 1 + (listQuery.page - 1) * listQuery.limit
+                }}</span>
               </div>
               <div v-else-if="col.renderType === 'dict'">
                 <span>{{ dictObj[col.dictObjKey][scope.row[col.key]] }}</span>
@@ -203,9 +287,20 @@
               <!-- 定制列 -->
               <!-- 操作列 -->
               <div v-else-if="col.key === 'operation'">
-                <div style="display: flex; column-gap: 12px;">
-                  <el-button type="primary" @click="handleShowUserCourseRecordModal(courseUserModalParams.courseInfo, scope.row)">查看打卡</el-button>
-                  <el-button type="danger" @click="handleDeleUserByCourseIdAndPhone(scope.row)">删除</el-button>
+                <div style="display: flex; column-gap: 12px">
+                  <el-button
+                    type="primary"
+                    @click="
+                      handleShowUserCourseRecordModal(
+                        courseUserModalParams.courseInfo,
+                        scope.row
+                      )
+                    "
+                  >查看打卡</el-button>
+                  <el-button
+                    type="danger"
+                    @click="handleDeleUserByCourseIdAndPhone(scope.row)"
+                  >删除</el-button>
                 </div>
               </div>
               <span v-else>{{ scope.row[col.key] }}</span>
@@ -214,9 +309,18 @@
         </el-table>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button type="success" @click="handleExportUnRecordUserList">导出今日未打卡学员</el-button>
-        <el-button type="success" @click="handleExportCourseRecordListByDate">导出今日打卡记录</el-button>
-        <el-button type="success" @click="handleExportCourseRecordList">导出全部打卡记录</el-button>
+        <el-button
+          type="success"
+          @click="handleExportUnRecordUserList"
+        >导出今日未打卡学员</el-button>
+        <el-button
+          type="success"
+          @click="handleExportCourseRecordListByDate"
+        >导出今日打卡记录</el-button>
+        <el-button
+          type="success"
+          @click="handleExportCourseRecordList"
+        >导出全部打卡记录</el-button>
         <el-button @click="courseUserModalParams.show = false">关 闭</el-button>
       </span>
     </el-dialog>
@@ -238,7 +342,7 @@
           border
           fit
           highlight-current-row
-          style="width: 100%;"
+          style="width: 100%"
         >
           <el-table-column
             v-for="col in userCourseRecordModalParams.columns"
@@ -252,7 +356,9 @@
             <template slot-scope="scope">
               <!-- 模板列 -->
               <div v-if="col.key === 'index'">
-                <span>{{ scope.$index + 1 + ( listQuery.page - 1 ) * listQuery.limit }}</span>
+                <span>{{
+                  scope.$index + 1 + (listQuery.page - 1) * listQuery.limit
+                }}</span>
               </div>
               <div v-else-if="col.renderType === 'dict'">
                 <span>{{ dictObj[col.dictObjKey][scope.row[col.key]] }}</span>
@@ -261,14 +367,16 @@
                 {{ parseTime(scope.row[col.key], col.timeFormat) }}
               </div>
               <div v-else-if="col.renderType === 'suffix'">
-                <span>{{ scope.row[col.key] && scope.row[col.key] + col.suffixValue }}</span>
+                <span>{{
+                  scope.row[col.key] && scope.row[col.key] + col.suffixValue
+                }}</span>
               </div>
               <div v-else-if="col.renderType === 'image'">
                 <div v-if="scope.row[col.key] && scope.row[col.key].length">
                   <el-image
                     v-for="img in scope.row[col.key]"
                     :key="img.uuid"
-                    style="width: 100px; height: auto;"
+                    style="width: 100px; height: auto"
                     :src="img.url"
                     :preview-src-list="[img.url]"
                   />
@@ -281,7 +389,9 @@
         </el-table>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="userCourseRecordModalParams.show = false">关 闭</el-button>
+        <el-button
+          @click="userCourseRecordModalParams.show = false"
+        >关 闭</el-button>
       </span>
     </el-dialog>
     <!-- 课程分享弹窗 -->
@@ -294,16 +404,51 @@
       :close-on-press-escape="false"
       @close="playbillModalParams.show = false"
     >
-      <el-form ref="playbillModalForm" :model="playbillModalParams.formData" :rules="playbillModalParams.formRules" label-width="100px" label-position="left">
+      <el-form
+        ref="playbillModalForm"
+        v-loading="playbillModalParams.generateLoading"
+        :model="playbillModalParams.formData"
+        :rules="playbillModalParams.formRules"
+        label-width="100px"
+        label-position="right"
+      >
         <el-form-item label="选择导师：" prop="openUser">
-          <el-select v-model="playbillModalParams.formData.openUser" size="small" style="width: 100%;" filterable clearable placeholder="选择导师">
-            <el-option v-for="item in dynamicFormOptions['openUser'].filter(row => !!row.userId)" :key="item.id" :value="item.id" :label="item.name" />
+          <el-select
+            v-model="playbillModalParams.formData.openUser"
+            size="small"
+            style="width: 100%"
+            filterable
+            clearable
+            placeholder="选择导师"
+            @change="handlePlaybillModalOpenUserChange"
+          >
+            <el-option
+              v-for="item in dynamicFormOptions['openUser'].filter(
+                (row) => !!row.userId
+              )"
+              :key="item.id"
+              :value="item.id"
+              :label="item.name"
+            />
           </el-select>
+        </el-form-item>
+        <el-form-item label="预览：">
+          <el-image
+            v-if="playbillModalParams.previewImg"
+            style="width: 300px; height: auto"
+            :src="playbillModalParams.previewImg"
+            :preview-src-list="[playbillModalParams.previewImg]"
+          />
+          <div v-else style="color: #ccc">未选择导师</div>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="playbillModalParams.show = false">取 消</el-button>
-        <el-button type="primary" :loading="playbillModalParams.submitting" @click="handlePlaybillModalSubmit">{{ '生成' }}</el-button>
+        <el-button
+          type="primary"
+          :loading="playbillModalParams.submitting"
+          @click="handlePlaybillModalSubmit"
+        >{{ "下载" }}</el-button>
       </span>
     </el-dialog>
   </div>
@@ -343,7 +488,13 @@ export default {
         studentInfo: null,
         baseColumns: [
           { label: '序号', key: 'index', width: 60, align: 'center' },
-          { label: '打卡时间', key: 'recordDate', width: 100, renderType: 'time', timeFormat: '{y}-{m}-{d}' }
+          {
+            label: '打卡时间',
+            key: 'recordDate',
+            width: 100,
+            renderType: 'time',
+            timeFormat: '{y}-{m}-{d}'
+          }
         ],
         columns: [],
         rows: []
@@ -366,11 +517,14 @@ export default {
       },
       playbillModalParams: {
         show: false,
+        row: null,
         formData: {
           courseId: '',
           courseName: '',
           openUser: []
         },
+        previewImg: '',
+        generateLoading: false,
         formRules: {
           openUser: [{ required: true, message: '请选择' }]
         },
@@ -393,12 +547,41 @@ export default {
       tableColumns: [
         { label: '序号', key: 'index', width: 60, align: 'center' },
         { label: '课程名', key: 'courseName' },
-        { label: '类型', key: 'type', width: 100, renderType: 'dict', dictObjKey: 'courseType' },
-        { label: '状态', key: 'status', width: 100, renderType: 'dict', dictObjKey: 'courseStatus' },
+        {
+          label: '类型',
+          key: 'type',
+          width: 100,
+          renderType: 'dict',
+          dictObjKey: 'courseType'
+        },
+        {
+          label: '状态',
+          key: 'status',
+          width: 100,
+          renderType: 'dict',
+          dictObjKey: 'courseStatus'
+        },
         { label: '开放的导师', key: 'openUser', width: 140, align: 'center' },
-        { label: '开始时间', key: 'startTime', width: 100, renderType: 'time', timeFormat: '{y}-{m}-{d}' },
-        { label: '结束时间', key: 'endTime', width: 100, renderType: 'time', timeFormat: '{y}-{m}-{d}' },
-        { label: '创建时间', key: 'createTime', width: 160, renderType: 'time' },
+        {
+          label: '开始时间',
+          key: 'startTime',
+          width: 100,
+          renderType: 'time',
+          timeFormat: '{y}-{m}-{d}'
+        },
+        {
+          label: '结束时间',
+          key: 'endTime',
+          width: 100,
+          renderType: 'time',
+          timeFormat: '{y}-{m}-{d}'
+        },
+        {
+          label: '创建时间',
+          key: 'createTime',
+          width: 160,
+          renderType: 'time'
+        },
         { label: '操作', key: 'operation', width: 380, fixed: 'right' }
       ]
     }
@@ -419,11 +602,13 @@ export default {
           currentPage: 1,
           pageSize: 99999
         })
-        this.dynamicFormOptions['openUser'] = teacherListRes.body.list.map(row => ({
-          id: row.phoneNumber,
-          name: row.phoneNumber,
-          userId: row.userId
-        }))
+        this.dynamicFormOptions['openUser'] = teacherListRes.body.list.map(
+          (row) => ({
+            id: row.phoneNumber,
+            name: row.phoneNumber,
+            userId: row.userId
+          })
+        )
       } catch (error) {
         console.log(error)
       }
@@ -449,9 +634,11 @@ export default {
         }
         const res = await jkdkApi.getAllCourseList(param)
         const data = res.body
-        this.list = data.list.map(row => {
+        this.list = data.list.map((row) => {
           return {
-            canEdit: new Date(new Date().setHours(0, 0, 0, 0)).getTime() < parseInt(row.startTime),
+            canEdit:
+              new Date(new Date().setHours(0, 0, 0, 0)).getTime() <
+              parseInt(row.startTime),
             ...row
           }
         })
@@ -474,10 +661,17 @@ export default {
           courseName: row?.courseName || '',
           openUser: row?.openUser ? row.openUser.split(',') : undefined,
           type: row?.type || undefined,
-          time: (row?.startTime && row?.endTime) ? [
-            new Date(new Date(parseInt(row?.startTime)).setHours(0, 0, 0, 0)),
-            new Date(new Date(parseInt(row?.endTime)).setHours(23, 59, 59, 999))
-          ] : []
+          time:
+            row?.startTime && row?.endTime
+              ? [
+                new Date(
+                  new Date(parseInt(row?.startTime)).setHours(0, 0, 0, 0)
+                ),
+                new Date(
+                  new Date(parseInt(row?.endTime)).setHours(23, 59, 59, 999)
+                )
+              ]
+              : []
         },
         submitting: false
       }
@@ -501,10 +695,20 @@ export default {
           courseName: formData.courseName || undefined,
           openUser: (formData.openUser || []).join(',') || undefined,
           type: formData.type || undefined,
-          startTime: (formData.time || [])[0] ? new Date(new Date(formData.time[0]).setHours(0, 0, 0, 0)).getTime() : undefined,
-          endTime: (formData.time || [])[1] ? new Date(new Date(formData.time[1]).setHours(23, 59, 59, 999)).getTime() : undefined
+          startTime: (formData.time || [])[0]
+            ? new Date(
+              new Date(formData.time[0]).setHours(0, 0, 0, 0)
+            ).getTime()
+            : undefined,
+          endTime: (formData.time || [])[1]
+            ? new Date(
+              new Date(formData.time[1]).setHours(23, 59, 59, 999)
+            ).getTime()
+            : undefined
         }
-        const res = formData.courseId ? await jkdkApi.updateCourse(params) : await jkdkApi.insertCourse(params)
+        const res = formData.courseId
+          ? await jkdkApi.updateCourse(params)
+          : await jkdkApi.insertCourse(params)
         if (res?.body === 1) {
           this.$message({
             type: 'success',
@@ -522,18 +726,22 @@ export default {
       this.$confirm(
         '此操作将删除课程【' + row.courseName + '】, 是否继续?',
         '提示'
-      ).then(async() => {
-        const res = await jkdkApi.deleteCourse({
-          courseId: row.courseId
-        })
-        if (res?.body === 1) {
-          this.$message({
-            type: 'success',
-            message: '删除成功'
+      )
+        .then(async() => {
+          const res = await jkdkApi.deleteCourse({
+            courseId: row.courseId
           })
-          this.handleFilter()
-        }
-      }).catch(err => { console.log(err) })
+          if (res?.body === 1) {
+            this.$message({
+              type: 'success',
+              message: '删除成功'
+            })
+            this.handleFilter()
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     },
     async handleShowCourseUserModal(courseInfo, formData) {
       formData = formData || {
@@ -562,43 +770,176 @@ export default {
     async handleShowUserCourseRecordModal(courseInfo, studentInfo) {
       const columns = [
         ...this.userCourseRecordModalParams.baseColumns,
-        ...(courseInfo.type === '2' ? [
-          { label: '体重', key: 'weight', width: 100, renderType: 'suffix', suffixValue: '斤' },
-          { label: '体脂率', key: 'rate', width: 100, renderType: 'suffix', suffixValue: '%' },
-          { label: '腰围', key: 'waist', width: 100, renderType: 'suffix', suffixValue: 'cm' },
-          { label: '使用方案', key: 'plan', width: 100, renderType: 'dict', dictObjKey: 'plan' },
-          { label: '昨日早餐', key: 'morning', width: 160 },
-          { label: '昨日午餐', key: 'noon', width: 160 },
-          { label: '昨日晚餐', key: 'night', width: 160 },
-          { label: '昨日加餐', key: 'extra', width: 160 },
-          { label: '排便', key: 'shitTimes', width: 100, renderType: 'suffix', suffixValue: '次' },
-          { label: '饮水', key: 'drinkMeasure', width: 100, renderType: 'suffix', suffixValue: 'ml' },
-          { label: '分享与感受', key: 'selfComment', width: 200 },
-          { label: '导师课程评分', key: 'evaluation', width: 120, renderType: 'dict', dictObjKey: 'evaluation' },
-          { label: '点评', key: 'teacherComment', width: 200 }
-        ] : [
-          { label: '是否做过宫腔手术', key: 'isOperation', width: 140, renderType: 'dict', dictObjKey: 'boolean' },
-          { label: '手术时间', key: 'operationTime', width: 100, renderType: 'time', timeFormat: '{y}-{m}-{d}' },
-          { label: '是否生育', key: 'isBirth', width: 100, renderType: 'dict', dictObjKey: 'boolean' },
-          { label: '生育次数', key: 'birthTimes', width: 100, renderType: 'suffix', suffixValue: '次' },
-          { label: '是否流过产', key: 'isAbort', width: 100, renderType: 'dict', dictObjKey: 'boolean' },
-          { label: '流产次数', key: 'abortTimes', width: 100, renderType: 'suffix', suffixValue: '次' },
-          { label: '是否有性生活', key: 'isSex', width: 120, renderType: 'dict', dictObjKey: 'boolean' },
-          { label: '月经颜色', key: 'menstruationColor', width: 160 },
-          { label: '是否痛经', key: 'dysmenorrhea', width: 100, renderType: 'dict', dictObjKey: 'boolean' },
-          { label: '月经是否有血块', key: 'clot', width: 140, renderType: 'dict', dictObjKey: 'boolean' },
-          { label: '经期', key: 'menstruationTime', width: 100, renderType: 'time', timeFormat: '{y}-{m}-{d}' },
-          { label: '月经天数', key: 'menstruationDay', width: 160 },
-          { label: '月经量', key: 'menstruationMeasure', width: 160 },
-          { label: '是否使用清洁药物', key: 'isClean', width: 160, renderType: 'dict', dictObjKey: 'boolean' },
-          { label: '使用的时间', key: 'cleanTime', width: 100, renderType: 'time', timeFormat: '{y}-{m}-{d}' },
-          { label: '白带颜色', key: 'leucorrheaColor', width: 160 },
-          { label: '是否瘙痒', key: 'isItch', width: 100, renderType: 'dict', dictObjKey: 'boolean' },
-          { label: '多图上传', key: 'imageList', width: 360, renderType: 'image' },
-          { label: '使用反馈', key: 'selfComment', width: 200 },
-          { label: '导师课程评分', key: 'evaluation', width: 120, renderType: 'dict', dictObjKey: 'evaluation' },
-          { label: '点评', key: 'teacherComment', width: 200 }
-        ])
+        ...(courseInfo.type === '2'
+          ? [
+            {
+              label: '体重',
+              key: 'weight',
+              width: 100,
+              renderType: 'suffix',
+              suffixValue: '斤'
+            },
+            {
+              label: '体脂率',
+              key: 'rate',
+              width: 100,
+              renderType: 'suffix',
+              suffixValue: '%'
+            },
+            {
+              label: '腰围',
+              key: 'waist',
+              width: 100,
+              renderType: 'suffix',
+              suffixValue: 'cm'
+            },
+            {
+              label: '使用方案',
+              key: 'plan',
+              width: 100,
+              renderType: 'dict',
+              dictObjKey: 'plan'
+            },
+            { label: '昨日早餐', key: 'morning', width: 160 },
+            { label: '昨日午餐', key: 'noon', width: 160 },
+            { label: '昨日晚餐', key: 'night', width: 160 },
+            { label: '昨日加餐', key: 'extra', width: 160 },
+            {
+              label: '排便',
+              key: 'shitTimes',
+              width: 100,
+              renderType: 'suffix',
+              suffixValue: '次'
+            },
+            {
+              label: '饮水',
+              key: 'drinkMeasure',
+              width: 100,
+              renderType: 'suffix',
+              suffixValue: 'ml'
+            },
+            { label: '分享与感受', key: 'selfComment', width: 200 },
+            {
+              label: '导师课程评分',
+              key: 'evaluation',
+              width: 120,
+              renderType: 'dict',
+              dictObjKey: 'evaluation'
+            },
+            { label: '点评', key: 'teacherComment', width: 200 }
+          ]
+          : [
+            {
+              label: '是否做过宫腔手术',
+              key: 'isOperation',
+              width: 140,
+              renderType: 'dict',
+              dictObjKey: 'boolean'
+            },
+            {
+              label: '手术时间',
+              key: 'operationTime',
+              width: 100,
+              renderType: 'time',
+              timeFormat: '{y}-{m}-{d}'
+            },
+            {
+              label: '是否生育',
+              key: 'isBirth',
+              width: 100,
+              renderType: 'dict',
+              dictObjKey: 'boolean'
+            },
+            {
+              label: '生育次数',
+              key: 'birthTimes',
+              width: 100,
+              renderType: 'suffix',
+              suffixValue: '次'
+            },
+            {
+              label: '是否流过产',
+              key: 'isAbort',
+              width: 100,
+              renderType: 'dict',
+              dictObjKey: 'boolean'
+            },
+            {
+              label: '流产次数',
+              key: 'abortTimes',
+              width: 100,
+              renderType: 'suffix',
+              suffixValue: '次'
+            },
+            {
+              label: '是否有性生活',
+              key: 'isSex',
+              width: 120,
+              renderType: 'dict',
+              dictObjKey: 'boolean'
+            },
+            { label: '月经颜色', key: 'menstruationColor', width: 160 },
+            {
+              label: '是否痛经',
+              key: 'dysmenorrhea',
+              width: 100,
+              renderType: 'dict',
+              dictObjKey: 'boolean'
+            },
+            {
+              label: '月经是否有血块',
+              key: 'clot',
+              width: 140,
+              renderType: 'dict',
+              dictObjKey: 'boolean'
+            },
+            {
+              label: '经期',
+              key: 'menstruationTime',
+              width: 100,
+              renderType: 'time',
+              timeFormat: '{y}-{m}-{d}'
+            },
+            { label: '月经天数', key: 'menstruationDay', width: 160 },
+            { label: '月经量', key: 'menstruationMeasure', width: 160 },
+            {
+              label: '是否使用清洁药物',
+              key: 'isClean',
+              width: 160,
+              renderType: 'dict',
+              dictObjKey: 'boolean'
+            },
+            {
+              label: '使用的时间',
+              key: 'cleanTime',
+              width: 100,
+              renderType: 'time',
+              timeFormat: '{y}-{m}-{d}'
+            },
+            { label: '白带颜色', key: 'leucorrheaColor', width: 160 },
+            {
+              label: '是否瘙痒',
+              key: 'isItch',
+              width: 100,
+              renderType: 'dict',
+              dictObjKey: 'boolean'
+            },
+            {
+              label: '多图上传',
+              key: 'imageList',
+              width: 360,
+              renderType: 'image'
+            },
+            { label: '使用反馈', key: 'selfComment', width: 200 },
+            {
+              label: '导师课程评分',
+              key: 'evaluation',
+              width: 120,
+              renderType: 'dict',
+              dictObjKey: 'evaluation'
+            },
+            { label: '点评', key: 'teacherComment', width: 200 }
+          ])
       ]
       this.userCourseRecordModalParams = {
         ...this.userCourseRecordModalParams,
@@ -615,13 +956,16 @@ export default {
           phoneNumber: studentInfo.phoneNumber
         }
         const res = await jkdkApi.selectUserCourseRecordList(params)
-        this.userCourseRecordModalParams.rows = (res.body || []).map(row => ({
+        this.userCourseRecordModalParams.rows = (res.body || []).map((row) => ({
           ...row,
-          imageList: (row.imageList && row.imageList.split(',').map(name => ({
-            name: name,
-            url: `${process.env.VUE_APP_BASE_API}/healthyImg/${name}`,
-            uuid: name + Math.random()
-          }))) || []
+          imageList:
+            (row.imageList &&
+              row.imageList.split(',').map((name) => ({
+                name: name,
+                url: `${process.env.VUE_APP_BASE_API}/healthyImg/${name}`,
+                uuid: name + Math.random()
+              }))) ||
+            []
         }))
       } catch (error) {
         console.log(error)
@@ -630,32 +974,84 @@ export default {
     },
     handleDeleUserByCourseIdAndPhone(row) {
       this.$confirm(
-        '此操作将从课程【' + this.courseUserModalParams.courseInfo.courseName + '】中删除学员【' + row.userName + '】, 是否继续?',
+        '此操作将从课程【' +
+          this.courseUserModalParams.courseInfo.courseName +
+          '】中删除学员【' +
+          row.userName +
+          '】, 是否继续?',
         '提示'
-      ).then(async() => {
-        const res = await jkdkApi.deleteByCourseIdAndPhone({
-          phoneNumber: row.phoneNumber,
-          courseId: this.courseUserModalParams.courseInfo.courseId
-        })
-        if (res?.body === 1) {
-          this.$message({
-            type: 'success',
-            message: '删除成功'
+      )
+        .then(async() => {
+          const res = await jkdkApi.deleteByCourseIdAndPhone({
+            phoneNumber: row.phoneNumber,
+            courseId: this.courseUserModalParams.courseInfo.courseId
           })
-          this.handleShowCourseUserModal(this.courseUserModalParams.courseInfo)
-        }
-      }).catch(err => { console.log(err) })
+          if (res?.body === 1) {
+            this.$message({
+              type: 'success',
+              message: '删除成功'
+            })
+            this.handleShowCourseUserModal(
+              this.courseUserModalParams.courseInfo
+            )
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     },
     handleShowPlaybillModal(row) {
       this.playbillModalParams = {
         ...this.playbillModalParams,
+        row: row,
         show: true,
         formData: {
           courseId: row?.courseId || '',
           courseName: row?.courseName || '',
           openUser: undefined
         },
+        previewImg: '',
+        generateLoading: false,
         submitting: false
+      }
+    },
+    handlePlaybillModalOpenUserChange() {
+      const userObj = this.dynamicFormOptions['openUser'].find(
+        (item) => item.id === this.playbillModalParams.formData.openUser
+      )
+      if (userObj) {
+        this.playbillModalParams.generateLoading = true
+        const codeUrl = `${process.env.VUE_APP_BASE_API2}/healthy/getQrCode?path=/pages/healthRecord/home/home&invitorId=${userObj.userId}&courseId=${this.playbillModalParams.formData.courseId}`
+        console.log(codeUrl)
+        const canvas = document.createElement('canvas')
+        canvas.width = 400
+        canvas.height = 520
+        const ctx = canvas.getContext('2d')
+        ctx.fillStyle = '#def8fc'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        const qrCodeImg = new Image()
+        qrCodeImg.src = codeUrl
+        qrCodeImg.setAttribute('crossOrigin', 'Anonymous')
+        qrCodeImg.onload = () => {
+          const qrCodeWidth = 350
+          const qrCodeHeight = 350
+          const qrCodeX = (canvas.width - qrCodeWidth) / 2
+          const qrCodeY = 30
+          ctx.drawImage(qrCodeImg, qrCodeX, qrCodeY, qrCodeWidth, qrCodeHeight)
+          ctx.fillStyle = 'black'
+          ctx.font = '20px Arial'
+          ctx.textAlign = 'center'
+          ctx.fillText(`${this.playbillModalParams.formData.courseName}`, canvas.width / 2, qrCodeY + qrCodeHeight + 35)
+          ctx.fillText(`时间：${parseTime(this.playbillModalParams.row.startTime, '{y}.{m}.{d}')} - ${parseTime(this.playbillModalParams.row.startTime, '{y}.{m}.{d}')}`, canvas.width / 2, qrCodeY + qrCodeHeight + 65)
+          ctx.fillStyle = '#22c4cc'
+          ctx.font = '18px Arial'
+          ctx.fillText(`1. 长按识别太阳码  2. 登录加入减脂营`, canvas.width / 2, qrCodeY + qrCodeHeight + 110)
+          const imageStream = canvas.toDataURL('image/png')
+          this.playbillModalParams.previewImg = imageStream
+          this.playbillModalParams.generateLoading = false
+        }
+      } else {
+        this.playbillModalParams.previewImg = ''
       }
     },
     async handlePlaybillModalSubmit() {
@@ -672,15 +1068,35 @@ export default {
       this.playbillModalParams.submitting = true
       try {
         const formData = this.playbillModalParams.formData
-        const userObj = this.dynamicFormOptions['openUser'].find(item => item.id === formData.openUser)
-        const params = {
-          courseId: formData.courseId,
-          invitorId: userObj.userId
+        // const userObj = this.dynamicFormOptions['openUser'].find(
+        //   (item) => item.id === formData.openUser
+        // )
+        // const params = {
+        //   courseId: formData.courseId,
+        //   invitorId: userObj.userId
+        // }
+        // const res = await jkdkApi.getQrCode({
+        //   path: `/pages/healthRecord/home/home?invitorId=${params.invitorId}&courseId=${params.courseId}`
+        // })
+        const base64ToBlob = (base64) => {
+          const byteCharacters = atob(base64.split(',')[1])
+          const byteArrays = []
+          for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
+            const slice = byteCharacters.slice(offset, offset + 1024)
+            const byteNumbers = new Array(slice.length)
+            for (let i = 0; i < slice.length; i++) {
+              byteNumbers[i] = slice.charCodeAt(i)
+            }
+            const byteArray = new Uint8Array(byteNumbers)
+            byteArrays.push(byteArray)
+          }
+          return new Blob(byteArrays, { type: 'image/png' })
         }
-        const res = await jkdkApi.getQrCode({
-          path: `/pages/healthRecord/home/home?invitorId=${params.invitorId}&courseId=${params.courseId}`
-        })
-        downloadByStream(res, `【${formData.courseName}】-${formData.openUser}.png`)
+        const imageStream = base64ToBlob(this.playbillModalParams.previewImg)
+        downloadByStream(
+          imageStream,
+          `【${formData.courseName}】-${formData.openUser}.png`
+        )
       } catch (error) {
         console.log(error)
       }
@@ -688,42 +1104,80 @@ export default {
     },
     handleExportCourseRecordList() {
       this.$confirm(
-        '此操作将导出【' + this.courseUserModalParams.courseInfo.courseName + '】全部打卡记录, 是否继续?',
+        '此操作将导出【' +
+          this.courseUserModalParams.courseInfo.courseName +
+          '】全部打卡记录, 是否继续?',
         '提示'
-      ).then(async() => {
-        const res = await jkdkApi.exportCourseRecordList({
-          courseId: this.courseUserModalParams.courseInfo.courseId
+      )
+        .then(async() => {
+          const res = await jkdkApi.exportCourseRecordList({
+            courseId: this.courseUserModalParams.courseInfo.courseId
+          })
+          downloadByStream(
+            res,
+            '【' +
+              this.courseUserModalParams.courseInfo.courseName +
+              '】全部打卡记录.xlsx'
+          )
         })
-        downloadByStream(res, '【' + this.courseUserModalParams.courseInfo.courseName + '】全部打卡记录.xlsx')
-      }).catch(err => { console.log(err) })
+        .catch((err) => {
+          console.log(err)
+        })
     },
     handleExportCourseRecordListByDate() {
       this.$confirm(
-        '此操作将导出【' + this.courseUserModalParams.courseInfo.courseName + '】今日打卡记录, 是否继续?',
+        '此操作将导出【' +
+          this.courseUserModalParams.courseInfo.courseName +
+          '】今日打卡记录, 是否继续?',
         '提示'
-      ).then(async() => {
-        const res = await jkdkApi.exportCourseRecordListByDate({
-          courseId: this.courseUserModalParams.courseInfo.courseId,
-          queryDate: parseTime(new Date(new Date().setHours(0, 0, 0, 0)).getTime(), '{y}-{m}-{d}')
+      )
+        .then(async() => {
+          const res = await jkdkApi.exportCourseRecordListByDate({
+            courseId: this.courseUserModalParams.courseInfo.courseId,
+            queryDate: parseTime(
+              new Date(new Date().setHours(0, 0, 0, 0)).getTime(),
+              '{y}-{m}-{d}'
+            )
+          })
+          downloadByStream(
+            res,
+            '【' +
+              this.courseUserModalParams.courseInfo.courseName +
+              '】今日打卡记录.xlsx'
+          )
         })
-        downloadByStream(res, '【' + this.courseUserModalParams.courseInfo.courseName + '】今日打卡记录.xlsx')
-      }).catch(err => { console.log(err) })
+        .catch((err) => {
+          console.log(err)
+        })
     },
     handleExportUnRecordUserList() {
       this.$confirm(
-        '此操作将导出【' + this.courseUserModalParams.courseInfo.courseName + '】今日未打卡学员, 是否继续?',
+        '此操作将导出【' +
+          this.courseUserModalParams.courseInfo.courseName +
+          '】今日未打卡学员, 是否继续?',
         '提示'
-      ).then(async() => {
-        const res = await jkdkApi.exportUnRecordUserList({
-          courseId: this.courseUserModalParams.courseInfo.courseId,
-          queryDate: parseTime(new Date(new Date().setHours(0, 0, 0, 0)).getTime(), '{y}-{m}-{d}')
+      )
+        .then(async() => {
+          const res = await jkdkApi.exportUnRecordUserList({
+            courseId: this.courseUserModalParams.courseInfo.courseId,
+            queryDate: parseTime(
+              new Date(new Date().setHours(0, 0, 0, 0)).getTime(),
+              '{y}-{m}-{d}'
+            )
+          })
+          downloadByStream(
+            res,
+            '【' +
+              this.courseUserModalParams.courseInfo.courseName +
+              '】今日未打卡学员.xlsx'
+          )
         })
-        downloadByStream(res, '【' + this.courseUserModalParams.courseInfo.courseName + '】今日未打卡学员.xlsx')
-      }).catch(err => { console.log(err) })
+        .catch((err) => {
+          console.log(err)
+        })
     }
   }
 }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>
