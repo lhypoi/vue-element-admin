@@ -1045,7 +1045,7 @@ export default {
           ctx.fillText(`时间：${parseTime(this.playbillModalParams.row.startTime, '{y}.{m}.{d}')} - ${parseTime(this.playbillModalParams.row.startTime, '{y}.{m}.{d}')}`, canvas.width / 2, qrCodeY + qrCodeHeight + 65)
           ctx.fillStyle = '#22c4cc'
           ctx.font = '18px Arial'
-          ctx.fillText(`1. 长按识别太阳码  2. 登录加入减脂营`, canvas.width / 2, qrCodeY + qrCodeHeight + 110)
+          ctx.fillText(`长按识别太阳码即可加入`, canvas.width / 2, qrCodeY + qrCodeHeight + 110)
           const imageStream = canvas.toDataURL('image/png')
           this.playbillModalParams.previewImg = imageStream
           this.playbillModalParams.generateLoading = false
