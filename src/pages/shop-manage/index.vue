@@ -128,6 +128,11 @@
               </el-select>
             </el-form-item>
           </el-col>
+          <el-col :span="8">
+            <el-form-item label="商品短标题：" prop="title">
+              <el-input v-model="wineInfo.title" size="small" placeholder="输入商品短标题" />
+            </el-form-item>
+          </el-col>
         </el-row>
         <!-- <el-form-item v-if="wineInfo.areaType !== '99'" label="是否置顶：" prop="topOrder">
           <el-switch v-model="wineInfo.topOrder" active-value="1" inactive-value="0" />
@@ -197,6 +202,12 @@
           <!-- <img-input :img-list="wineInfo.wineImage" :multi="false" @change="list => wineInfo.wineImage = list" /> -->
           <img-input :img-list="wineInfo.wineImage" :multi="false" @change="list => wineInfo.wineImage = list" />
         </el-form-item>
+        <el-form-item label="上传外盒图：" prop="packageImage">
+          <img-input :img-list="wineInfo.packageImage" :multi="false" @change="list => wineInfo.packageImage = list" />
+        </el-form-item>
+        <el-form-item label="九宫格封面图：" prop="coverImage">
+          <img-input :img-list="wineInfo.coverImage" :multi="false" @change="list => wineInfo.coverImage = list" />
+        </el-form-item>
         <el-form-item label="详情页轮播图：" prop="detailTopImage">
           <img-input :img-list="wineInfo.detailTopImage" @change="list => wineInfo.detailTopImage = list" />
         </el-form-item>
@@ -220,7 +231,7 @@ import {
 import waves from '@/directive/waves' // waves directive
 import imgInput from '@/pages/common/imgInput'
 import { getCategoryList } from '@/api/category'
-import { deepClone, parseTime } from '@/utils/index'
+import { parseTime } from '@/utils/index'
 export default {
   name: 'ShopManage',
   components: { imgInput },
@@ -263,12 +274,15 @@ export default {
         areaType: '',
         catId: '',
         wineName: '',
+        title: '',
         wineTypeList: [
           { volume: null, price: null, stock: null, time: null, salePrice: null }
         ],
         commissionRate: 80,
         promoterRate: 80,
         wineImage: [],
+        packageImage: [],
+        coverImage: [],
         detailTopImage: [],
         detailImage: [],
         saleTime: []
@@ -290,6 +304,7 @@ export default {
       areaList: [],
       tableColumns: [
         { label: '商品名称', key: 'wineName', fixed: 'left' },
+        { label: '短名称', key: 'title' },
         { label: '所属板块', key: 'areaName' },
         { label: '商品分类', key: 'catName' },
         { label: '商品价格', key: 'price' },
@@ -391,6 +406,7 @@ export default {
         areaType: '',
         catId: '',
         wineName: '',
+        title: '',
         words: [],
         description: '',
         // topOrder: '0',
@@ -401,6 +417,8 @@ export default {
         promoterRate: 80,
         tags: [],
         wineImage: [],
+        packageImage: [],
+        coverImage: [],
         detailTopImage: [],
         detailImage: [],
         saleTime: []
@@ -419,6 +437,7 @@ export default {
           areaType: wine.areaType,
           catId: wine.catId,
           wineName: wine.wineName,
+          title: wine.title,
           words: wine.words,
           description: wine.description,
           // topOrder: wine.topOrder,
@@ -442,6 +461,16 @@ export default {
             url: `https://api.ukshuxi.com/goodsImg/${wine.wineId}.png`,
             response: [`${wine.wineId}.png`]
             // raw: await this.getFileFromSrc(`https://api.ukshuxi.com/goodsImg/${wine.wineId}.png`)
+          }],
+          packageImage: [{
+            url: `https://api.ukshuxi.com/packageImg/${wine.wineId}/${wine.packageImage}`,
+            response: [`${wine.packageImage}`]
+            // raw: await this.getFileFromSrc(`https://api.ukshuxi.com/goodsPackageImg/${wine.wineId}.png`)
+          }],
+          coverImage: [{
+            url: `https://api.ukshuxi.com/coverImg/${wine.wineId}/${wine.coverImage}`,
+            response: [`${wine.coverImage}`]
+            // raw: await this.getFileFromSrc(`https://api.ukshuxi.com/goodsCoverImg/${wine.wineId}/${wine.coverImage}.png`)
           }],
           detailTopImage: await Promise.all(wine.detailTopImage.map(async name => {
             return {
@@ -478,6 +507,7 @@ export default {
           if (this.curRowId) formData.append('wineId', this.curRowId)
           formData.append('areaType', this.wineInfo.areaType)
           formData.append('wineName', this.wineInfo.wineName)
+          formData.append('title', this.wineInfo.title)
           formData.append('catId', this.wineInfo.catId)
           formData.append('promoterRate', this.wineInfo.promoterRate)
           formData.append('commissionRate', this.wineInfo.commissionRate)
@@ -508,6 +538,8 @@ export default {
           formData.append('tags', this.wineInfo.tags.join(','))
           formData.append('wineImage', this.wineInfo.wineImage.map(item => item.response[0]).join(','))
           // formData.append('wineImage', this.wineInfo.wineImage.map(item => item.response[0])[0])
+          formData.append('packageImage', this.wineInfo.packageImage.map(item => item.response[0]).join(','))
+          formData.append('coverImage', this.wineInfo.coverImage.map(item => item.response[0]).join(','))
           formData.append('detailTopImage', this.wineInfo.detailTopImage.map(item => item.response[0]).join(','))
           formData.append('detailImage', this.wineInfo.detailImage.map(item => item.response[0]).join(','))
           const res = await uploadWine(formData)
@@ -521,6 +553,9 @@ export default {
             this.dialogVisible = false
             this.listQuery.page = 1
             this.getList()
+          } else {
+            this.updateSend = false
+            this.$message.error('操作失败')
           }
         } else {
           this.$message.warning('信息不完整')
@@ -580,7 +615,7 @@ export default {
               type: 'success',
               message: '上架成功!'
             })
-            row.isShow = '1'
+            this.$set(row, 'isShow', '1')
           }
         })
         .catch(err => { console.log(err) })
@@ -599,7 +634,7 @@ export default {
               type: 'success',
               message: '下架成功!'
             })
-            row.isShow = '0'
+            this.$set(row, 'isShow', '0')
           }
         })
         .catch(err => { console.log(err) })
