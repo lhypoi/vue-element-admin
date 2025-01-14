@@ -99,7 +99,7 @@
               ? 160
               : col.key === 'index'
                 ? 50
-                : 155
+                : 'auto'
         "
         :fixed="col.fixed"
       >
@@ -679,7 +679,7 @@ export default {
         ]
         columns.push({
           label: '操作',
-          fixed: 'right',
+          // fixed: 'right',
           key: 'operation'
         })
         columns[0].fixed = 'left'
