@@ -13,6 +13,16 @@ const pageRouter = [
     }]
   },
   {
+    path: '/refund-manage',
+    component: Layout,
+    children: [{
+      path: '/refund-manage',
+      component: () => import('@/pages/refund-manage/index'),
+      name: '退款管理',
+      meta: { title: '退款管理', icon: 'table', affix: true }
+    }]
+  },
+  {
     path: '/shop-manage',
     component: Layout,
     children: [{
@@ -81,7 +91,7 @@ const pageRouter = [
       name: '通知管理',
       meta: { title: '通知管理', icon: 'inform', affix: true }
     }]
-  },
+  }
   // {
   //   path: '/code-manage',
   //   component: Layout,

@@ -245,3 +245,31 @@ export function getExpressCompanyList(query) {
     }
   })
 }
+
+export function getOrderRefundManage(query) {
+  return request({
+    url: '/wine',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'getOrderRefundManage',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
+
+export function auditOrderRefund(query) {
+  return request({
+    url: '/wine',
+    method: 'post',
+    data: {
+      body: query,
+      header: {
+        serviceCode: 'auditOrderRefund',
+        reqTime: (new Date()).toISOString()
+      }
+    }
+  })
+}
